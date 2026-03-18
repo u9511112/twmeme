@@ -25,18 +25,24 @@ Future<void> main() async {
   );
 
   // ── Firebase FCM ─────────────────────────────────────────
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await FirebaseMessaging.instance.requestPermission(
-    alert: true, badge: true, sound: true,
-  );
-  await FirebaseMessaging.instance.subscribeToTopic('all');
+  // Guard: Firebase requires google-services.json (Android) / GoogleService-Info.plist (iOS).
+  // Without it the app still runs — FCM features are simply disabled.
+  try {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true, badge: true, sound: true,
+    );
+    await FirebaseMessaging.instance.subscribeToTopic('all');
 
-  // Listen for foreground notifications
-  FirebaseMessaging.onMessage.listen((msg) {
-    debugPrint('Foreground FCM: ${msg.notification?.title}');
-    // TODO: show in-app snackbar / banner
-  });
+    // Listen for foreground notifications
+    FirebaseMessaging.onMessage.listen((msg) {
+      debugPrint('Foreground FCM: ${msg.notification?.title}');
+      // TODO: show in-app snackbar / banner
+    });
+  } catch (e) {
+    debugPrint('Firebase init skipped (no config file): $e');
+  }
 
   // ── System UI ─────────────────────────────────────────────
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
