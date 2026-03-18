@@ -1,0 +1,65 @@
+name: Scrape Memes
+
+on:
+  schedule:
+    # Every 4 hours (UTC): 00:00, 04:00, 08:00, 12:00, 16:00, 20:00
+    - cron: '0 */4 * * *'
+  # Allow manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Platforms to scrape (space-separated)'
+        required: false
+        default: 'ptt dcard threads instagram'
+
+jobs:
+  scrape:
+    name: Scrape Memes
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: scraper/requirements.txt
+
+      - name: Install Python dependencies
+        working-directory: scraper
+        run: pip install -r requirements.txt
+
+      - name: Install Chromium for patchright/playwright
+        working-directory: scraper
+        run: |
+          python -m patchright install chromium || \
+          python -m playwright install chromium
+
+      - name: Install Chromium system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+            libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
+            libxfixes3 libxrandr2 libgbm1 libasound2
+
+      - name: Run scraper
+        working-directory: scraper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          PLATFORMS="${{ github.event.inputs.platforms || 'ptt dcard threads instagram' }}"
+          python main.py --platforms $PLATFORMS
+
+      - name: Upload scraper logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraper-logs-${{ github.run_id }}
+          path: scraper/*.log
+          if-no-files-found: ignore

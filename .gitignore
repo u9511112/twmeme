@@ -1,0 +1,43 @@
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Secrets
+scraper/.env
+scraper/proxies.txt
+
+# ── Flutter ──────────────────────────────────────────────────
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/.packages
+app/pubspec.lock
+app/android/.gradle/
+app/android/local.properties
+app/android/key.properties
+app/ios/Pods/
+app/ios/.symlinks/
+app/ios/Flutter/Generated.xcconfig
+app/ios/Flutter/flutter_export_environment.sh
+
+# Firebase config (add your own, do not commit)
+app/android/app/google-services.json
+app/ios/Runner/GoogleService-Info.plist
+
+# ── Node / Deno (Supabase CLI) ───────────────────────────────
+node_modules/
+.supabase/
+
+# ── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
