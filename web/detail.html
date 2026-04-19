@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>貓咪驚恐 — TWmeme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="貓咪驚恐迷因 — 4K 高畫質，一鍵複製到聊天室、下載原圖。">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="wordmark">迷因<em>搜</em></a>
+  <nav class="nav-links">
+    <a href="#">關於</a>
+    <a href="#">意見回饋</a>
+  </nav>
+</header>
+
+<div class="topbar">
+  <a href="results.html" class="back" aria-label="返回">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </a>
+  <form class="searchbox" onsubmit="event.preventDefault();">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" value="貓咪驚恐">
+    <button class="btn-search" type="submit" aria-label="搜尋">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </button>
+  </form>
+</div>
+
+<main class="detail">
+  <div class="image-pane t-sky">
+    😱
+    <span class="quality-badge">4K · 1920×1920</span>
+  </div>
+
+  <aside>
+    <h1>貓咪驚恐</h1>
+    <div class="meta-row">
+      <span>來源：PTT Gossiping</span>
+      <span>2024-11-03</span>
+    </div>
+    <div class="tags">
+      <span class="tag-sm">#貓</span>
+      <span class="tag-sm">#驚恐</span>
+      <span class="tag-sm">#經典</span>
+      <span class="tag-sm">#表情包</span>
+      <span class="tag-sm">#高畫質</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="toast('已複製到剪貼簿')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        複製到剪貼簿
+      </button>
+      <button class="btn btn-secondary" onclick="toast('已下載 cat-shocked-4k.png')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        下載原圖 (4K)
+      </button>
+      <button class="btn btn-secondary" onclick="toast('分享選單開啟')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+        分享到 LINE / Discord
+      </button>
+    </div>
+
+    <div class="ai-teaser">
+      <strong>🪄 AI 微調</strong>（即將上線）<br>
+      一鍵升解析度 · 改文字 · 去浮水印<br>
+      首張免費 · 起價 <span class="price">NT$1/credit</span>
+    </div>
+  </aside>
+</main>
+
+<footer class="site-footer">
+  © 2026 TWmeme · 台灣繁中迷因社群工具
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1500);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>搜尋結果 — TWmeme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="搜尋結果 — 台灣迷因搜尋 TWmeme。快速找到你要的迷因，一鍵複製分享。">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="wordmark">迷因<em>搜</em></a>
+  <nav class="nav-links">
+    <a href="#">關於</a>
+    <a href="#">意見回饋</a>
+  </nav>
+</header>
+
+<div class="topbar">
+  <a href="index.html" class="back" aria-label="返回">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </a>
+  <form class="searchbox" onsubmit="event.preventDefault(); doSearch();">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="q" type="text" value="貓咪驚恐">
+    <button class="btn-search" type="submit" aria-label="搜尋">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </button>
+  </form>
+  <div class="result-meta">找到 <strong id="count">42</strong> 張 · 按相關度</div>
+</div>
+
+<main>
+<section class="section">
+  <h1 class="sr-only">搜尋結果</h1>
+  <div class="masonry" id="grid"></div>
+</section>
+</main>
+
+<footer class="site-footer">
+  © 2026 TWmeme · 台灣繁中迷因社群工具
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Allowlist of known gradient classes. If future Supabase data includes
+  // a color-key, still only classes in this set are applied to className.
+  const ALLOWED_BGS = new Set([
+    't-coral','t-mustard','t-sage','t-sky','t-plum',
+    't-sand','t-mint','t-rose','t-steel',
+  ]);
+
+  // Mock data (Phase 1 will replace with Supabase query). Untrusted fields
+  // (name, bg, quality, emoji) are rendered via textContent / allowlist,
+  // never concatenated into innerHTML, so later DB-driven content is safe.
+  const memes = [
+    { bg:'t-sky',    emoji:'😱',     name:'貓咪驚恐 ver.1', quality:'4K', tall:true  },
+    { bg:'t-coral',  emoji:'🙀',     name:'嚇歪貓',         quality:'HD', tall:false },
+    { bg:'t-mustard',emoji:'😾',     name:'暴怒橘貓',       quality:'HD', tall:false },
+    { bg:'t-rose',   emoji:'🐱💦',   name:'冒冷汗貓',       quality:'HD', tall:true  },
+    { bg:'t-sage',   emoji:'🐈‍⬛😰', name:'黑貓受驚',       quality:'HD', tall:false },
+    { bg:'t-plum',   emoji:'😹',     name:'笑到流淚貓',     quality:'4K', tall:false },
+    { bg:'t-mint',   emoji:'🐾👀',   name:'偷看貓',         quality:'HD', tall:true  },
+    { bg:'t-sand',   emoji:'😼',     name:'得意貓',         quality:'HD', tall:false },
+    { bg:'t-steel',  emoji:'🧊🐱',   name:'結冰貓',         quality:'HD', tall:false },
+    { bg:'t-coral',  emoji:'🫣',     name:'遮臉貓',         quality:'HD', tall:true  },
+    { bg:'t-sky',    emoji:'🙄',     name:'翻白眼貓',       quality:'HD', tall:false },
+    { bg:'t-mustard',emoji:'🐱🔥',   name:'怒火貓',         quality:'4K', tall:false },
+    { bg:'t-sage',   emoji:'😿',     name:'哭泣貓',         quality:'HD', tall:false },
+    { bg:'t-plum',   emoji:'🤨',     name:'懷疑貓',         quality:'HD', tall:true  },
+    { bg:'t-rose',   emoji:'😺',     name:'邪笑貓',         quality:'HD', tall:false },
+    { bg:'t-mint',   emoji:'🥺',     name:'可憐貓',         quality:'HD', tall:false },
+  ];
+
+  const params = new URLSearchParams(location.search);
+  const q = params.get('q');
+  if (q) { document.getElementById('q').value = q; }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1500);
+  }
+
+  function renderCard(meme) {
+    const wrap = document.createElement('article');
+    wrap.className = 'card-wrap' + (meme.tall ? ' tall' : '');
+
+    const link = document.createElement('a');
+    link.className = 'card';
+    link.href = 'detail.html';
+    link.setAttribute('aria-label', meme.name + ' 迷因詳細');
+
+    const thumb = document.createElement('div');
+    const bgClass = ALLOWED_BGS.has(meme.bg) ? meme.bg : 't-sand';
+    thumb.className = 'thumb ' + bgClass;
+    thumb.textContent = meme.emoji;
+
+    const badge = document.createElement('span');
+    badge.className = 'quality-badge';
+    badge.textContent = meme.quality;
+    thumb.appendChild(badge);
+
+    const caption = document.createElement('div');
+    caption.className = 'caption';
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'name';
+    nameSpan.textContent = meme.name;
+    caption.appendChild(nameSpan);
+
+    link.appendChild(thumb);
+    link.appendChild(caption);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'copy-ghost';
+    copyBtn.textContent = '複製';
+    copyBtn.dataset.meme = meme.name;
+    copyBtn.addEventListener('click', () => {
+      showToast('已複製「' + meme.name + '」');
+    });
+
+    wrap.appendChild(link);
+    wrap.appendChild(copyBtn);
+    return wrap;
+  }
+
+  const grid = document.getElementById('grid');
+  const frag = document.createDocumentFragment();
+  memes.forEach(m => frag.appendChild(renderCard(m)));
+  grid.appendChild(frag);
+
+  function doSearch() {
+    const val = document.getElementById('q').value.trim();
+    if (val) location.href = 'results.html?q=' + encodeURIComponent(val);
+  }
+</script>
+</body>
+</html>
