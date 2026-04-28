@@ -74,8 +74,21 @@ function renderCard(meme, opts) {
   copyBtn.className = 'copy-ghost';
   copyBtn.textContent = '複製';
   copyBtn.dataset.meme = displayName;
-  copyBtn.addEventListener('click', () => {
-    showToast('已複製「' + displayName + '」');
+  copyBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = meme.cached_url || meme.media_url;
+    if (url) {
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('已複製「' + displayName + '」連結');
+      } catch (_) {
+        showToast('複製失敗、長按圖片用瀏覽器複製');
+      }
+    } else {
+      // mock entry without URL — keep old fake-toast behavior
+      showToast('已複製「' + displayName + '」');
+    }
     if (opts.onCopy) opts.onCopy(meme);
   });
 

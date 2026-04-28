@@ -51,6 +51,25 @@ async function getTrendingMemes(limit = 12) {
   }
 }
 
+async function getMemeById(id) {
+  const c = client();
+  if (!c) return null;
+  try {
+    const safe = String(id || '').trim();
+    if (!safe) return null;
+    const { data, error } = await c
+      .from('memes')
+      .select('id, title, cached_url, media_url, media_type, platform, source_url, width, height, like_count, share_count, comment_count, fetched_at')
+      .eq('id', safe)
+      .maybeSingle();
+    if (error) throw error;
+    return data || null;
+  } catch (e) {
+    console.warn('[supabase] getMemeById failed:', e);
+    return null;
+  }
+}
+
 async function searchMemes(query, limit = 40) {
   const c = client();
   if (!c) return null;
@@ -123,6 +142,6 @@ async function submitUnmetSearch(description) {
 
 window.TWmeme = window.TWmeme || {};
 window.TWmeme.supa = {
-  getTrendingMemes, searchMemes,
+  getTrendingMemes, searchMemes, getMemeById,
   logSearchQuery, logClick, submitUnmetSearch,
 };
