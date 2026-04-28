@@ -489,19 +489,22 @@ a { color: inherit; text-decoration: none; }
   outline: none;
   border-color: var(--primary);
 }
-.unmet-form button {
+.unmet-submit {
   font: inherit;
+  font-size: 15px;
   font-weight: 600;
   background: var(--primary);
   color: white;
   border: none;
   border-radius: var(--r-full);
-  padding: var(--s-sm) var(--s-lg);
+  padding: var(--s-sm) var(--s-xl);
+  min-height: 40px;
   cursor: pointer;
+  white-space: nowrap;
   transition: background var(--d-short), transform var(--d-short);
 }
-.unmet-form button:hover {
+.unmet-submit:hover {
   background: var(--primary-ink);
   transform: scale(1.03);
 }
-.unmet-form button:active { transform: scale(0.97); }
+.unmet-submit:active { transform: scale(0.97); }

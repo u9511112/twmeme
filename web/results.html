@@ -47,10 +47,10 @@
   <div id="unmet-form" class="unmet-form" hidden>
     <h2 class="unmet-title">沒找到「<span id="unmet-query"></span>」？</h2>
     <p class="unmet-sub">描述一下你想找的迷因、我們收集起來補上。</p>
-    <form id="unmet-form-el" onsubmit="event.preventDefault(); submitUnmet();">
+    <form id="unmet-form-el">
       <textarea id="unmet-text" rows="3" maxlength="280"
         placeholder="例：那張柴犬被雷打到的反應圖、或是 PTT 那個館長跪的梗"></textarea>
-      <button class="btn-search" type="submit">送出</button>
+      <button type="submit" class="unmet-submit">送出</button>
     </form>
   </div>
 
@@ -162,6 +162,13 @@
       window.TWmeme.render.showToast('送出失敗、稍候再試');
     }
   }
+
+  // Bind submit via JS to guarantee preventDefault (inline onsubmit lost the
+  // race in some browsers and the page navigated after writing to DB).
+  document.getElementById('unmet-form-el').addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitUnmet();
+  });
 
   function doSearch() {
     const val = document.getElementById('q').value.trim();
