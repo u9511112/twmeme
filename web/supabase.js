@@ -78,8 +78,9 @@ async function searchMemes(query, limit = 40) {
     if (!safe) return [];
     const { data, error } = await c
       .from('memes')
-      .select('id, title, cached_url, media_url, media_type, platform')
+      .select('id, title, cached_url, media_url, media_type, platform, trending_score')
       .ilike('title', '%' + safe + '%')
+      .order('trending_score', { ascending: false })
       .limit(limit);
     if (error) throw error;
     return data || [];
