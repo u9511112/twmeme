@@ -9,7 +9,7 @@
 // never goes blank if Supabase is paused / restoring / network blips.
 
 const SUPABASE_URL = 'https://yayqogregeqtggsijole.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.PLACEHOLDER_REPLACE_BEFORE_DEPLOY';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlheXFvZ3JlZ2VxdGdnc2lqb2xlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4OTkwNTIsImV4cCI6MjA4OTQ3NTA1Mn0.FNNi48oVw-YNyYTXxVpgBgsgq8lVLXFEUuIYRORVgvM';
 
 let _client = null;
 function client() {
