@@ -9,6 +9,7 @@ Flow:
 5. Insert stats history snapshot
 """
 
+import asyncio
 import logging
 import os
 import uuid
@@ -25,46 +26,107 @@ RECENT_HASH_LIMIT = 5000   # compare against this many recent hashes
 
 
 def get_client() -> Client:
-    url = os.environ["SUPABASE_URL"]
-    key = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
+    url = os.environ.get("SUPABASE_URL", "").strip()
+    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    missing = [n for n, v in (("SUPABASE_URL", url), ("SUPABASE_SERVICE_ROLE_KEY", key)) if not v]
+    if missing:
+        raise RuntimeError(
+            f"Missing required env var(s): {', '.join(missing)}. "
+            "Set them in scraper/.env locally, or as GitHub Actions repo secrets "
+            "(gh secret set SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)."
+        )
     return create_client(url, key)
 
 
 async def upload_media_to_storage(
-    client: Client, media_url: str, meme_id: str
+    client: Client, media_url: str, meme_id: str, retries: int = 3
 ) -> str | None:
     """
     Download media bytes → upload to Supabase Storage bucket 'memes'.
-    Returns the public URL or None on failure.
+    Returns the public URL or None on failure. Retries up to `retries` times.
     """
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                media_url, timeout=FETCH_TIMEOUT,
-                headers={"Referer": "https://www.google.com/"}
-            ) as r:
-                if r.status != 200:
-                    logger.warning(f"Media download {media_url}: HTTP {r.status}")
-                    return None
-                content_type = r.content_type or "image/jpeg"
-                data = await r.read()
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/122.0.0.0 Safari/537.36"
+        ),
+        "Referer": "https://www.google.com/",
+    }
 
-        # Derive extension from content-type
-        ext = content_type.split("/")[-1].split(";")[0].strip()
-        if ext not in ("jpeg", "jpg", "png", "gif", "webp", "mp4", "webm", "mov"):
-            ext = "jpg"
-        path = f"{meme_id}.{ext}"
+    for attempt in range(1, retries + 1):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    media_url, timeout=FETCH_TIMEOUT, headers=headers
+                ) as r:
+                    if r.status != 200:
+                        logger.warning(
+                            f"Media download {media_url}: HTTP {r.status} "
+                            f"(attempt {attempt}/{retries})"
+                        )
+                        if attempt < retries:
+                            await asyncio.sleep(2 * attempt)
+                            continue
+                        return None
+                    content_type = r.content_type or "image/jpeg"
+                    data = await r.read()
 
-        client.storage.from_("memes").upload(
-            path, data, {"content-type": content_type, "upsert": "false"}
-        )
-        public_url = client.storage.from_("memes").get_public_url(path)
-        logger.debug(f"Uploaded to storage: {public_url}")
-        return public_url
+            # Derive extension from content-type
+            ext = content_type.split("/")[-1].split(";")[0].strip()
+            if ext not in ("jpeg", "jpg", "png", "gif", "webp", "mp4", "webm", "mov"):
+                ext = "jpg"
+            path = f"{meme_id}.{ext}"
 
-    except Exception as e:
-        logger.warning(f"Storage upload failed for {media_url}: {e}")
-        return None
+            client.storage.from_("memes").upload(
+                path, data, {"content-type": content_type, "upsert": "true"}
+            )
+            public_url = client.storage.from_("memes").get_public_url(path)
+            logger.debug(f"Uploaded to storage: {public_url}")
+            return public_url
+
+        except Exception as e:
+            logger.warning(
+                f"Storage upload failed for {media_url}: {e} "
+                f"(attempt {attempt}/{retries})"
+            )
+            if attempt < retries:
+                await asyncio.sleep(2 * attempt)
+
+    return None
+
+
+async def backfill_missing_cache(client: Client) -> int:
+    """Re-download and upload media for all memes with NULL cached_url."""
+    rows = (
+        client.table("memes")
+        .select("id,media_url")
+        .is_("cached_url", "null")
+        .execute()
+    )
+    fixed = 0
+    total = len(rows.data)
+    logger.info(f"Backfill: {total} memes with NULL cached_url")
+
+    for i, row in enumerate(rows.data, 1):
+        meme_id   = row["id"]
+        media_url = row["media_url"]
+        logger.info(f"Backfill [{i}/{total}] {media_url[:60]}")
+
+        cached_url = await upload_media_to_storage(client, media_url, meme_id)
+        if cached_url:
+            client.table("memes").update(
+                {"cached_url": cached_url}
+            ).eq("id", meme_id).execute()
+            fixed += 1
+            logger.info(f"  → cached: {cached_url[:60]}")
+        else:
+            logger.warning(f"  → FAILED to cache {meme_id}")
+
+        await asyncio.sleep(0.5)
+
+    logger.info(f"Backfill complete: {fixed}/{total} fixed")
+    return fixed
 
 
 async def insert_meme(client: Client, item: dict, phash: str) -> str | None:

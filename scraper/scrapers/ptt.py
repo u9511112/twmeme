@@ -19,7 +19,7 @@ from .base import BaseScraper
 logger = logging.getLogger(__name__)
 
 PTT_BASE    = "https://www.ptt.cc"
-PTT_BOARDS  = ["Memes", "funny", "joke", "StupidClown"]
+PTT_BOARDS  = ["Beauty", "Memes", "funny", "joke", "StupidClown", "C_Chat"]
 
 # Image/video URL patterns found in PTT posts
 IMG_PATTERN  = re.compile(r"\.(jpg|jpeg|png|gif|webp)$", re.I)
@@ -28,6 +28,10 @@ IMGUR_GIFV   = re.compile(r"https?://i\.imgur\.com/\S+\.gifv", re.I)
 
 
 class PTTScraper(BaseScraper):
+    def __init__(self, pages_per_board: int = 3):
+        super().__init__()
+        self.pages_per_board = pages_per_board
+
     async def scrape(self) -> list[dict]:
         results: list[dict] = []
         headers = {
@@ -43,22 +47,44 @@ class PTTScraper(BaseScraper):
             for board in PTT_BOARDS:
                 url = f"{PTT_BASE}/bbs/{board}/index.html"
                 try:
-                    items = await self._scrape_board(session, url, board)
+                    items = await self._scrape_board_pages(session, url, board)
                     results.extend(items)
-                    logger.info(f"PTT/{board}: {len(items)} items")
+                    logger.info(f"PTT/{board}: {len(items)} items from {self.pages_per_board} pages")
                 except Exception as e:
                     logger.error(f"PTT/{board} failed: {e}")
                 await asyncio.sleep(random.uniform(1.0, 2.5))
         return results
 
-    async def _scrape_board(
+    async def _scrape_board_pages(
         self, session: aiohttp.ClientSession, url: str, board: str
     ) -> list[dict]:
+        """Scrape multiple pages of a board."""
+        all_items: list[dict] = []
+        current_url = url
+        for page in range(self.pages_per_board):
+            items, prev_url = await self._scrape_board(session, current_url, board)
+            all_items.extend(items)
+            if not prev_url:
+                break
+            current_url = prev_url
+            await asyncio.sleep(random.uniform(0.5, 1.5))
+        return all_items
+
+    async def _scrape_board(
+        self, session: aiohttp.ClientSession, url: str, board: str
+    ) -> tuple[list[dict], str | None]:
         async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as r:
             html = await r.text()
 
         soup = BeautifulSoup(html, "html.parser")
         items: list[dict] = []
+
+        # Find "previous page" link
+        prev_url: str | None = None
+        for btn in soup.select(".btn-group-paging a"):
+            if "上頁" in btn.text:
+                prev_url = PTT_BASE + btn["href"]
+                break
 
         for row in soup.select(".r-ent"):
             title_el = row.select_one(".title a")
@@ -94,7 +120,7 @@ class PTTScraper(BaseScraper):
 
             await asyncio.sleep(random.uniform(0.3, 0.8))
 
-        return items
+        return items, prev_url
 
     async def _extract_media(
         self, session: aiohttp.ClientSession, url: str
@@ -106,20 +132,36 @@ class PTTScraper(BaseScraper):
         media: list[dict] = []
         seen:  set[str]   = set()
 
-        for a in soup.select(".content a[href]"):
-            href = a["href"].strip()
-            if href in seen:
-                continue
-            seen.add(href)
+        # Method 1: <a href> links in content
+        content_el = soup.select_one("#main-content")
+        if content_el:
+            for a in content_el.select("a[href]"):
+                href = a["href"].strip()
+                if href in seen:
+                    continue
+                seen.add(href)
+                self._classify_url(href, media)
 
-            if IMG_PATTERN.search(href):
-                mtype = "gif" if href.lower().endswith(".gif") else "image"
-                media.append({"url": href, "type": mtype})
-            elif VID_PATTERN.search(href):
-                media.append({"url": href, "type": "video"})
-            elif IMGUR_GIFV.match(href):
-                # .gifv → convert to .mp4 for direct playback
-                mp4_url = href.replace(".gifv", ".mp4")
-                media.append({"url": mp4_url, "type": "video"})
+            # Method 2: plain-text URLs in content (PTT often has bare URLs)
+            content_text = content_el.get_text()
+            for match in re.finditer(
+                r'https?://[^\s<>"\']+\.(?:jpg|jpeg|png|gif|webp|mp4|webm|mov|gifv)',
+                content_text, re.I
+            ):
+                href = match.group(0).rstrip(".,;)")
+                if href in seen:
+                    continue
+                seen.add(href)
+                self._classify_url(href, media)
 
         return media
+
+    def _classify_url(self, href: str, media: list[dict]) -> None:
+        if IMG_PATTERN.search(href):
+            mtype = "gif" if href.lower().endswith(".gif") else "image"
+            media.append({"url": href, "type": mtype})
+        elif VID_PATTERN.search(href):
+            media.append({"url": href, "type": "video"})
+        elif IMGUR_GIFV.match(href):
+            mp4_url = href.replace(".gifv", ".mp4")
+            media.append({"url": mp4_url, "type": "video"})
