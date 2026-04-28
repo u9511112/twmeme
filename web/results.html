@@ -30,17 +30,30 @@
   </a>
   <form class="searchbox" onsubmit="event.preventDefault(); doSearch();">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-    <input id="q" type="text" value="貓咪驚恐">
+    <input id="q" type="text" value="">
     <button class="btn-search" type="submit" aria-label="搜尋">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
     </button>
   </form>
-  <div class="result-meta">找到 <strong id="count">42</strong> 張 · 按相關度</div>
+  <div class="result-meta">找到 <strong id="count">—</strong> 張 · 按相關度</div>
 </div>
 
 <main>
 <section class="section">
   <h1 class="sr-only">搜尋結果</h1>
+
+  <!-- Zero-result fallback form: shown when no memes match the query.
+       Inline above the (empty) grid so users don't have to scroll. -->
+  <div id="unmet-form" class="unmet-form" hidden>
+    <h2 class="unmet-title">沒找到「<span id="unmet-query"></span>」？</h2>
+    <p class="unmet-sub">描述一下你想找的迷因、我們收集起來補上。</p>
+    <form id="unmet-form-el" onsubmit="event.preventDefault(); submitUnmet();">
+      <textarea id="unmet-text" rows="3" maxlength="280"
+        placeholder="例：那張柴犬被雷打到的反應圖、或是 PTT 那個館長跪的梗"></textarea>
+      <button class="btn-search" type="submit">送出</button>
+    </form>
+  </div>
+
   <div class="masonry" id="grid"></div>
 </section>
 </main>
@@ -51,99 +64,111 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
-  // Allowlist of known gradient classes. If future Supabase data includes
-  // a color-key, still only classes in this set are applied to className.
-  const ALLOWED_BGS = new Set([
-    't-coral','t-mustard','t-sage','t-sky','t-plum',
-    't-sand','t-mint','t-rose','t-steel',
-  ]);
+<!-- supabase-js v2 (anon key in supabase.js is public-safe by RLS) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="render.js"></script>
 
-  // Mock data (Phase 1 will replace with Supabase query). Untrusted fields
-  // (name, bg, quality, emoji) are rendered via textContent / allowlist,
-  // never concatenated into innerHTML, so later DB-driven content is safe.
-  const memes = [
-    { bg:'t-sky',    emoji:'😱',     name:'貓咪驚恐 ver.1', quality:'4K', tall:true  },
-    { bg:'t-coral',  emoji:'🙀',     name:'嚇歪貓',         quality:'HD', tall:false },
-    { bg:'t-mustard',emoji:'😾',     name:'暴怒橘貓',       quality:'HD', tall:false },
-    { bg:'t-rose',   emoji:'🐱💦',   name:'冒冷汗貓',       quality:'HD', tall:true  },
-    { bg:'t-sage',   emoji:'🐈‍⬛😰', name:'黑貓受驚',       quality:'HD', tall:false },
-    { bg:'t-plum',   emoji:'😹',     name:'笑到流淚貓',     quality:'4K', tall:false },
-    { bg:'t-mint',   emoji:'🐾👀',   name:'偷看貓',         quality:'HD', tall:true  },
-    { bg:'t-sand',   emoji:'😼',     name:'得意貓',         quality:'HD', tall:false },
-    { bg:'t-steel',  emoji:'🧊🐱',   name:'結冰貓',         quality:'HD', tall:false },
-    { bg:'t-coral',  emoji:'🫣',     name:'遮臉貓',         quality:'HD', tall:true  },
-    { bg:'t-sky',    emoji:'🙄',     name:'翻白眼貓',       quality:'HD', tall:false },
-    { bg:'t-mustard',emoji:'🐱🔥',   name:'怒火貓',         quality:'4K', tall:false },
-    { bg:'t-sage',   emoji:'😿',     name:'哭泣貓',         quality:'HD', tall:false },
-    { bg:'t-plum',   emoji:'🤨',     name:'懷疑貓',         quality:'HD', tall:true  },
-    { bg:'t-rose',   emoji:'😺',     name:'邪笑貓',         quality:'HD', tall:false },
-    { bg:'t-mint',   emoji:'🥺',     name:'可憐貓',         quality:'HD', tall:false },
+<script>
+  // Mock fallback if Supabase is paused / unreachable. Site never goes blank.
+  // Same shape as Supabase rows (title + emoji thumb).
+  const MOCK_RESULTS = [
+    { title:'貓咪驚恐',     emoji:'😱',     bg:'t-sky',    quality:'4K', tall:true  },
+    { title:'嚇歪貓',       emoji:'🙀',     bg:'t-coral',  quality:'HD' },
+    { title:'暴怒橘貓',     emoji:'😾',     bg:'t-mustard',quality:'HD' },
+    { title:'冒冷汗貓',     emoji:'🐱💦',   bg:'t-rose',   quality:'HD', tall:true  },
+    { title:'黑貓受驚',     emoji:'🐈‍⬛😰', bg:'t-sage',   quality:'HD' },
+    { title:'笑到流淚貓',   emoji:'😹',     bg:'t-plum',   quality:'4K' },
+    { title:'偷看貓',       emoji:'🐾👀',   bg:'t-mint',   quality:'HD', tall:true  },
+    { title:'得意貓',       emoji:'😼',     bg:'t-sand',   quality:'HD' },
+    { title:'結冰貓',       emoji:'🧊🐱',   bg:'t-steel',  quality:'HD' },
+    { title:'遮臉貓',       emoji:'🫣',     bg:'t-coral',  quality:'HD', tall:true  },
+    { title:'翻白眼貓',     emoji:'🙄',     bg:'t-sky',    quality:'HD' },
+    { title:'怒火貓',       emoji:'🐱🔥',   bg:'t-mustard',quality:'4K' },
   ];
 
   const params = new URLSearchParams(location.search);
-  const q = params.get('q');
-  if (q) { document.getElementById('q').value = q; }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 1500);
-  }
-
-  function renderCard(meme) {
-    const wrap = document.createElement('article');
-    wrap.className = 'card-wrap' + (meme.tall ? ' tall' : '');
-
-    const link = document.createElement('a');
-    link.className = 'card';
-    link.href = 'detail.html';
-    link.setAttribute('aria-label', meme.name + ' 迷因詳細');
-
-    const thumb = document.createElement('div');
-    const bgClass = ALLOWED_BGS.has(meme.bg) ? meme.bg : 't-sand';
-    thumb.className = 'thumb ' + bgClass;
-    thumb.textContent = meme.emoji;
-
-    const badge = document.createElement('span');
-    badge.className = 'quality-badge';
-    badge.textContent = meme.quality;
-    thumb.appendChild(badge);
-
-    const caption = document.createElement('div');
-    caption.className = 'caption';
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'name';
-    nameSpan.textContent = meme.name;
-    caption.appendChild(nameSpan);
-
-    link.appendChild(thumb);
-    link.appendChild(caption);
-
-    const copyBtn = document.createElement('button');
-    copyBtn.type = 'button';
-    copyBtn.className = 'copy-ghost';
-    copyBtn.textContent = '複製';
-    copyBtn.dataset.meme = meme.name;
-    copyBtn.addEventListener('click', () => {
-      showToast('已複製「' + meme.name + '」');
-    });
-
-    wrap.appendChild(link);
-    wrap.appendChild(copyBtn);
-    return wrap;
-  }
+  const q = (params.get('q') || '').trim();
+  document.getElementById('q').value = q;
 
   const grid = document.getElementById('grid');
-  const frag = document.createDocumentFragment();
-  memes.forEach(m => frag.appendChild(renderCard(m)));
-  grid.appendChild(frag);
+  const countEl = document.getElementById('count');
+  const unmetForm = document.getElementById('unmet-form');
+  const unmetQuerySpan = document.getElementById('unmet-query');
+
+  async function loadResults() {
+    if (!q) {
+      // direct hit on results.html with no query → show mock as discovery
+      countEl.textContent = MOCK_RESULTS.length;
+      window.TWmeme.render.renderGrid(grid, MOCK_RESULTS, {
+        onCopy: (m) => {/* mock copy, no log */},
+      });
+      return;
+    }
+
+    let memes = await window.TWmeme.supa.searchMemes(q);
+
+    // null = fetch failed; [] = success but zero results
+    let usingFallback = false;
+    if (memes === null) {
+      memes = MOCK_RESULTS;
+      usingFallback = true;
+    }
+
+    countEl.textContent = memes.length;
+
+    if (memes.length === 0) {
+      // Zero result: show the unmet-search form, log query had_result=false
+      unmetQuerySpan.textContent = q;
+      unmetForm.hidden = false;
+      window.TWmeme.supa.logSearchQuery({
+        queryText: q, hadResult: false, resultCount: 0,
+      });
+      return;
+    }
+
+    window.TWmeme.render.renderGrid(grid, memes, {
+      onCopy: (m) => {
+        // copy click is implicit click signal; record it
+        const idx = memes.indexOf(m);
+        window.TWmeme.supa.logClick(q, idx);
+      },
+    });
+
+    // Don't log for the mock fallback — those queries didn't actually
+    // hit our index, treating them as had_result=true would lie.
+    if (!usingFallback) {
+      window.TWmeme.supa.logSearchQuery({
+        queryText: q, hadResult: true, resultCount: memes.length,
+      });
+    }
+  }
+
+  async function submitUnmet() {
+    const ta = document.getElementById('unmet-text');
+    const desc = ta.value.trim();
+    if (desc.length < 2) {
+      window.TWmeme.render.showToast('多寫幾個字比較好找');
+      return;
+    }
+    const r = await window.TWmeme.supa.submitUnmetSearch(desc);
+    if (r.ok) {
+      ta.value = '';
+      unmetForm.hidden = true;
+      window.TWmeme.render.showToast('收到、晚點補上');
+    } else if (r.reason === 'throttled') {
+      window.TWmeme.render.showToast('剛剛已收到、不用再送一次');
+    } else {
+      window.TWmeme.render.showToast('送出失敗、稍候再試');
+    }
+  }
 
   function doSearch() {
     const val = document.getElementById('q').value.trim();
     if (val) location.href = 'results.html?q=' + encodeURIComponent(val);
   }
+
+  loadResults();
 </script>
 </body>
 </html>

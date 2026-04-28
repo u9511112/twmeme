@@ -56,74 +56,10 @@
 <section class="section">
   <div class="section-head">
     <h2>最近爆紅 🔥</h2>
-    <a class="more" href="#">看全部 →</a>
+    <a class="more" href="results.html">看全部 →</a>
   </div>
 
-  <div class="broken-grid">
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="我的刀盾 迷因詳細">
-        <div class="thumb t-coral">🛡️⚔️<span class="quality-badge">HD</span></div>
-        <div class="caption"><span class="name">我的刀盾</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="我的刀盾">複製</button>
-    </article>
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="貓咪驚恐 迷因詳細">
-        <div class="thumb t-sky">😱<span class="quality-badge">4K</span></div>
-        <div class="caption"><span class="name">貓咪驚恐</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="貓咪驚恐">複製</button>
-    </article>
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="黑人問號 迷因詳細">
-        <div class="thumb t-mustard">🤔❓<span class="quality-badge">HD</span></div>
-        <div class="caption"><span class="name">黑人問號</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="黑人問號">複製</button>
-    </article>
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="週一憂鬱柴柴 迷因詳細">
-        <div class="thumb t-sage">🐕😮‍💨<span class="quality-badge">HD</span></div>
-        <div class="caption"><span class="name">週一憂鬱柴柴</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="週一憂鬱柴柴">複製</button>
-    </article>
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="誠實豆沙包 迷因詳細">
-        <div class="thumb t-rose">🫘🥟<span class="quality-badge">原圖</span></div>
-        <div class="caption"><span class="name">誠實豆沙包</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="誠實豆沙包">複製</button>
-    </article>
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="奧客貓 迷因詳細">
-        <div class="thumb t-plum">🐈‍⬛😠<span class="quality-badge">HD</span></div>
-        <div class="caption"><span class="name">奧客貓</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="奧客貓">複製</button>
-    </article>
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="哭著也要畫完 迷因詳細">
-        <div class="thumb t-mint">😭🎨<span class="quality-badge">4K</span></div>
-        <div class="caption"><span class="name">哭著也要畫完</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="哭著也要畫完">複製</button>
-    </article>
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="小丑竟是我自己 迷因詳細">
-        <div class="thumb t-sand">🤡🎪<span class="quality-badge">HD</span></div>
-        <div class="caption"><span class="name">小丑竟是我自己</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="小丑竟是我自己">複製</button>
-    </article>
-    <article class="card-wrap">
-      <a class="card" href="detail.html" aria-label="上班中請勿打擾 迷因詳細">
-        <div class="thumb t-steel">🥱💤<span class="quality-badge">HD</span></div>
-        <div class="caption"><span class="name">上班中請勿打擾</span></div>
-      </a>
-      <button type="button" class="copy-ghost" data-meme="上班中請勿打擾">複製</button>
-    </article>
-  </div>
+  <div class="broken-grid" id="trending-grid"></div>
 </section>
 </main>
 
@@ -133,7 +69,25 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- supabase-js v2 (anon key in supabase.js is public-safe by RLS) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="render.js"></script>
+
 <script>
+  // Mock fallback (same shape as Supabase rows). Used when DB is paused.
+  const MOCK_TRENDING = [
+    { title:'我的刀盾',         emoji:'🛡️⚔️',  bg:'t-coral',  quality:'HD' },
+    { title:'貓咪驚恐',         emoji:'😱',     bg:'t-sky',    quality:'4K' },
+    { title:'黑人問號',         emoji:'🤔❓',   bg:'t-mustard',quality:'HD' },
+    { title:'週一憂鬱柴柴',     emoji:'🐕😮‍💨',  bg:'t-sage',   quality:'HD' },
+    { title:'誠實豆沙包',       emoji:'🫘🥟',   bg:'t-rose',   quality:'原圖' },
+    { title:'奧客貓',           emoji:'🐈‍⬛😠',  bg:'t-plum',   quality:'HD' },
+    { title:'哭著也要畫完',     emoji:'😭🎨',   bg:'t-mint',   quality:'4K' },
+    { title:'小丑竟是我自己',   emoji:'🤡🎪',   bg:'t-sand',   quality:'HD' },
+    { title:'上班中請勿打擾',   emoji:'🥱💤',   bg:'t-steel',  quality:'HD' },
+  ];
+
   function pick(word) {
     document.getElementById('q').value = word;
     goResults();
@@ -143,14 +97,15 @@
     if (!q) return;
     location.href = 'results.html?q=' + encodeURIComponent(q);
   }
-  document.querySelectorAll('.copy-ghost').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const t = document.getElementById('toast');
-      t.textContent = '已複製「' + (btn.dataset.meme || '迷因') + '」';
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 1500);
-    });
-  });
+
+  async function loadTrending() {
+    const grid = document.getElementById('trending-grid');
+    let memes = await window.TWmeme.supa.getTrendingMemes(12);
+    if (!memes || memes.length === 0) memes = MOCK_TRENDING;
+    window.TWmeme.render.renderGrid(grid, memes);
+  }
+
+  loadTrending();
 </script>
 </body>
 </html>
