@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TWmeme — 找到那張你記得但搜不到的迷因</title>
-<meta name="description" content="台灣繁中迷因搜尋。早期版本，目前 83 張、以 PTT 表特板為主。搜不到的告訴我們、會補上。">
+<meta name="description" content="台灣繁中迷因搜尋。早期版本，以 PTT 表特板為主。搜不到的告訴我們、會補上。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="TWmeme — 找到那張你記得但搜不到的迷因">
-<meta property="og:description" content="早期版本、目前 83 張，以 PTT 表特板為主。搜不到的告訴我們、會補上。">
+<meta property="og:description" content="早期版本、以 PTT 表特板為主。搜不到的告訴我們、會補上。">
 <meta property="og:url" content="https://twmeme.vercel.app/">
 <meta property="og:site_name" content="TWmeme">
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="TWmeme — 找到那張你記得但搜不到的迷因">
-<meta name="twitter:description" content="早期版本、目前 83 張，以 PTT 表特板為主。搜不到的告訴我們、會補上。">
+<meta name="twitter:description" content="早期版本、以 PTT 表特板為主。搜不到的告訴我們、會補上。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
 <main>
 <section class="hero">
   <h1>找到那張你記得<br>但搜不到的迷因</h1>
-  <p class="sub">早期版本、目前 83 張、以 PTT 表特板為主。搜不到的告訴我們、會補上。</p>
+  <p class="sub" id="hero-sub">早期版本、以 PTT 表特板為主。搜不到的告訴我們、會補上。</p>
 
   <form class="searchbox" onsubmit="event.preventDefault(); goResults();">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -79,7 +79,17 @@
     // DB unreachable / empty: leave grid blank, no fake content.
   }
 
+  async function loadHeroCount() {
+    const sub = document.getElementById('hero-sub');
+    const n = await window.TWmeme.supa.getMemeCount();
+    if (typeof n === 'number' && n > 0) {
+      sub.textContent = `早期版本、目前 ${n.toLocaleString('en')} 張、以 PTT 表特板為主。搜不到的告訴我們、會補上。`;
+    }
+    // null (DB unreachable): keep generic copy, no number.
+  }
+
   loadTrending();
+  loadHeroCount();
 </script>
 </body>
 </html>

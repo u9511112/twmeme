@@ -51,6 +51,21 @@ async function getTrendingMemes(limit = 12) {
   }
 }
 
+async function getMemeCount() {
+  const c = client();
+  if (!c) return null;
+  try {
+    const { count, error } = await c
+      .from('memes')
+      .select('id', { count: 'exact', head: true });
+    if (error) throw error;
+    return typeof count === 'number' ? count : null;
+  } catch (e) {
+    console.warn('[supabase] getMemeCount failed:', e);
+    return null;
+  }
+}
+
 async function getMemeById(id) {
   const c = client();
   if (!c) return null;
@@ -143,6 +158,6 @@ async function submitUnmetSearch(description) {
 
 window.TWmeme = window.TWmeme || {};
 window.TWmeme.supa = {
-  getTrendingMemes, searchMemes, getMemeById,
+  getTrendingMemes, searchMemes, getMemeById, getMemeCount,
   logSearchQuery, logClick, submitUnmetSearch,
 };

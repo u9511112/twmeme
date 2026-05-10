@@ -1,24 +1,28 @@
-# MemeMaster TW — Setup Guide
+# TWmeme — Setup Guide
 
 ## Prerequisites
+
 - Python 3.12+
-- Flutter 3.19+
-- Supabase account (free tier works)
-- Firebase project (for FCM push)
-- GitHub repo (for Actions scheduler)
+- Supabase 帳號（免費版夠用）
+- GitHub repo（給 Actions 排程用）
+- Vercel 帳號（部署 web）
 
 ---
 
 ## Step 1 — Supabase
 
-1. Create a new Supabase project at supabase.com
-2. In **SQL Editor**, run `supabase/migrations/001_initial_schema.sql`
-3. Verify in **Table Editor**: `memes` and `meme_stats_history` tables exist
-4. Copy your **Project URL** and **anon/service_role keys** from Settings → API
+1. 在 supabase.com 開新 project
+2. **SQL Editor** 跑 `supabase/migrations/001_initial_schema.sql`
+3. 接著跑 `supabase/migrations/002_query_logging.sql`
+4. **Table Editor** 確認 `memes` / `meme_stats_history` / `search_queries` / `unmet_searches` 都建好
+5. 從 **Settings → API** 抄下：
+   - `Project URL`
+   - `anon` key（可公開，給 web 用）
+   - `service_role` key（絕對保密，給 scraper 用）
 
 ---
 
-## Step 2 — Python Scraper (local test)
+## Step 2 — Scraper（本機測試）
 
 ```bash
 cd scraper
@@ -28,80 +32,64 @@ pip install -r requirements.txt
 python -m patchright install chromium
 
 cp .env.example .env
-# Edit .env — add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
+# 編輯 .env：填 SUPABASE_URL 和 SUPABASE_SERVICE_ROLE_KEY
 
-# Optional: add proxies
+# 可選：加代理（Threads/IG 沒這個就會失敗）
 cp proxies.txt.example proxies.txt
-# Edit proxies.txt with real proxy URLs
+# 編輯 proxies.txt
 
+# 跑（預設只 ptt dcard，這兩個沒代理也穩）
 python main.py --platforms ptt dcard
 ```
 
 ---
 
-## Step 3 — GitHub Actions (automated scraping)
+## Step 3 — GitHub Actions（自動化）
 
-1. Push this repo to GitHub
-2. Go to **Settings → Secrets and variables → Actions**
-3. Add:
+1. push 這個 repo 到 GitHub
+2. **Settings → Secrets and variables → Actions** 新增：
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
-4. The scraper runs automatically every 4 hours
-5. To test manually: **Actions → Scrape Memes → Run workflow**
+3. cron 每 4 小時自動跑（`.github/workflows/scrape.yml`）
+4. 想手動跑：**Actions → Scrape Memes → Run workflow**，可選平台
 
 ---
 
-## Step 4 — Supabase Edge Function (FCM alerts)
+## Step 4 — Web（Vercel 部署）
+
+Web 是純靜態（`web/index.html` + `results.html` + `detail.html` + js/css），沒 build step。
+
+### 設定 Supabase keys
+
+`web/supabase.js` 的 `SUPABASE_URL` 和 `SUPABASE_ANON_KEY` 是**寫死在 client**的。anon key 配合 RLS 是公開安全的（[migrations 註解](supabase/migrations/001_initial_schema.sql) 有寫為什麼）。
+
+換 Supabase project 時直接改這兩個常數即可，不需要 build/env。
+
+### 部署
 
 ```bash
-# Install Supabase CLI
-npm install -g supabase
+# 第一次：link 到 Vercel project
+npx vercel link
 
-# Login and link project
-supabase login
-supabase link --project-ref YOUR_PROJECT_REF
+# 部署 preview
+npx vercel
 
-# Deploy function
-supabase functions deploy trending-alert
-
-# Set FCM secret
-supabase secrets set FCM_SERVER_KEY=your_legacy_server_key
-
-# Enable pg_cron + pg_net in Supabase Dashboard → Extensions
-# Then in SQL Editor, uncomment and run the cron.schedule() block
-# at the bottom of 001_initial_schema.sql (replace YOUR_PROJECT_REF and YOUR_ANON_KEY)
+# 部署 production
+npx vercel --prod
 ```
+
+`vercel.json` 已設好 `outputDirectory: "web"`、cleanUrls、安全 header。
 
 ---
 
-## Step 5 — Flutter App
+## Step 5 — 本機開 web
 
-### Firebase setup
-1. Create a Firebase project at console.firebase.google.com
-2. Add Android/iOS apps
-3. Download `google-services.json` → `app/android/app/`
-4. Download `GoogleService-Info.plist` → `app/ios/Runner/`
+純靜態，任何 static server 都行：
 
-### Run
 ```bash
-cd app
-flutter pub get
-flutter run \
-  --dart-define=SUPABASE_URL=https://YOUR_REF.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=your_anon_key
-```
-
-### Build release
-```bash
-# Android
-flutter build apk --release \
-  --dart-define=SUPABASE_URL=... \
-  --dart-define=SUPABASE_ANON_KEY=...
-
-# iOS
-flutter build ipa --release \
-  --dart-define=SUPABASE_URL=... \
-  --dart-define=SUPABASE_ANON_KEY=...
+cd web
+python -m http.server 5173
+# 開 http://localhost:5173
 ```
 
 ---
@@ -109,33 +97,29 @@ flutter build ipa --release \
 ## Architecture at a Glance
 
 ```
-GitHub Actions (every 4h)
+GitHub Actions (cron 每 4h)
     │
     ▼
-Python Scraper (patchright + anti-ban)
-    │  PTT / Dcard / Threads / IG
-    │  pHash dedup
+Python Scraper (patchright 反封鎖)
+    │  PTT / Dcard
+    │  pHash 去重
     ▼
-Supabase PostgreSQL ←──────────────────────────── Flutter App
-    │  + Storage (cached media)                   (Riverpod + infinite scroll)
-    │                                              (Waterfall grid / TikTok feed)
-    ▼
-Supabase Edge Function (hourly)
-    │  Detect like spike ≥100 in 1h
-    ▼
-Firebase Cloud Messaging
+Supabase PostgreSQL + Storage
     │
     ▼
-App push notification 🔥
+靜態 Web (Vercel CDN)
+    │  搜尋 / trending / detail
+    ▼
+使用者
 ```
 
 ---
 
-## Platform Notes
+## Platform Coverage
 
-| Platform | Method | Auth | Difficulty |
-|----------|--------|------|------------|
-| PTT | aiohttp + BeautifulSoup | None (over18 cookie) | Easy |
-| Dcard | Public REST API | None | Easy |
-| Threads | patchright + network intercept | None | Medium |
-| Instagram | patchright + network intercept | None | Hard (needs residential proxy) |
+| Platform | Method | 預設啟用 |
+|----------|--------|----------|
+| PTT | aiohttp + BeautifulSoup | ✅ |
+| Dcard | patchright + GraphQL intercept | ✅ |
+| Threads | patchright + network intercept | ⚠️ 需住宅代理 |
+| Instagram | patchright + hashtag API | ⚠️ 需住宅代理 |
