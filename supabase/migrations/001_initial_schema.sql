@@ -117,7 +117,7 @@ create policy "public read memes storage"
 -- Allow service_role to upload
 create policy "service upload memes storage"
   on storage.objects for insert
-  using (bucket_id = 'memes' and auth.role() = 'service_role');
+  with check (bucket_id = 'memes' and auth.role() = 'service_role');
 
 -- ============================================================
 -- pg_cron: call trending-alert Edge Function every hour
