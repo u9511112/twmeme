@@ -6,7 +6,7 @@
 -- Required extensions
 create extension if not exists "uuid-ossp";
 create extension if not exists pg_trgm;
-create extension if not exists pg_net;       -- HTTP calls from pg_cron → Edge Function
+create extension if not exists pg_net;       -- legacy: was for pg_cron → trending-alert (now removed); kept inert for back-compat
 
 -- ============================================================
 -- ENUM TYPES
@@ -32,7 +32,8 @@ create table public.memes (
   comment_count   integer          not null default 0,
   phash           text             not null,               -- 64-char hex perceptual hash
   trending_score  float8           not null default 0.0,
-  notified        boolean          not null default false, -- FCM sent flag
+  notified        boolean          not null default false, -- legacy: FCM sent flag from Flutter era; inert
+
   fetched_at      timestamptz      not null default now(),
   created_at      timestamptz      not null default now()
 );
@@ -119,18 +120,7 @@ create policy "service upload memes storage"
   on storage.objects for insert
   with check (bucket_id = 'memes' and auth.role() = 'service_role');
 
--- ============================================================
--- pg_cron: call trending-alert Edge Function every hour
--- (Replace YOUR_PROJECT_REF and YOUR_ANON_KEY before running)
--- ============================================================
--- select cron.schedule(
---   'trending-check',
---   '0 * * * *',
---   $$
---     select net.http_post(
---       url     := 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/trending-alert',
---       headers := '{"Authorization": "Bearer YOUR_ANON_KEY", "Content-Type": "application/json"}'::jsonb,
---       body    := '{}'::jsonb
---     )
---   $$
--- );
+-- (Removed: pg_cron schedule for trending-alert Edge Function.
+--  Edge Function deleted with the Flutter→web pivot. The `notified`
+--  column and pg_net extension are kept inert for back-compat with
+--  existing deployments — see comments above.)

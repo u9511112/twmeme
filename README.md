@@ -39,7 +39,7 @@ Supabase PostgreSQL + Storage
 | Web | 純靜態 HTML/CSS/JS + supabase-js v2 |
 | Hosting | Vercel |
 
-> **過去的版本**：曾經有 Flutter mobile app + FCM trending 推播，後來收斂為純網頁。`supabase/functions/trending-alert/` 是當時的孤兒 Edge Function（已移除）。
+> **過去的版本**：曾經有 Flutter mobile app + FCM trending 推播，後來收斂為純網頁。`supabase/functions/trending-alert/` 是當時的 Edge Function，已移除。`memes.notified` 欄位 / `pg_net` extension 留著但未使用（避免 schema 分岔）。
 
 ## Quick Start
 
