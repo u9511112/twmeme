@@ -1,8 +1,10 @@
 """
-MemeMaster TW — Scraper Orchestrator
+TWmeme — Scraper Orchestrator
 
 Usage:
-    python main.py [--platforms ptt dcard threads instagram]
+    python main.py                                   # default: ptt dcard
+    python main.py --platforms ptt dcard
+    python main.py --platforms threads instagram     # needs residential proxies
 
 Environment variables (set in .env or GitHub Actions secrets):
     SUPABASE_URL
@@ -41,6 +43,10 @@ SCRAPER_MAP = {
     "threads":   ThreadsScraper,
     "instagram": InstagramScraper,
 }
+
+# Threads/IG need residential proxies to be reliable (~30-50% without).
+# Run them explicitly via --platforms when you have proxies set up.
+DEFAULT_PLATFORMS = ["ptt", "dcard"]
 
 
 async def process_item(client, item: dict) -> bool:
@@ -100,9 +106,9 @@ def main():
     parser.add_argument(
         "--platforms",
         nargs="+",
-        default=list(SCRAPER_MAP.keys()),
+        default=DEFAULT_PLATFORMS,
         choices=list(SCRAPER_MAP.keys()),
-        help="Platforms to scrape (default: all)",
+        help="Platforms to scrape (default: ptt dcard; threads/instagram need residential proxies)",
     )
     args = parser.parse_args()
     asyncio.run(run(args.platforms))
