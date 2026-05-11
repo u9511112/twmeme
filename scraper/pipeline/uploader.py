@@ -169,11 +169,21 @@ async def backfill_missing_cache(client: dict) -> int:
 async def insert_meme(client: dict, item: dict, phash: str) -> str | None:
     """
     Dedup-check then insert meme. Returns inserted UUID or None if skipped.
+
+    Two-phase dedup:
+    1. Pre-flight check (no lock) — reject obvious dups fast, before R2 upload.
+    2. Authoritative re-check inside an advisory-locked transaction — closes
+       the TOCTOU race that opens up while the R2 upload is in flight. The
+       lock serializes the dedup-and-insert critical section across all
+       workers, scoped to this scraper (hashtext namespace).
+
+    R2 upload happens between the two phases (unlocked) so we don't hold a
+    Postgres advisory lock through tens of seconds of network IO. The cost
+    of losing the race is one wasted R2 upload, not a duplicate row.
     """
     pool = await _get_pool()
 
     async with pool.acquire() as conn:
-        # Fast source_url dedup (unique constraint in DB)
         existing = await conn.fetchval(
             "SELECT id FROM public.memes WHERE source_url = $1 LIMIT 1",
             item["source_url"],
@@ -182,13 +192,11 @@ async def insert_meme(client: dict, item: dict, phash: str) -> str | None:
             logger.debug(f"Skipping duplicate source_url: {item['source_url']}")
             return None
 
-        # pHash dedup against recent entries
         recent = await conn.fetch(
             "SELECT phash FROM public.memes ORDER BY fetched_at DESC LIMIT $1",
             RECENT_HASH_LIMIT,
         )
-        existing_hashes = [r["phash"] for r in recent]
-        if is_duplicate(phash, existing_hashes):
+        if is_duplicate(phash, [r["phash"] for r in recent]):
             logger.debug(f"pHash duplicate detected for {item['media_url']}")
             return None
 
@@ -197,6 +205,32 @@ async def insert_meme(client: dict, item: dict, phash: str) -> str | None:
 
     async with pool.acquire() as conn:
         async with conn.transaction():
+            await conn.execute(
+                "SELECT pg_advisory_xact_lock(hashtext('twmeme.insert_meme'))"
+            )
+
+            existing = await conn.fetchval(
+                "SELECT id FROM public.memes WHERE source_url = $1 LIMIT 1",
+                item["source_url"],
+            )
+            if existing:
+                logger.info(
+                    f"Race lost on source_url after R2 upload, skipping: "
+                    f"{item['source_url']}"
+                )
+                return None
+
+            recent = await conn.fetch(
+                "SELECT phash FROM public.memes ORDER BY fetched_at DESC LIMIT $1",
+                RECENT_HASH_LIMIT,
+            )
+            if is_duplicate(phash, [r["phash"] for r in recent]):
+                logger.info(
+                    f"Race lost on pHash after R2 upload, skipping: "
+                    f"{item['media_url']}"
+                )
+                return None
+
             await conn.execute(
                 """
                 INSERT INTO public.memes (
