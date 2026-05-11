@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — TWmeme</title>
+<meta name="description" content="TWmeme Chrome Extension Privacy Policy">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-scoped overrides — keep the global styles.css intact. */
+  .legal {
+    max-width: 720px;
+    margin: 48px auto;
+    padding: 0 24px;
+    line-height: 1.7;
+  }
+  .legal h1 { font-size: 36px; margin-bottom: 8px; }
+  .legal h2 { font-size: 22px; margin-top: 32px; }
+  .legal .updated { color: var(--muted, #6B6459); font-size: 14px; }
+  .legal code {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 13px;
+    background: rgba(232, 226, 214, 0.5);
+    padding: 1px 6px;
+    border-radius: 4px;
+    word-break: break-all;
+  }
+  .legal a { color: var(--primary, #FF5B4B); text-decoration: none; }
+  .legal a:hover { text-decoration: underline; }
+  .legal ul { padding-left: 22px; }
+  .legal li { margin-bottom: 6px; }
+  .legal .back {
+    display: inline-block;
+    margin-top: 40px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/" class="brand">TWmeme</a>
+</header>
+
+<main class="legal">
+
+<h1>Privacy Policy</h1>
+<p class="updated">TWmeme Chrome Extension &middot; Last updated: 2026-05-11</p>
+
+<p>This Chrome extension lets you type <code>:meme &lt;keyword&gt;</code> inside chat boxes (LINE, Threads, Instagram) to insert a meme from the public TWmeme catalog. It is built and maintained as an open-source side project (<a href="https://github.com/u9511112/twmeme">github.com/u9511112/twmeme</a>).</p>
+
+<h2>What this extension collects</h2>
+<p><strong>Nothing personally identifiable.</strong> Specifically:</p>
+<ul>
+  <li>It does <strong>not</strong> read or store the rest of your chat input — only the trailing <code>:meme &lt;query&gt;</code> pattern, used solely to trigger a meme search.</li>
+  <li>It does <strong>not</strong> transmit your chat content, browsing history, identity, location, or any cookies anywhere.</li>
+  <li>It does <strong>not</strong> use analytics SDKs, tracking pixels, or A/B testing.</li>
+</ul>
+
+<h2>What network requests it makes</h2>
+<p>The only outbound requests are to:</p>
+<ul>
+  <li><code>https://ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/sql</code> — to query the public TWmeme meme catalog (PostgreSQL over HTTPS).</li>
+  <li><code>https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/*</code> — to load meme images (Cloudflare R2 public bucket).</li>
+</ul>
+<p>These are the same endpoints <a href="https://twmeme.vercel.app/">twmeme.vercel.app</a> uses. The connection is read-only by Postgres-level GRANT permissions (the <code>web_anon</code> role can <code>SELECT</code> public memes and <code>INSERT</code> anonymous search logs only; it cannot read logs back, cannot modify the catalog).</p>
+
+<h2>What gets logged on the server side</h2>
+<p>When you complete a search (the overlay actually returns results), the extension inserts a row into TWmeme's <code>search_queries</code> table containing:</p>
+<ul>
+  <li>The query text you typed after <code>:meme</code></li>
+  <li>Whether results were returned (true/false)</li>
+  <li>The result count</li>
+</ul>
+<p>No IP address, user agent, account identifier, or cookie is sent or stored alongside this row. Logs are used solely to improve catalog coverage — which queries return no results, which memes to add next.</p>
+<p>If you'd rather not log queries at all, disable the extension. There is no separate opt-out toggle in v0.0.x.</p>
+
+<h2>What gets stored locally (Chrome Storage)</h2>
+<p>Starting in a later version, the extension may store your last 8 picked memes in <code>chrome.storage.local</code> to provide a "recent" carousel. This data:</p>
+<ul>
+  <li>Lives only inside Chrome on your device.</li>
+  <li>Is never transmitted off your machine.</li>
+  <li>Can be cleared at any time by removing the extension or via <code>chrome://extensions</code> → TWmeme → "Storage".</li>
+</ul>
+
+<h2>Open source</h2>
+<p>Source code: <a href="https://github.com/u9511112/twmeme/tree/master/extension">github.com/u9511112/twmeme/tree/master/extension</a></p>
+<p>You can audit every line. If you find a privacy issue, open a GitHub issue and the author will respond.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy: <a href="mailto:u9511112@gmail.com">u9511112@gmail.com</a> or via GitHub issues.</p>
+
+<h2>Changes to this policy</h2>
+<p>If material changes happen (new endpoints, new data collected), this file will be updated and the extension version will bump. The current version is recorded in the published Chrome Web Store listing.</p>
+
+<a href="/" class="back">← 回 TWmeme</a>
+
+</main>
+
+</body>
+</html>
