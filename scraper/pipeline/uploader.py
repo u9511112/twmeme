@@ -1,12 +1,17 @@
 """
-Supabase uploader pipeline.
+Neon + R2 uploader pipeline.
 
 Flow:
 1. Check source_url uniqueness (fast DB lookup)
 2. pHash dedup check against recent hashes
-3. Download + upload media to Supabase Storage (cached_url)
-4. Insert meme row
+3. Download + upload media to R2 (cached_url)
+4. Insert meme row into Neon
 5. Insert stats history snapshot
+
+Connection model:
+- Neon Postgres via asyncpg (TCP, persistent pool)
+- R2 via boto3 (sync; called from async context — fine because items
+  are processed sequentially)
 """
 
 import asyncio
@@ -15,34 +20,66 @@ import os
 import uuid
 
 import aiohttp
-from supabase import create_client, Client
+import asyncpg
+import boto3
+from botocore.config import Config
 
 from .dedup import is_duplicate
 
 logger = logging.getLogger(__name__)
 
 FETCH_TIMEOUT     = aiohttp.ClientTimeout(total=45)
-RECENT_HASH_LIMIT = 5000   # compare against this many recent hashes
+RECENT_HASH_LIMIT = 5000
+
+# Module-level state. get_client() lazy-initializes; close_client() tears down.
+_state: dict = {"pool": None, "r2": None, "bucket": None, "public_url": None}
 
 
-def get_client() -> Client:
-    url = os.environ.get("SUPABASE_URL", "").strip()
-    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
-    missing = [n for n, v in (("SUPABASE_URL", url), ("SUPABASE_SERVICE_ROLE_KEY", key)) if not v]
-    if missing:
-        raise RuntimeError(
-            f"Missing required env var(s): {', '.join(missing)}. "
-            "Set them in scraper/.env locally, or as GitHub Actions repo secrets "
-            "(gh secret set SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)."
+def get_client() -> dict:
+    """Initialize R2 + return state bag. asyncpg pool is created on first DB call."""
+    if _state["r2"] is None:
+        required = ("NEON_DATABASE_URL", "R2_ENDPOINT", "R2_ACCESS_KEY_ID",
+                    "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL")
+        missing = [k for k in required if not os.environ.get(k, "").strip()]
+        if missing:
+            raise RuntimeError(
+                f"Missing required env var(s): {', '.join(missing)}. "
+                "Set them in scraper/.env locally, or as GitHub Actions repo secrets."
+            )
+        _state["r2"] = boto3.client(
+            "s3",
+            endpoint_url=os.environ["R2_ENDPOINT"],
+            aws_access_key_id=os.environ["R2_ACCESS_KEY_ID"],
+            aws_secret_access_key=os.environ["R2_SECRET_ACCESS_KEY"],
+            config=Config(signature_version="s3v4", region_name="auto"),
         )
-    return create_client(url, key)
+        _state["bucket"] = os.environ["R2_BUCKET"]
+        _state["public_url"] = os.environ["R2_PUBLIC_URL"].rstrip("/")
+    return _state
+
+
+async def _get_pool() -> asyncpg.Pool:
+    if _state["pool"] is None:
+        _state["pool"] = await asyncpg.create_pool(
+            os.environ["NEON_DATABASE_URL"],
+            min_size=1,
+            max_size=4,
+            statement_cache_size=0,  # Neon poolers don't keep prepared statements
+        )
+    return _state["pool"]
+
+
+async def close_client(client: dict) -> None:
+    if client.get("pool") is not None:
+        await client["pool"].close()
+        client["pool"] = None
 
 
 async def upload_media_to_storage(
-    client: Client, media_url: str, meme_id: str, retries: int = 3
+    client: dict, media_url: str, meme_id: str, retries: int = 3
 ) -> str | None:
     """
-    Download media bytes → upload to Supabase Storage bucket 'memes'.
+    Download media bytes → upload to R2 as memes/{meme_id}.{ext}.
     Returns the public URL or None on failure. Retries up to `retries` times.
     """
     headers = {
@@ -72,22 +109,21 @@ async def upload_media_to_storage(
                     content_type = r.content_type or "image/jpeg"
                     data = await r.read()
 
-            # Derive extension from content-type
             ext = content_type.split("/")[-1].split(";")[0].strip()
             if ext not in ("jpeg", "jpg", "png", "gif", "webp", "mp4", "webm", "mov"):
                 ext = "jpg"
-            path = f"{meme_id}.{ext}"
+            key = f"memes/{meme_id}.{ext}"
 
-            client.storage.from_("memes").upload(
-                path, data, {"content-type": content_type, "upsert": "true"}
+            client["r2"].put_object(
+                Bucket=client["bucket"], Key=key, Body=data, ContentType=content_type,
             )
-            public_url = client.storage.from_("memes").get_public_url(path)
-            logger.debug(f"Uploaded to storage: {public_url}")
+            public_url = f"{client['public_url']}/{key}"
+            logger.debug(f"Uploaded to R2: {public_url}")
             return public_url
 
         except Exception as e:
             logger.warning(
-                f"Storage upload failed for {media_url}: {e} "
+                f"R2 upload failed for {media_url}: {e} "
                 f"(attempt {attempt}/{retries})"
             )
             if attempt < retries:
@@ -96,28 +132,29 @@ async def upload_media_to_storage(
     return None
 
 
-async def backfill_missing_cache(client: Client) -> int:
+async def backfill_missing_cache(client: dict) -> int:
     """Re-download and upload media for all memes with NULL cached_url."""
-    rows = (
-        client.table("memes")
-        .select("id,media_url")
-        .is_("cached_url", "null")
-        .execute()
-    )
+    pool = await _get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT id, media_url FROM public.memes WHERE cached_url IS NULL"
+        )
     fixed = 0
-    total = len(rows.data)
+    total = len(rows)
     logger.info(f"Backfill: {total} memes with NULL cached_url")
 
-    for i, row in enumerate(rows.data, 1):
-        meme_id   = row["id"]
+    for i, row in enumerate(rows, 1):
+        meme_id   = str(row["id"])
         media_url = row["media_url"]
         logger.info(f"Backfill [{i}/{total}] {media_url[:60]}")
 
         cached_url = await upload_media_to_storage(client, media_url, meme_id)
         if cached_url:
-            client.table("memes").update(
-                {"cached_url": cached_url}
-            ).eq("id", meme_id).execute()
+            async with pool.acquire() as conn:
+                await conn.execute(
+                    "UPDATE public.memes SET cached_url = $1 WHERE id = $2",
+                    cached_url, row["id"],
+                )
             fixed += 1
             logger.info(f"  → cached: {cached_url[:60]}")
         else:
@@ -129,57 +166,64 @@ async def backfill_missing_cache(client: Client) -> int:
     return fixed
 
 
-async def insert_meme(client: Client, item: dict, phash: str) -> str | None:
+async def insert_meme(client: dict, item: dict, phash: str) -> str | None:
     """
     Dedup-check then insert meme. Returns inserted UUID or None if skipped.
     """
-    # Fast source_url dedup (unique constraint in DB)
-    existing_url = (
-        client.table("memes")
-        .select("id")
-        .eq("source_url", item["source_url"])
-        .limit(1)
-        .execute()
-    )
-    if existing_url.data:
-        logger.debug(f"Skipping duplicate source_url: {item['source_url']}")
-        return None
+    pool = await _get_pool()
 
-    # pHash dedup against recent entries
-    recent = (
-        client.table("memes")
-        .select("phash")
-        .order("fetched_at", desc=True)
-        .limit(RECENT_HASH_LIMIT)
-        .execute()
-    )
-    existing_hashes = [r["phash"] for r in recent.data]
-    if is_duplicate(phash, existing_hashes):
-        logger.debug(f"pHash duplicate detected for {item['media_url']}")
-        return None
+    async with pool.acquire() as conn:
+        # Fast source_url dedup (unique constraint in DB)
+        existing = await conn.fetchval(
+            "SELECT id FROM public.memes WHERE source_url = $1 LIMIT 1",
+            item["source_url"],
+        )
+        if existing:
+            logger.debug(f"Skipping duplicate source_url: {item['source_url']}")
+            return None
+
+        # pHash dedup against recent entries
+        recent = await conn.fetch(
+            "SELECT phash FROM public.memes ORDER BY fetched_at DESC LIMIT $1",
+            RECENT_HASH_LIMIT,
+        )
+        existing_hashes = [r["phash"] for r in recent]
+        if is_duplicate(phash, existing_hashes):
+            logger.debug(f"pHash duplicate detected for {item['media_url']}")
+            return None
 
     meme_id    = str(uuid.uuid4())
     cached_url = await upload_media_to_storage(client, item["media_url"], meme_id)
 
-    client.table("memes").insert({
-        "id":            meme_id,
-        "platform":      item["platform"],
-        "source_url":    item["source_url"],
-        "media_url":     item["media_url"],
-        "cached_url":    cached_url,
-        "media_type":    item["media_type"],
-        "title":         item.get("title"),
-        "like_count":    item.get("like_count", 0),
-        "share_count":   item.get("share_count", 0),
-        "comment_count": item.get("comment_count", 0),
-        "phash":         phash,
-    }).execute()
-
-    # Record stats snapshot for spike detection
-    client.table("meme_stats_history").insert({
-        "meme_id":   meme_id,
-        "like_count": item.get("like_count", 0),
-    }).execute()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            await conn.execute(
+                """
+                INSERT INTO public.memes (
+                    id, platform, source_url, media_url, cached_url, media_type,
+                    title, like_count, share_count, comment_count, phash
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                """,
+                uuid.UUID(meme_id),
+                item["platform"],
+                item["source_url"],
+                item["media_url"],
+                cached_url,
+                item["media_type"],
+                item.get("title"),
+                item.get("like_count", 0),
+                item.get("share_count", 0),
+                item.get("comment_count", 0),
+                phash,
+            )
+            await conn.execute(
+                """
+                INSERT INTO public.meme_stats_history (meme_id, like_count)
+                VALUES ($1, $2)
+                """,
+                uuid.UUID(meme_id),
+                item.get("like_count", 0),
+            )
 
     logger.info(f"Inserted [{item['platform']}] {item.get('title', '')[:40]} → {meme_id}")
     return meme_id
