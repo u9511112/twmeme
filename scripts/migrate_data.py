@@ -283,8 +283,15 @@ def migrate_memes(src_conn, dst_conn, r2, env, limit: int | None) -> tuple[int, 
     return inserted, skipped, failed
 
 
-def migrate_append_only(src_conn, dst_conn, table: str, columns: list[str]) -> tuple[int, str]:
+def migrate_append_only(
+    src_conn, dst_conn, table: str, columns: list[str],
+    filter_to_existing_memes: bool = False,
+) -> tuple[int, str]:
     """Copy append-only logging table. Skips entirely if target non-empty.
+
+    If filter_to_existing_memes=True, restricts to rows whose meme_id is in
+    Neon's memes table (needed for --limit runs where stats reference memes
+    we haven't migrated yet — FK would otherwise fire).
 
     Returns (rows_inserted, status). Status is one of: 'copied', 'skip_nonempty'.
     """
@@ -299,7 +306,19 @@ def migrate_append_only(src_conn, dst_conn, table: str, columns: list[str]) -> t
     placeholders = ", ".join(["%s"] * len(columns))
 
     with src_conn.cursor() as sc:
-        sc.execute(f"SELECT {cols_csv} FROM public.{table} ORDER BY 1;")
+        if filter_to_existing_memes:
+            with dst_conn.cursor() as dc:
+                dc.execute("SELECT id FROM public.memes;")
+                allowed = [str(r[0]) for r in dc.fetchall()]
+            if not allowed:
+                log.info(f"[{table}] no memes in target — nothing to migrate")
+                return 0, "copied"
+            sc.execute(
+                f"SELECT {cols_csv} FROM public.{table} WHERE meme_id = ANY(%s::uuid[]) ORDER BY 1;",
+                (allowed,),
+            )
+        else:
+            sc.execute(f"SELECT {cols_csv} FROM public.{table} ORDER BY 1;")
         rows = sc.fetchall()
 
     if not rows:
@@ -337,10 +356,12 @@ def execute(env: dict, source_url: str, limit: int | None) -> int:
         ins, skp, fail = migrate_memes(src, dst, r2, env, limit)
         log.info(f"[memes] inserted={ins} skipped={skp} failed={fail}")
 
-        # Stats history — preserve recorded_at + like_count, let Neon assign new PKs
+        # Stats history — preserve recorded_at + like_count, let Neon assign new PKs.
+        # Filter to memes that exist in target so --limit doesn't blow up the FK.
         s_ins, _ = migrate_append_only(
             src, dst, "meme_stats_history",
             ["meme_id", "like_count", "recorded_at"],
+            filter_to_existing_memes=True,
         )
 
         # Search queries — drop original PK, let Neon assign
