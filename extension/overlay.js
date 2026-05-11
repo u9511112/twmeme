@@ -140,6 +140,7 @@ class Overlay {
     this.isOpen = false;
     this.onPick = null;  // (meme) => void — set by controller
     this.lastInput = null;  // remembered for refocus
+    this._hideTimer = null;  // pending body-clear timer from hide(); cancelled on show()
   }
 
   ensureMounted() {
@@ -168,6 +169,13 @@ class Overlay {
 
   show(anchorRect, query) {
     this.ensureMounted();
+    // Cancel any pending body-clear timer from a hide() in flight — if user
+    // re-triggers within the 200ms exit animation, we'd otherwise wipe the
+    // freshly-rendered new content.
+    if (this._hideTimer != null) {
+      clearTimeout(this._hideTimer);
+      this._hideTimer = null;
+    }
     this.isOpen = true;
     this.selectedIndex = 0;
     this.results = [];
@@ -199,8 +207,9 @@ class Overlay {
     if (this.panel) {
       this.panel.classList.remove("open");
     }
-    // Allow exit animation to finish, then unmount-ish (keep host, just empty)
-    setTimeout(() => {
+    // Allow exit animation to finish, then clear body. show() cancels this.
+    this._hideTimer = setTimeout(() => {
+      this._hideTimer = null;
       if (this.body) this.body.innerHTML = "";
     }, 200);
   }
@@ -240,10 +249,21 @@ class Overlay {
       const cell = document.createElement("div");
       cell.className = "cell" + (i === 0 ? " selected" : "");
       cell.dataset.index = String(i);
-      cell.innerHTML = `
-        <img src="${escapeAttr(row.cached_url)}" alt="${escapeAttr(row.title || "")}" loading="lazy">
-        <span class="platform">${escapeHtml(row.platform || "")}</span>
-      `;
+
+      // DOM API instead of innerHTML so cached_url / title / platform values
+      // are treated as data, not parsed as HTML. No XSS surface even if a
+      // future scraper bug lets a malicious string into the row.
+      const img = document.createElement("img");
+      img.src = row.cached_url || "";
+      img.alt = row.title || "";
+      img.loading = "lazy";
+      cell.appendChild(img);
+
+      const platform = document.createElement("span");
+      platform.className = "platform";
+      platform.textContent = row.platform || "";
+      cell.appendChild(platform);
+
       cell.addEventListener("mouseenter", () => this.setSelected(i));
       cell.addEventListener("click", () => this.confirm());
       this.grid.appendChild(cell);

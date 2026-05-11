@@ -18,7 +18,7 @@ const NEON_PASS = "eSoHu1pLOwjbDiQQsO6IWt90Pr5G";
 const SQL_URL = `https://${NEON_HOST}/sql`;
 const CONNSTRING = `postgresql://${NEON_USER}:${NEON_PASS}@${NEON_HOST}/${NEON_DB}?sslmode=require`;
 
-async function neonQuery(query, params = []) {
+async function neonQuery(query, params = [], { signal } = {}) {
   const resp = await fetch(SQL_URL, {
     method: "POST",
     headers: {
@@ -28,7 +28,13 @@ async function neonQuery(query, params = []) {
       "Neon-Array-Mode": "false",
     },
     body: JSON.stringify({ query, params, arrayMode: false, fullResults: false }),
+    signal,
   });
+  if (resp.status === 429) {
+    // Neon rate-limit. Don't retry from here — let caller decide (debounce will
+    // naturally back off, and a flood-prevention DB trigger backstops anyway).
+    throw new Error("Neon HTTP 429 (rate limited)");
+  }
   if (!resp.ok) {
     const body = await resp.text();
     throw new Error(`Neon HTTP ${resp.status}: ${body.slice(0, 200)}`);
@@ -37,7 +43,7 @@ async function neonQuery(query, params = []) {
   return json.rows || [];
 }
 
-async function searchMemes(query, limit = 5) {
+async function searchMemes(query, limit = 5, opts = {}) {
   const safe = String(query || "").trim();
   if (!safe) return [];
   const pattern = "%" + safe + "%";
@@ -48,6 +54,7 @@ async function searchMemes(query, limit = 5) {
      ORDER BY trending_score DESC
      LIMIT $2`,
     [pattern, limit],
+    opts,
   );
 }
 

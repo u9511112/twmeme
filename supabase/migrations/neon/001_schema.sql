@@ -142,6 +142,63 @@ grant select on public.unmet_searches to scraper;
 grant usage  on all sequences in schema public to scraper;
 
 -- ============================================================
+-- RATE LIMITS (defense in depth)
+--
+-- web_anon has INSERT on search_queries + unmet_searches. The 2-second
+-- localStorage throttle in web/db.js is client-side only — a flood attacker
+-- with the connection string can bypass it by hitting /sql directly.
+-- These BEFORE INSERT triggers cap insertion rates at the DB level so a
+-- bored adversary can't fill the table with 10M rows in 5 minutes.
+--
+-- Numbers are global (not per-IP — we don't see the client IP at the DB
+-- layer through Neon's HTTP endpoint). Legit users insert maybe 1 row per
+-- few seconds; these limits are 10x that.
+-- ============================================================
+-- SECURITY DEFINER so the trigger runs as the function owner (neondb_owner),
+-- not as web_anon (which doesn't have SELECT on these tables by design — the
+-- whole point of the GRANT model is that web_anon can INSERT but cannot read
+-- back). search_path is locked to public to neutralize search_path attacks.
+create or replace function enforce_search_queries_rate() returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $body$
+begin
+  if (select count(*) from public.search_queries
+      where searched_at > now() - interval '1 second') > 20 then
+    raise exception 'search_queries rate limit exceeded (20/sec)'
+      using errcode = '54000';
+  end if;
+  return new;
+end;
+$body$;
+
+create or replace function enforce_unmet_searches_rate() returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $body$
+begin
+  if (select count(*) from public.unmet_searches
+      where created_at > now() - interval '10 seconds') > 5 then
+    raise exception 'unmet_searches rate limit exceeded (5 per 10 sec)'
+      using errcode = '54000';
+  end if;
+  return new;
+end;
+$body$;
+
+drop trigger if exists trg_search_queries_rate on public.search_queries;
+create trigger trg_search_queries_rate
+  before insert on public.search_queries
+  for each row execute function enforce_search_queries_rate();
+
+drop trigger if exists trg_unmet_searches_rate on public.unmet_searches;
+create trigger trg_unmet_searches_rate
+  before insert on public.unmet_searches
+  for each row execute function enforce_unmet_searches_rate();
+
+-- ============================================================
 -- DONE
 -- Verify after running:
 --   select count(*) from public.memes;            -- expect 0 on fresh DB

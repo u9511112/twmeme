@@ -51,11 +51,12 @@ async function runQuery(query) {
   const ctrl = new AbortController();
   inflightAbort = ctrl;
   try {
-    const rows = await window.TWmemeDB.searchMemes(query, 8);
+    const rows = await window.TWmemeDB.searchMemes(query, 8, { signal: ctrl.signal });
     if (ctrl.signal.aborted) return;
     window.TWmemeOverlay.renderResults(rows, query);
   } catch (e) {
     if (ctrl.signal.aborted) return;
+    if (e?.name === "AbortError") return;
     console.error("[TWmeme] query failed:", e);
     window.TWmemeOverlay.renderResults([], query);
   } finally {
@@ -88,9 +89,17 @@ function closeOverlay() {
 //   B) ClipboardEvent with image blob in dataTransfer
 //   C) Direct DOM manipulation on the contenteditable
 //
-// Until then, we stub: remove the `:meme <query>` text from the input
-// and console.log what would have been inserted. Once the spike picks
-// a winner, only `insertImageInto()` needs to change.
+// Until then, we stub: remove the `:meme <query>` text and console.log
+// what would have been inserted.
+//
+// ⚠️ DANGEROUS STUB BEHAVIOR — contenteditable wipe ⚠️
+// The contenteditable branch currently does `el.innerText = stripped`,
+// which wipes ALL descendants of the input element — mentions, emoji
+// glyphs, link spans, draft attachments, formatting. If you test this on
+// LINE Web / Threads / IG with rich content already in the composer,
+// your draft will be replaced with plain text only. This is acceptable
+// while spiking (you're testing with an empty input anyway), but the
+// real `insertImageInto()` must preserve the rest of the composer state.
 async function insertImageInto(el, meme) {
   console.log("[TWmeme] would insert", meme.cached_url, "into", el);
 
@@ -102,12 +111,15 @@ async function insertImageInto(el, meme) {
       el.value = stripped;
       el.dispatchEvent(new Event("input", { bubbles: true }));
     } else if (el.isContentEditable) {
-      // For contenteditable: clear and reinsert. Crude but fine until W2 spike lands.
+      // WARNING: wipes other content. Replace with structure-preserving
+      // logic once W2 spike picks the real insertion API.
       el.innerText = stripped;
     }
   }
 
   // TODO(W2-spike): replace this stub with the API picked by the spike.
+  // Make sure the replacement (a) preserves existing rich content in the
+  // composer and (b) only removes the `:meme <query>` trigger substring.
 }
 
 function handleInput(ev) {
@@ -136,19 +148,21 @@ function handleInput(ev) {
 
 function handleKeydown(ev) {
   if (!window.TWmemeOverlay.isOpen) return;
+  // Overlay grid is 4 columns. ↑↓ moves between rows (±GRID_COLS),
+  // ←→ moves between columns within a row (±1).
+  const GRID_COLS = 4;
   switch (ev.key) {
     case "ArrowDown":
       ev.preventDefault();
       ev.stopPropagation();
-      window.TWmemeOverlay.moveSelection(+1);
+      window.TWmemeOverlay.moveSelection(+GRID_COLS);
       break;
     case "ArrowUp":
       ev.preventDefault();
       ev.stopPropagation();
-      window.TWmemeOverlay.moveSelection(-1);
+      window.TWmemeOverlay.moveSelection(-GRID_COLS);
       break;
     case "ArrowRight":
-      // Treat right/left as horizontal nav within the 4-column grid
       ev.preventDefault();
       ev.stopPropagation();
       window.TWmemeOverlay.moveSelection(+1);

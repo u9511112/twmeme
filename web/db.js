@@ -22,6 +22,20 @@ function sql() {
   return _sqlPromise;
 }
 
+// Auth / permission errors mean the connection string in this file is no
+// longer valid (password rotated, role dropped, GRANT revoked). We don't
+// want those to be silently caught and degrade to mock data — bump them
+// from warn to error so they show up in DevTools red.
+function logErr(label, e) {
+  const msg = String(e?.message || e || '');
+  const isAuth = /password|authentication|permission denied|role .* does not exist|HTTP 401|HTTP 403/i.test(msg);
+  if (isAuth) {
+    console.error('[db] CRITICAL — auth/permission failure in ' + label + ' — site is now serving fallback data:', e);
+  } else {
+    console.warn('[db] ' + label + ' failed:', e);
+  }
+}
+
 // ---- 2-second submit throttle (per query_text key) -------------------
 const THROTTLE_MS = 2000;
 function throttled(key) {
@@ -46,7 +60,7 @@ async function getTrendingMemes(limit = 12) {
                          LIMIT ${limit}`;
     return rows.length > 0 ? rows : null;
   } catch (e) {
-    console.warn('[db] trending fetch failed, falling back:', e);
+    logErr('trending fetch', e);
     return null;
   }
 }
@@ -57,7 +71,7 @@ async function getMemeCount() {
     const rows = await s`SELECT count(*)::int AS n FROM public.memes`;
     return rows[0]?.n ?? null;
   } catch (e) {
-    console.warn('[db] getMemeCount failed:', e);
+    logErr('getMemeCount', e);
     return null;
   }
 }
@@ -75,7 +89,7 @@ async function getMemeById(id) {
                          LIMIT 1`;
     return rows[0] || null;
   } catch (e) {
-    console.warn('[db] getMemeById failed:', e);
+    logErr('getMemeById', e);
     return null;
   }
 }
@@ -93,7 +107,7 @@ async function searchMemes(query, limit = 40) {
                          LIMIT ${limit}`;
     return rows;
   } catch (e) {
-    console.warn('[db] search failed, falling back:', e);
+    logErr('search', e);
     return null;
   }
 }
@@ -106,7 +120,7 @@ function logSearchQuery({ queryText, hadResult, resultCount, clickedIndex = null
   sql().then(s =>
     s`INSERT INTO public.search_queries (query_text, had_result, result_count, clicked_index)
       VALUES (${safe}, ${!!hadResult}, ${resultCount ?? null}, ${clickedIndex})`
-  ).catch(e => console.warn('[db] logSearchQuery error:', e));
+  ).catch(e => logErr('logSearchQuery', e));
 }
 
 function logClick(queryText, clickedIndex) {
@@ -115,7 +129,7 @@ function logClick(queryText, clickedIndex) {
   sql().then(s =>
     s`INSERT INTO public.search_queries (query_text, had_result, clicked_index)
       VALUES (${safe}, true, ${clickedIndex})`
-  ).catch(e => console.warn('[db] logClick error:', e));
+  ).catch(e => logErr('logClick', e));
 }
 
 async function submitUnmetSearch(description) {
@@ -127,7 +141,7 @@ async function submitUnmetSearch(description) {
     await s`INSERT INTO public.unmet_searches (description) VALUES (${safe})`;
     return { ok: true };
   } catch (e) {
-    console.warn('[db] submitUnmetSearch error:', e);
+    logErr('submitUnmetSearch', e);
     return { ok: false, reason: 'error' };
   }
 }

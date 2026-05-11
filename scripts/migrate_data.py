@@ -34,6 +34,7 @@ from pathlib import Path
 import boto3
 import psycopg2
 import psycopg2.extras
+import psycopg2.sql as pgsql
 from botocore.config import Config
 from botocore.exceptions import ClientError
 
@@ -152,7 +153,7 @@ def dry_run(env: dict, source_url: str | None) -> int:
         u, db, ver = cur.fetchone()
         log.info(f"[Neon] connected: user={u} db={db} pg={ver.split(',')[0]}")
         for tbl in ("memes", "meme_stats_history", "search_queries", "unmet_searches"):
-            cur.execute(f"SELECT count(*) FROM public.{tbl};")
+            cur.execute(pgsql.SQL("SELECT count(*) FROM {}").format(pgsql.Identifier("public", tbl)))
             log.info(f"[Neon]   {tbl}: {cur.fetchone()[0]} rows")
 
     # R2 connectivity
@@ -174,7 +175,7 @@ def dry_run(env: dict, source_url: str | None) -> int:
                 log.info(f"[Source] connected: pg={cur.fetchone()[0].split(',')[0]}")
                 for tbl in ("memes", "meme_stats_history", "search_queries", "unmet_searches"):
                     try:
-                        cur.execute(f"SELECT count(*) FROM public.{tbl};")
+                        cur.execute(pgsql.SQL("SELECT count(*) FROM {}").format(pgsql.Identifier("public", tbl)))
                         log.info(f"[Source]   {tbl}: {cur.fetchone()[0]} rows")
                     except psycopg2.Error as e:
                         log.warning(f"[Source]   {tbl}: {e}")
@@ -294,16 +295,32 @@ def migrate_append_only(
     we haven't migrated yet — FK would otherwise fire).
 
     Returns (rows_inserted, status). Status is one of: 'copied', 'skip_nonempty'.
+
+    Identifier safety: `table` and `columns` come from hardcoded call-site
+    literals today, but we still compose them via psycopg2.sql.Identifier so
+    a future refactor cannot accidentally introduce SQL injection if those
+    names start coming from elsewhere.
     """
+    ident_table = pgsql.Identifier("public", table)
+    ident_cols = pgsql.SQL(", ").join(pgsql.Identifier(c) for c in columns)
+    placeholders = pgsql.SQL(", ").join(pgsql.SQL("%s") for _ in columns)
+
+    # Pick a stable sort key per table — UUID-keyed tables (meme_stats_history)
+    # need a timestamp to be reproducible across resumes; bigserial-keyed
+    # tables are fine with the PK.
+    order_by = pgsql.Identifier(
+        "recorded_at" if "recorded_at" in columns
+        else "searched_at" if "searched_at" in columns
+        else "created_at" if "created_at" in columns
+        else columns[0]
+    )
+
     with dst_conn.cursor() as dc:
-        dc.execute(f"SELECT count(*) FROM public.{table};")
+        dc.execute(pgsql.SQL("SELECT count(*) FROM {}").format(ident_table))
         existing = dc.fetchone()[0]
         if existing > 0:
             log.info(f"[{table}] target has {existing} rows — skipping (cannot dedup)")
             return 0, "skip_nonempty"
-
-    cols_csv = ", ".join(columns)
-    placeholders = ", ".join(["%s"] * len(columns))
 
     with src_conn.cursor() as sc:
         if filter_to_existing_memes:
@@ -314,24 +331,28 @@ def migrate_append_only(
                 log.info(f"[{table}] no memes in target — nothing to migrate")
                 return 0, "copied"
             sc.execute(
-                f"SELECT {cols_csv} FROM public.{table} WHERE meme_id = ANY(%s::uuid[]) ORDER BY 1;",
+                pgsql.SQL(
+                    "SELECT {cols} FROM {tbl} WHERE meme_id = ANY(%s::uuid[]) ORDER BY {ord}"
+                ).format(cols=ident_cols, tbl=ident_table, ord=order_by),
                 (allowed,),
             )
         else:
-            sc.execute(f"SELECT {cols_csv} FROM public.{table} ORDER BY 1;")
+            sc.execute(
+                pgsql.SQL("SELECT {cols} FROM {tbl} ORDER BY {ord}").format(
+                    cols=ident_cols, tbl=ident_table, ord=order_by,
+                ),
+            )
         rows = sc.fetchall()
 
     if not rows:
         log.info(f"[{table}] source empty — nothing to migrate")
         return 0, "copied"
 
+    insert_sql = pgsql.SQL("INSERT INTO {tbl} ({cols}) VALUES ({vals})").format(
+        tbl=ident_table, cols=ident_cols, vals=placeholders,
+    )
     with dst_conn.cursor() as dc:
-        psycopg2.extras.execute_batch(
-            dc,
-            f"INSERT INTO public.{table} ({cols_csv}) VALUES ({placeholders})",
-            rows,
-            page_size=200,
-        )
+        psycopg2.extras.execute_batch(dc, insert_sql, rows, page_size=200)
         dst_conn.commit()
 
     log.info(f"[{table}] inserted {len(rows)} rows")
