@@ -49,13 +49,28 @@ jobs:
       # (likely Dcard geo-blocking GH IP ranges at the authoritative DNS layer).
       # Cloudflare's anycast resolver bypasses it. Stop systemd-resolved so it
       # can't rewrite resolv.conf back, then write our own.
-      - name: Use Cloudflare DNS resolver
+      #
+      # Chromium's built-in AsyncDns resolver (and patchright's stealth fork)
+      # ignores resolv.conf overrides AND the --host-resolver-rules launch flag.
+      # The only resolver hook every code path honors is /etc/hosts. Pin Dcard's
+      # IPv4 there so Chromium falls into a hardcoded mapping at the OS level.
+      - name: Use Cloudflare DNS resolver + pin Dcard IP in /etc/hosts
         run: |
           sudo systemctl disable --now systemd-resolved 2>/dev/null || true
           sudo rm -f /etc/resolv.conf
           sudo sh -c 'printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf'
           echo "--- /etc/resolv.conf ---"
           cat /etc/resolv.conf
+
+          sudo apt-get install -y -qq dnsutils
+          DCARD_IPV4=$(dig +short A www.dcard.tw @1.1.1.1 | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          if [ -z "$DCARD_IPV4" ]; then
+            echo "::error::could not resolve A record for www.dcard.tw via 1.1.1.1"
+            exit 1
+          fi
+          echo "Resolved www.dcard.tw → $DCARD_IPV4 — pinning in /etc/hosts"
+          echo "$DCARD_IPV4 www.dcard.tw" | sudo tee -a /etc/hosts
+
           echo "--- DNS sanity check ---"
           getent hosts www.dcard.tw
           getent hosts www.ptt.cc

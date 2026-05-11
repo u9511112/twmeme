@@ -11,7 +11,6 @@ import json
 import logging
 import random
 import re
-import socket
 
 from .base import BaseScraper, _pick_proxy, human_scroll, accept_cookie_banner, UA, ScraperBlockedError
 
@@ -22,33 +21,8 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-DCARD_WEB  = "https://www.dcard.tw"
-DCARD_HOST = "www.dcard.tw"
-FORUMS     = ["meme", "funny", "joke", "trending"]
-
-
-def _resolve_dcard_ip() -> str | None:
-    """
-    Resolve www.dcard.tw via the system resolver (libc → /etc/resolv.conf).
-    On GH Actions runners we override resolv.conf to 1.1.1.1, so this works
-    even when Chromium's built-in AsyncDns resolver fails.
-
-    Prefer IPv4 — GH runners' egress on IPv6 to public anycast is flaky.
-    Returns None if resolution fails entirely.
-    """
-    try:
-        infos = socket.getaddrinfo(DCARD_HOST, 443, type=socket.SOCK_STREAM)
-    except socket.gaierror as e:
-        logger.error(f"DNS resolve {DCARD_HOST} failed: {e}")
-        return None
-
-    for family, *_ , sockaddr in infos:
-        if family == socket.AF_INET:
-            return sockaddr[0]
-    for family, *_ , sockaddr in infos:
-        if family == socket.AF_INET6:
-            return sockaddr[0]
-    return None
+DCARD_WEB = "https://www.dcard.tw"
+FORUMS    = ["meme", "funny", "joke", "trending"]
 
 
 class DcardScraper(BaseScraper):
@@ -69,29 +43,16 @@ class DcardScraper(BaseScraper):
         url = f"{DCARD_WEB}/f/{forum}?tab=popular"
         captured_posts: list[dict] = []
 
-        # Chromium's built-in AsyncDns resolver ignores /etc/resolv.conf and
-        # gets ERR_NAME_NOT_RESOLVED for www.dcard.tw on GH Actions runners.
-        # Resolve via libc (which honors our 1.1.1.1 override) and bake the IP
-        # into Chromium's host-resolver-rules. Fall back to disabling AsyncDns.
-        browser_args = [
-            "--no-sandbox",
-            "--disable-blink-features=AutomationControlled",
-            "--disable-dev-shm-usage",
-            "--disable-features=AsyncDns",
-        ]
-        dcard_ip = _resolve_dcard_ip()
-        if dcard_ip:
-            logger.info(f"Resolved {DCARD_HOST} → {dcard_ip}, baking into Chromium host-resolver-rules")
-            browser_args.append(f"--host-resolver-rules=MAP {DCARD_HOST} {dcard_ip}")
-        else:
-            logger.warning(f"Could not pre-resolve {DCARD_HOST}; relying on Chromium fallback")
-
         proxy = _pick_proxy()
         async with async_playwright() as p:
             browser = await p.chromium.launch(
                 headless=True,
                 proxy=proxy,
-                args=browser_args,
+                args=[
+                    "--no-sandbox",
+                    "--disable-blink-features=AutomationControlled",
+                    "--disable-dev-shm-usage",
+                ],
             )
             ctx = await browser.new_context(
                 user_agent=UA.random,
