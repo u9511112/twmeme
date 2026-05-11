@@ -217,7 +217,11 @@ class Overlay {
   renderHeader(query) {
     this.header.innerHTML = "";
     const q = document.createElement("span");
-    q.innerHTML = `<span class="q">:meme ${escapeHtml(query)}</span>`;
+    if (query === "" || query == null) {
+      q.innerHTML = `<span class="q">最近用過</span>`;
+    } else {
+      q.innerHTML = `<span class="q">:meme ${escapeHtml(query)}</span>`;
+    }
     const hint = document.createElement("span");
     hint.className = "hint";
     hint.innerHTML = `<kbd>↑</kbd><kbd>↓</kbd> 選 <kbd>Enter</kbd> 插入 <kbd>Esc</kbd> 關閉`;
@@ -243,9 +247,31 @@ class Overlay {
       return;
     }
 
+    this._renderGrid(rows.slice(0, 8));
+  }
+
+  renderRecent(rows) {
+    this.results = rows;
+    this.selectedIndex = 0;
+    this.body.innerHTML = "";
+
+    if (rows.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.innerHTML =
+        `還沒選過任何迷因。<br>` +
+        `打 <span class="q">:meme 關鍵字</span> 搜尋。`;
+      this.body.appendChild(empty);
+      return;
+    }
+
+    this._renderGrid(rows.slice(0, 8));
+  }
+
+  _renderGrid(rows) {
     this.grid = document.createElement("div");
     this.grid.className = "grid";
-    rows.slice(0, 8).forEach((row, i) => {
+    rows.forEach((row, i) => {
       const cell = document.createElement("div");
       cell.className = "cell" + (i === 0 ? " selected" : "");
       cell.dataset.index = String(i);

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TWmeme",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "在 LINE / Threads / IG 輸入框打 :meme 直接插入台灣迷因。",
   "icons": {
     "16": "icons/icon-16.png",
@@ -20,12 +20,12 @@
         "*://www.instagram.com/*",
         "*://*.instagram.com/*"
       ],
-      "js": ["db.js", "overlay.js", "content.js"],
+      "js": ["db.js", "storage.js", "overlay.js", "content.js"],
       "run_at": "document_idle"
     }
   ],
   "host_permissions": [
     "https://ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/*"
   ],
-  "permissions": []
+  "permissions": ["storage"]
 }

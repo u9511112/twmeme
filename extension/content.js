@@ -6,7 +6,10 @@
 // which is stubbed pending the DevTools spike on which API LINE Web /
 // Threads / IG actually accept.
 
-const TRIGGER = /:meme\s+([^\n]+?)\s*$/;
+// Match `:meme` optionally followed by a query. The empty-query form
+// (just `:meme` or `:meme ` with no real query) opens the overlay onto
+// the recent-picks grid.
+const TRIGGER = /:meme(?:\s+([^\n]*?))?\s*$/;
 const DEBOUNCE_MS = 200;
 
 let debounceTimer = null;
@@ -35,7 +38,10 @@ function getCaretText(el) {
 function findTrigger(text) {
   if (text == null) return null;
   const m = TRIGGER.exec(text);
-  return m ? m[1].trim() : null;
+  if (!m) return null;
+  // m[1] is undefined when the user just typed `:meme` with nothing after.
+  // Normalize to "" so callers can branch on emptiness without nullchecks.
+  return (m[1] || "").trim();
 }
 
 function isEligibleTarget(el) {
@@ -64,15 +70,28 @@ async function runQuery(query) {
   }
 }
 
+async function runRecent() {
+  // No network call — chrome.storage.local read is sync-fast.
+  // Cancel any in-flight Neon search so a stale query doesn't overwrite recent.
+  if (inflightAbort) inflightAbort.abort();
+  const rows = await window.TWmemeStorage.getRecent();
+  window.TWmemeOverlay.renderRecent(rows);
+}
+
 function openFor(el, query) {
   currentInput = el;
   currentQuery = query;
   const rect = el.getBoundingClientRect();
   window.TWmemeOverlay.show(rect, query);
-  // Slight delay so the "searching…" state is briefly visible if the
-  // query is fast — avoids flash-of-empty.
   clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => runQuery(query), DEBOUNCE_MS);
+  if (query === "") {
+    // Empty query → show recent immediately, no debounce, no Neon round-trip.
+    runRecent();
+  } else {
+    // Slight delay so the "searching…" state is briefly visible if the
+    // query is fast — avoids flash-of-empty.
+    debounceTimer = setTimeout(() => runQuery(query), DEBOUNCE_MS);
+  }
 }
 
 function closeOverlay() {
@@ -140,9 +159,13 @@ function handleInput(ev) {
   } else if (query !== currentQuery) {
     currentQuery = query;
     window.TWmemeOverlay.renderHeader(query);
-    window.TWmemeOverlay.renderLoading();
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => runQuery(query), DEBOUNCE_MS);
+    if (query === "") {
+      runRecent();
+    } else {
+      window.TWmemeOverlay.renderLoading();
+      debounceTimer = setTimeout(() => runQuery(query), DEBOUNCE_MS);
+    }
   }
 }
 
@@ -196,6 +219,12 @@ function handleClickOutside(ev) {
 window.TWmemeOverlay.onPick = async (meme) => {
   const el = currentInput;
   closeOverlay();
+  // Persist BEFORE inserting — even if insertion fails (stub or platform
+  // quirk), the user's intent was clear and they probably want it in recent
+  // for the next try. Storage write is fire-and-forget, ~ms.
+  window.TWmemeStorage.pushRecent(meme).catch((e) =>
+    console.warn("[TWmeme] pushRecent failed:", e)
+  );
   if (el) await insertImageInto(el, meme);
 };
 
@@ -203,4 +232,4 @@ document.addEventListener("input", handleInput, true);
 document.addEventListener("keydown", handleKeydown, true);
 document.addEventListener("mousedown", handleClickOutside, true);
 
-console.log("[TWmeme] content script v0.0.2 loaded on", location.host);
+console.log("[TWmeme] content script v0.0.3 loaded on", location.host);
