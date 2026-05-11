@@ -49,9 +49,10 @@ class DcardScraper(BaseScraper):
             # `patchright-init-script-inject.internal` that only exists inside
             # patchright's request interceptor. If we route it through a real
             # proxy, the proxy fails to resolve it and the whole navigation
-            # tears down. Bypass the proxy for *.internal and loopback so
-            # patchright's magic and any localhost services stay direct.
-            proxy = {**proxy, "bypass": "*.internal,localhost,127.0.0.1,::1"}
+            # tears down. Bypass the proxy for that exact hostname only —
+            # broader patterns (*.internal, etc.) caused Chromium to bypass
+            # the proxy for everything in earlier iterations.
+            proxy = {**proxy, "bypass": "patchright-init-script-inject.internal"}
 
         async with async_playwright() as p:
             browser = await p.chromium.launch(
