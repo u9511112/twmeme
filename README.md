@@ -19,12 +19,15 @@ GitHub Actions (cron 每 4 小時)
 Python Scraper (patchright stealth + 代理輪替)
     │  PTT / Dcard
     │  pHash 去重 (imagehash, Hamming ≤ 8)
+    │  asyncpg → Neon Postgres
+    │  boto3   → Cloudflare R2
     ▼
-Supabase PostgreSQL + Storage
+Neon Postgres (metadata) + Cloudflare R2 (images)
     │
     ▼
 靜態 Web (web/, 部署在 Vercel)
-    │  supabase-js anon key + RLS
+    │  @neondatabase/serverless HTTP driver
+    │  GRANT-restricted web_anon role
     ▼
 使用者搜尋 / 複製 / 下載
 ```
@@ -33,28 +36,30 @@ Supabase PostgreSQL + Storage
 
 | Layer | Tech |
 |-------|------|
-| Scraper | Python 3.12, patchright, aiohttp, imagehash |
-| Database | Supabase (PostgreSQL + Storage) |
+| Scraper | Python 3.12, patchright, aiohttp, imagehash, asyncpg, boto3 |
+| Database | Neon Postgres 17 (Singapore) |
+| Object Storage | Cloudflare R2 (APAC, public r2.dev URL) |
 | Scheduler | GitHub Actions (`cron: '0 */4 * * *'`) |
-| Web | 純靜態 HTML/CSS/JS + supabase-js v2 |
+| Web | 純靜態 HTML/CSS/JS + `@neondatabase/serverless` HTTP driver |
 | Hosting | Vercel |
 
-> **過去的版本**：曾經有 Flutter mobile app + FCM trending 推播，後來收斂為純網頁。`supabase/functions/trending-alert/` 是當時的 Edge Function，已移除。`memes.notified` 欄位 / `pg_net` extension 留著但未使用（避免 schema 分岔）。
+> **過去的版本**：
+> - 曾經有 Flutter mobile app + FCM trending 推播，後來收斂為純網頁。
+> - 原本資料庫是 Supabase (Postgres + Storage)，2026-05 遷移到 Neon + R2（脫離 free-tier auto-pause、拿到 R2 10GB + 零 egress 的免費額度）。舊的 Supabase migrations 移到 `supabase/migrations/legacy/` 留作歷史。
 
 ## Quick Start
 
 完整步驟見 [SETUP.md](SETUP.md)。
 
 ```bash
-# 本機跑 scraper（需 Supabase service_role key）
+# 本機跑 scraper
 cd scraper
 pip install -r requirements.txt
 python -m patchright install chromium
-cp .env.example .env  # 填入 SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+cp .env.example .env  # 填入 NEON_DATABASE_URL + R2_*
 python main.py --platforms ptt dcard
 
-# 本機開 web（純靜態）
-# 直接用任何 static server
+# 本機開 web（純靜態，連 prod Neon — web_anon role GRANT-safe）
 cd web
 python -m http.server 5173
 # 開 http://localhost:5173
@@ -64,11 +69,13 @@ python -m http.server 5173
 
 ```
 TWmeme/
-├── scraper/          # Python 爬蟲 + 反封鎖
-├── supabase/         # SQL migrations + Edge Functions
-├── web/              # 靜態前端（Vercel 部署目標）
-├── vercel.json       # Vercel 設定（output dir = web）
-└── .github/          # GitHub Actions cron
+├── scraper/                       # Python 爬蟲 + 反封鎖
+├── supabase/migrations/neon/      # 現用的 Neon schema (single file)
+├── supabase/migrations/legacy/    # Supabase 時代的 SQL，留作歷史
+├── scripts/migrate_data.py        # Supabase → Neon + R2 一次性搬遷腳本
+├── web/                           # 靜態前端（Vercel 部署目標）
+├── vercel.json                    # Vercel 設定（output dir = web）
+└── .github/                       # GitHub Actions cron
 ```
 
 ## Anti-Ban Strategy

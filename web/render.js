@@ -1,7 +1,7 @@
 // TWmeme — shared DOM render helpers.
 //
 // renderCard(meme) accepts both shapes:
-//   - Supabase row:  { id, title, cached_url, media_type, platform }
+//   - DB row:        { id, title, cached_url, media_type, platform }
 //   - Mock fallback: { name, emoji, bg, quality, tall }
 // Real images get an <img>; mock entries fall back to emoji + color block.
 
