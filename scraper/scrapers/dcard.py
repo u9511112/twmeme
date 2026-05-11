@@ -44,6 +44,15 @@ class DcardScraper(BaseScraper):
         captured_posts: list[dict] = []
 
         proxy = _pick_proxy()
+        if proxy:
+            # Patchright injects its stealth init via a magic hostname
+            # `patchright-init-script-inject.internal` that only exists inside
+            # patchright's request interceptor. If we route it through a real
+            # proxy, the proxy fails to resolve it and the whole navigation
+            # tears down. Bypass the proxy for *.internal and loopback so
+            # patchright's magic and any localhost services stay direct.
+            proxy = {**proxy, "bypass": "*.internal,localhost,127.0.0.1,::1"}
+
         async with async_playwright() as p:
             browser = await p.chromium.launch(
                 headless=True,
