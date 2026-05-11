@@ -68,7 +68,13 @@ jobs:
           getent hosts www.ptt.cc
 
           sudo apt-get install -y -qq tinyproxy
-          sudo sed -i 's/^LogLevel.*/LogLevel Critical/' /etc/tinyproxy/tinyproxy.conf
+          # Bump log to Info so we can see why Chromium's CONNECT is rejected.
+          # Also widen Allow to cover any loopback variant Chromium might use.
+          sudo sed -i 's/^LogLevel.*/LogLevel Info/' /etc/tinyproxy/tinyproxy.conf
+          sudo sed -i 's|^Logfile.*|Logfile "/var/log/tinyproxy/tinyproxy.log"|' /etc/tinyproxy/tinyproxy.conf
+          if ! grep -q '^Allow ::1' /etc/tinyproxy/tinyproxy.conf; then
+            echo "Allow ::1" | sudo tee -a /etc/tinyproxy/tinyproxy.conf
+          fi
           sudo systemctl restart tinyproxy
           sleep 1
           sudo systemctl is-active --quiet tinyproxy || (echo "::error::tinyproxy failed to start"; sudo journalctl -u tinyproxy --no-pager -n 30; exit 1)
@@ -78,6 +84,7 @@ jobs:
           echo "tinyproxy → www.dcard.tw responded with: $PROBE"
           if [ "$PROBE" = "ERR" ] || [ "$PROBE" = "000" ]; then
             echo "::error::tinyproxy could not reach www.dcard.tw"
+            sudo cat /var/log/tinyproxy/tinyproxy.log || true
             exit 1
           fi
 
@@ -97,6 +104,10 @@ jobs:
         run: |
           PLATFORMS="${{ github.event.inputs.platforms || 'ptt dcard' }}"
           python main.py --platforms $PLATFORMS
+
+      - name: Dump tinyproxy log
+        if: always()
+        run: sudo cat /var/log/tinyproxy/tinyproxy.log 2>/dev/null | tail -80 || echo "(no tinyproxy log)"
 
       - name: Upload scraper logs on failure
         if: failure()
