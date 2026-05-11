@@ -14,10 +14,14 @@ import re
 
 from .base import BaseScraper, _pick_proxy, human_scroll, accept_cookie_banner, UA, ScraperBlockedError
 
-try:
-    from patchright.async_api import async_playwright
-except ImportError:
-    from playwright.async_api import async_playwright
+# Dcard runs through a localhost forward proxy in CI to bypass Chromium's
+# DNS resolver (see scrape.yml). Patchright is incompatible here: its stealth
+# init hook routes a magic hostname `patchright-init-script-inject.internal`
+# through the proxy too, which NXDOMAINs and tears down the navigation. The
+# proxy bypass dance to exempt that one host failed (Chromium silently
+# stopped using the proxy at all). Drop down to plain playwright for dcard
+# only; other scrapers keep patchright.
+from playwright.async_api import async_playwright
 
 logger = logging.getLogger(__name__)
 
@@ -44,15 +48,6 @@ class DcardScraper(BaseScraper):
         captured_posts: list[dict] = []
 
         proxy = _pick_proxy()
-        if proxy:
-            # Patchright injects its stealth init via a magic hostname
-            # `patchright-init-script-inject.internal` that only exists inside
-            # patchright's request interceptor. If we route it through a real
-            # proxy, the proxy fails to resolve it and the whole navigation
-            # tears down. Bypass the proxy for that exact hostname only —
-            # broader patterns (*.internal, etc.) caused Chromium to bypass
-            # the proxy for everything in earlier iterations.
-            proxy = {**proxy, "bypass": "patchright-init-script-inject.internal"}
 
         async with async_playwright() as p:
             browser = await p.chromium.launch(
