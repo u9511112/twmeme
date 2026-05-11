@@ -48,8 +48,12 @@ jobs:
       - name: Run scraper
         working-directory: scraper
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEON_DATABASE_URL:     ${{ secrets.NEON_DATABASE_URL }}
+          R2_ENDPOINT:           ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID:      ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY:  ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET:             ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL:         ${{ secrets.R2_PUBLIC_URL }}
         run: |
           PLATFORMS="${{ github.event.inputs.platforms || 'ptt dcard' }}"
           python main.py --platforms $PLATFORMS
