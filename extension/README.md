@@ -72,7 +72,7 @@ extension/
 
 ## 上架到 Chrome Web Store
 
-1. 跑 `bash scripts/package_extension.sh` → 產出 `dist/twmeme-extension-v0.0.3.zip`
+1. 跑 `python scripts/package_extension.py` → 產出 `dist/twmeme-extension-v0.0.3.zip`
 2. 照 `extension/SCREENSHOTS.md` 拍 3-5 張截圖
 3. 把 `extension/STORE-LISTING.md` 各區段貼到 https://chrome.google.com/webstore/devconsole
 4. 上傳 zip + 截圖 → 送審

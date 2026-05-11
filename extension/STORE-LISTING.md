@@ -132,7 +132,7 @@ https://twmeme.vercel.app/privacy
 
 ## 送審前 checklist
 
-- [ ] `bash scripts/package_extension.sh` 跑成功，產出 `dist/twmeme-extension-v0.0.3.zip`
+- [ ] `python scripts/package_extension.py` 跑成功，產出 `dist/twmeme-extension-v0.0.3.zip`
 - [ ] zip 內檔案數 = 8（manifest + 4 js + 3 png）
 - [ ] manifest.json version 已 bump
 - [ ] 至少 3 張 1280×800 截圖（見 SCREENSHOTS.md）
