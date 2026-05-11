@@ -45,6 +45,21 @@ jobs:
             libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
             libxfixes3 libxrandr2 libgbm1 libasound2t64
 
+      # GH Actions runners' default DNS resolver gets NXDOMAIN for www.dcard.tw
+      # (likely Dcard geo-blocking GH IP ranges at the authoritative DNS layer).
+      # Cloudflare's anycast resolver bypasses it. Stop systemd-resolved so it
+      # can't rewrite resolv.conf back, then write our own.
+      - name: Use Cloudflare DNS resolver
+        run: |
+          sudo systemctl disable --now systemd-resolved 2>/dev/null || true
+          sudo rm -f /etc/resolv.conf
+          sudo sh -c 'printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf'
+          echo "--- /etc/resolv.conf ---"
+          cat /etc/resolv.conf
+          echo "--- DNS sanity check ---"
+          getent hosts www.dcard.tw
+          getent hosts www.ptt.cc
+
       - name: Run scraper
         working-directory: scraper
         env:
