@@ -14,14 +14,10 @@ import re
 
 from .base import BaseScraper, _pick_proxy, human_scroll, accept_cookie_banner, UA, ScraperBlockedError
 
-# Dcard runs through a localhost forward proxy in CI to bypass Chromium's
-# DNS resolver (see scrape.yml). Patchright is incompatible here: its stealth
-# init hook routes a magic hostname `patchright-init-script-inject.internal`
-# through the proxy too, which NXDOMAINs and tears down the navigation. The
-# proxy bypass dance to exempt that one host failed (Chromium silently
-# stopped using the proxy at all). Drop down to plain playwright for dcard
-# only; other scrapers keep patchright.
-from playwright.async_api import async_playwright
+try:
+    from patchright.async_api import async_playwright
+except ImportError:
+    from playwright.async_api import async_playwright
 
 logger = logging.getLogger(__name__)
 

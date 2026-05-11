@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       platforms:
-        description: 'Platforms to scrape (space-separated). Threads/IG need residential proxies.'
+        description: 'Platforms to scrape (space-separated). Dcard needs residential proxy (see DCARD-CI-STATUS.md). Threads/IG also need residential proxy.'
         required: false
-        default: 'ptt dcard'
+        default: 'ptt'
 
 jobs:
   scrape:
@@ -45,53 +45,6 @@ jobs:
             libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
             libxfixes3 libxrandr2 libgbm1 libasound2t64
 
-      # GH Actions runners' default DNS resolver gets NXDOMAIN for www.dcard.tw
-      # (Dcard geo-blocks GH IP ranges at the authoritative DNS layer). Override
-      # resolv.conf to Cloudflare, then route Chromium through a localhost
-      # tinyproxy. Why the proxy:
-      #   - Chromium's built-in AsyncDns resolver (and patchright's stealth fork)
-      #     ignores both /etc/resolv.conf overrides AND --host-resolver-rules.
-      #     /etc/hosts pins were also silently ignored. Tried, didn't work.
-      #   - tinyproxy uses libc getaddrinfo for DNS, which honors our resolv.conf.
-      #     Chromium connects only to 127.0.0.1:8888 (no DNS needed); tinyproxy
-      #     resolves the real hostname and CONNECT-tunnels TLS through. CF still
-      #     sees real Chromium TLS fingerprint, so WAF challenges pass normally.
-      - name: Set Cloudflare resolver + start tinyproxy for Chromium
-        run: |
-          sudo systemctl disable --now systemd-resolved 2>/dev/null || true
-          sudo rm -f /etc/resolv.conf
-          sudo sh -c 'printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf'
-          echo "--- /etc/resolv.conf ---"
-          cat /etc/resolv.conf
-          echo "--- libc DNS sanity check ---"
-          getent hosts www.dcard.tw || echo "(libc has no IPv4 — tinyproxy will use IPv6)"
-          getent hosts www.ptt.cc
-
-          sudo apt-get install -y -qq tinyproxy
-          # Bump log to Info so we can see why Chromium's CONNECT is rejected.
-          # Also widen Allow to cover any loopback variant Chromium might use.
-          sudo sed -i 's/^LogLevel.*/LogLevel Info/' /etc/tinyproxy/tinyproxy.conf
-          sudo sed -i 's|^Logfile.*|Logfile "/var/log/tinyproxy/tinyproxy.log"|' /etc/tinyproxy/tinyproxy.conf
-          if ! grep -q '^Allow ::1' /etc/tinyproxy/tinyproxy.conf; then
-            echo "Allow ::1" | sudo tee -a /etc/tinyproxy/tinyproxy.conf
-          fi
-          sudo systemctl restart tinyproxy
-          sleep 1
-          sudo systemctl is-active --quiet tinyproxy || (echo "::error::tinyproxy failed to start"; sudo journalctl -u tinyproxy --no-pager -n 30; exit 1)
-
-          echo "--- tinyproxy probe to www.dcard.tw ---"
-          PROBE=$(curl -sS -x http://127.0.0.1:8888 -o /dev/null -w "%{http_code}" --max-time 20 https://www.dcard.tw/ || echo "ERR")
-          echo "tinyproxy → www.dcard.tw responded with: $PROBE"
-          if [ "$PROBE" = "ERR" ] || [ "$PROBE" = "000" ]; then
-            echo "::error::tinyproxy could not reach www.dcard.tw"
-            sudo cat /var/log/tinyproxy/tinyproxy.log || true
-            exit 1
-          fi
-
-          echo "http://127.0.0.1:8888" > scraper/proxies.txt
-          echo "--- scraper/proxies.txt ---"
-          cat scraper/proxies.txt
-
       - name: Run scraper
         working-directory: scraper
         env:
@@ -102,12 +55,8 @@ jobs:
           R2_BUCKET:             ${{ secrets.R2_BUCKET }}
           R2_PUBLIC_URL:         ${{ secrets.R2_PUBLIC_URL }}
         run: |
-          PLATFORMS="${{ github.event.inputs.platforms || 'ptt dcard' }}"
+          PLATFORMS="${{ github.event.inputs.platforms || 'ptt' }}"
           python main.py --platforms $PLATFORMS
-
-      - name: Dump tinyproxy log
-        if: always()
-        run: sudo cat /var/log/tinyproxy/tinyproxy.log 2>/dev/null | tail -80 || echo "(no tinyproxy log)"
 
       - name: Upload scraper logs on failure
         if: failure()
