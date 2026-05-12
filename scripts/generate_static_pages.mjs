@@ -154,7 +154,7 @@ function renderMemePage(meme, related) {
     '@id': `${url}#breadcrumb`,
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'TWmeme', item: SITE_ORIGIN + '/' },
-      { '@type': 'ListItem', position: 2, name: '迷因索引', item: SITE_ORIGIN + '/meme/' },
+      { '@type': 'ListItem', position: 2, name: '迷因索引', item: SITE_ORIGIN + '/meme' },
       { '@type': 'ListItem', position: 3, name: title.slice(0, 60) },
     ],
   };
@@ -305,7 +305,7 @@ function renderSitemap(memes) {
     // results.html is intentionally excluded — it's marked noindex,follow
     // since search-result URLs would create infinite Google index pages.
     { loc: `${SITE_ORIGIN}/privacy.html`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
-    { loc: `${SITE_ORIGIN}/meme/`, lastmod: TODAY, changefreq: 'daily', priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/meme`, lastmod: TODAY, changefreq: 'daily', priority: '0.9' },
   ];
 
   const memeEntries = memes.map(m => ({
@@ -360,11 +360,11 @@ function renderMemeIndexPage(memes) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>所有迷因索引 — TWmeme</title>
 <meta name="description" content="TWmeme 收錄的所有台灣繁中迷因索引、來自 PTT 表特板與 C_Chat 板、依發文時間倒序排列。每張可點進詳細頁複製連結或下載原圖。">
-<link rel="canonical" href="${SITE_ORIGIN}/meme/">
+<link rel="canonical" href="${SITE_ORIGIN}/meme">
 <meta property="og:type" content="website">
 <meta property="og:title" content="所有迷因索引 — TWmeme">
 <meta property="og:description" content="TWmeme 收錄的所有台灣繁中迷因、依發文時間排列。">
-<meta property="og:url" content="${SITE_ORIGIN}/meme/">
+<meta property="og:url" content="${SITE_ORIGIN}/meme">
 <meta property="og:locale" content="zh_TW">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
