@@ -58,6 +58,30 @@ jobs:
           PLATFORMS="${{ github.event.inputs.platforms || 'ptt' }}"
           python main.py --platforms $PLATFORMS
 
+      - name: Trigger Vercel redeploy to regenerate /meme/*.html SSG pages
+        # Runs after a successful scrape so new memes get static long-tail
+        # pages within ~30s of being written to the DB. If the secret is
+        # missing the step logs the setup instructions and exits 0 — never
+        # fails the scrape run for a Phase 2 deploy-pipeline concern.
+        if: success()
+        env:
+          HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "VERCEL_DEPLOY_HOOK secret not set — skipping SSG redeploy."
+            echo ""
+            echo "To enable per-scrape redeploys:"
+            echo "  1. Vercel dashboard → twmeme project → Settings → Git → Deploy Hooks"
+            echo "  2. Create hook on the master branch (any name, e.g. 'scraper-trigger')"
+            echo "  3. Copy the URL into this repo's Settings → Secrets → Actions"
+            echo "     as VERCEL_DEPLOY_HOOK"
+            echo ""
+            echo "Without this, new memes only get static pages on next manual deploy."
+            exit 0
+          fi
+          echo "Triggering Vercel rebuild..."
+          curl -sS -X POST "$HOOK_URL" -w "\nHTTP %{http_code}\n"
+
       - name: Upload scraper logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
