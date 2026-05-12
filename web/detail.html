@@ -4,6 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>迷因詳細 — TWmeme</title>
+<script>
+  // Phase 2 SSG: detail.html is the legacy SPA route. Every meme now has
+  // a static /meme/<id>.html generated at build time (see
+  // scripts/generate_static_pages.mjs). Old detail.html?id=xxx bookmarks
+  // and external links redirect to the canonical static URL so we don't
+  // serve duplicate content to Google / AI engines.
+  (function() {
+    try {
+      var params = new URLSearchParams(location.search);
+      var id = (params.get('id') || '').trim();
+      // Basic UUID shape check; refuse weird inputs to avoid open-redirect-ish
+      // surprises and stop the redirect loop if /meme/<garbage> would 404.
+      if (/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(id)) {
+        location.replace('/meme/' + id);
+      }
+    } catch (_) { /* SPA fallback handles this */ }
+  })();
+</script>
+<meta name="robots" content="noindex,follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">

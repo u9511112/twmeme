@@ -25,7 +25,7 @@ function renderCard(meme, opts) {
 
   const link = document.createElement('a');
   link.className = 'card';
-  link.href = meme.id ? ('detail.html?id=' + encodeURIComponent(meme.id)) : 'detail.html';
+  link.href = meme.id ? ('/meme/' + encodeURIComponent(meme.id)) : '/';
   const displayName = meme.title || meme.name || '迷因';
   link.setAttribute('aria-label', displayName + ' 迷因詳細');
   if (opts.onClick) {

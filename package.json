@@ -1,0 +1,22 @@
+{
+  "name": "twmeme",
+  "version": "1.0.0",
+  "description": "台灣繁中迷因搜尋網站 — 你記得長什麼樣、但搜不到名字的那張。",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/generate_static_pages.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/u9511112/twmeme.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/u9511112/twmeme/issues"
+  },
+  "homepage": "https://github.com/u9511112/twmeme#readme",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}

@@ -44,3 +44,8 @@ Thumbs.db
 
 .vercel
 .gstack/
+
+# SSG build output (Phase 2): regenerated on every Vercel build from Neon
+web/meme/
+web/meme.js
+web/sitemap.xml
