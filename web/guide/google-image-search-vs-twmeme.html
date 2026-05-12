@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>為什麼 Google 圖搜不到台灣迷因（3 個替代方案） — TWmeme</title>
+<meta name="description" content="Google 圖片搜尋對台灣 PTT / Dcard 論壇迷因為什麼幾乎無用？拆解 Google 圖片排序的 4 個訊號、為什麼台灣論壇圖片每個都打不到、加上 3 個實際可用的替代方案（含 TWmeme、Bing、Yandex 比較）。">
+<link rel="canonical" href="https://twmeme.vercel.app/guide/google-image-search-vs-twmeme">
+<meta property="og:type" content="article">
+<meta property="og:title" content="為什麼 Google 圖搜不到台灣迷因 — TWmeme">
+<meta property="og:description" content="Google 圖片搜尋對台灣論壇迷因失效的技術原因 + 3 個替代方案比較。">
+<meta property="og:url" content="https://twmeme.vercel.app/guide/google-image-search-vs-twmeme">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "@id": "https://twmeme.vercel.app/guide/google-image-search-vs-twmeme#article",
+  "headline": "為什麼 Google 圖搜不到台灣迷因（3 個替代方案）",
+  "description": "Google 圖片排序機制拆解 + 為什麼對台灣論壇圖失效 + 3 個實際替代方案。",
+  "datePublished": "2026-05-12",
+  "dateModified": "2026-05-12",
+  "inLanguage": "zh-Hant-TW",
+  "url": "https://twmeme.vercel.app/guide/google-image-search-vs-twmeme",
+  "isPartOf": { "@id": "https://twmeme.vercel.app/#website" },
+  "publisher": { "@id": "https://twmeme.vercel.app/#organization" },
+  "author": { "@type": "Organization", "name": "TWmeme" },
+  "about": [
+    { "@type": "Thing", "name": "Google 圖片搜尋" },
+    { "@type": "Thing", "name": "台灣迷因" },
+    { "@type": "Thing", "name": "Yandex" },
+    { "@type": "Thing", "name": "SauceNAO" }
+  ],
+  "speakable": { "@type": "SpeakableSpecification", "cssSelector": ["h1", ".tldr", ".faq-q"] }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "inLanguage": "zh-Hant-TW",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "為什麼 Google 圖搜不到 PTT 上的圖？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Google 圖片搜尋的排序訊號是「檔名 + alt 屬性 + 周圍文字 + 反向連結」。PTT 上的圖通常檔名是 imgur 自動產生的亂碼（如 HIHHJrabkAAyUkI.jpg）、alt 是空的（PTT 推文沒有圖片描述欄位）、周圍文字只是討論不是描述、反向連結都集中在同一篇 PTT 文章。結果是 Google 對這張圖能取得的「語意訊號」幾乎是 0、自然搜不到。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Yandex 圖搜對台灣迷因有幫助嗎？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yandex 的「以圖搜圖」（reverse image search）很強、號稱準確度勝過 Google。但前提是你已經有那張圖檔案——把圖上傳給 Yandex、它找相似的圖。對於「我記得長什麼樣但沒檔案」的情境用不上。如果你只是要找這張圖的原始出處（已下載），Yandex 是好選擇。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "SauceNAO 是什麼？適合找台灣迷因嗎？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "SauceNAO 是 ACG（動漫）圖反查專用、強在找 pixiv / Twitter 上的二次元插畫原作。對台灣論壇上的反應圖、人物迷因幫助不大——SauceNAO 的索引主要來自 booru 系列圖站、不收 PTT / Dcard 內容。如果你要找的是動漫角色二創、SauceNAO 比 Google 圖搜好；如果是真實人物或論壇梗圖、用 TWmeme 或 Yandex。"
+      }
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "TWmeme", "item": "https://twmeme.vercel.app/" },
+    { "@type": "ListItem", "position": 2, "name": "指南", "item": "https://twmeme.vercel.app/guide/" },
+    { "@type": "ListItem", "position": 3, "name": "為什麼 Google 圖搜不到台灣迷因" }
+  ]
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/" class="wordmark">迷因<em>搜</em></a>
+  <nav class="nav-links">
+    <a href="/guide/">指南</a>
+    <a href="mailto:u9511112@gmail.com?subject=TWmeme%20%E6%84%8F%E8%A6%8B%E5%9B%9E%E9%A5%8B">意見回饋</a>
+  </nav>
+</header>
+
+<main class="article">
+  <article>
+    <p class="article-breadcrumb"><a href="/">TWmeme</a> / <a href="/guide/">指南</a> / 為什麼 Google 圖搜不到台灣迷因</p>
+
+    <h1>為什麼 Google 圖搜不到台灣迷因（3 個替代方案）</h1>
+
+    <p class="article-byline">By TWmeme · 更新於 2026-05-12</p>
+
+    <div class="tldr">
+      <strong>30 秒快答：</strong>Google 圖片以「檔名 + alt 屬性 + 周圍文字 + 反向連結」排序、但台灣論壇圖每個訊號都打不到——檔名是 imgur 亂碼、alt 是空的、周圍文字是討論、反向連結都集中在同一篇 PTT 文。3 個能用的替代方案：TWmeme（用中文標題反查）、Yandex 以圖搜圖（已有檔案時）、SauceNAO（限二次元動漫圖）。
+    </div>
+
+    <h2>Google 圖片搜尋怎麼運作的</h2>
+
+    <p>Google 圖片排序的核心訊號有 4 個（依重要度排序）：</p>
+
+    <ol>
+      <li><strong>檔名</strong>：<code>red-shiba-inu-shocked.jpg</code> 這種有語意的檔名、比 <code>HIHHJrabkAAyUkI.jpg</code> 強得多。</li>
+      <li><strong>alt 屬性</strong>：<code>&lt;img alt="柴犬被閃電打到的反應圖"&gt;</code>——直接告訴爬蟲圖片內容。</li>
+      <li><strong>周圍文字</strong>：圖片標籤前後的段落、caption、figure 標題。</li>
+      <li><strong>反向連結</strong>：有多少獨立網域連到這張圖、連結文字用什麼字眼。</li>
+    </ol>
+
+    <p>這套機制對「商業網站的產品圖、攝影師作品、新聞圖」運作得很好——這些情境下檔名通常是英文、alt 是描述、周圍有 caption、有獨立網域連結指過來。但對台灣論壇圖、四個訊號每個都打不到。</p>
+
+    <h2>為什麼台灣論壇圖每個訊號都失敗</h2>
+
+    <p>拿一張典型的 PTT 表特板貼文當例子：</p>
+
+    <ul>
+      <li><strong>檔名</strong>：<code>imgur.com/HIHHJrabkAAyUkI.jpg</code>——imgur 自動產生的 base32 亂碼、零語意。</li>
+      <li><strong>alt 屬性</strong>：空的。PTT 推文系統不支援 alt、發文者也沒辦法加。</li>
+      <li><strong>周圍文字</strong>：「推文 1: 太正了吧」「推文 2: 想娶」——是討論不是描述。對 Google 來說這些是 noise、不是 signal。</li>
+      <li><strong>反向連結</strong>：只有一個 PTT 文章連這張圖。沒有多個獨立網域給「authority」訊號。</li>
+    </ul>
+
+    <p>Google 看完這張圖、能用來建索引的有效訊息趨近於 0。所以即使你用「柴犬 雷 反應」這種精確關鍵字搜、結果通常是商業 stock photo 網站的柴犬圖、不是 PTT 上那張你記得的。</p>
+
+    <h2>替代方案 1：TWmeme（中文關鍵字反查）</h2>
+
+    <p>TWmeme 的解法是<strong>反過來建索引</strong>——不依賴圖片本身的 metadata、改用<strong>論壇的中文標題和推文</strong>當作圖片描述。</p>
+
+    <ul>
+      <li>每 4 小時爬 PTT 表特板和 C_Chat 板</li>
+      <li>把文章標題、推文摘要、發文日期跟圖片綁在一起存到資料庫</li>
+      <li>搜尋時、用 PostgreSQL trigram 索引比對中文標題、ILIKE 模糊匹配</li>
+      <li>結果按發文時間和熱門度排序</li>
+    </ul>
+
+    <p>適用情境：「我記得那張圖在某個 PTT 文章看過、文章標題大概有 XXX 字眼」。命中率對台灣本土迷因很高、對國際梗圖（Drake meme 那類）幫助不大——那類圖 Google 反而做得好。</p>
+
+    <p>限制：</p>
+
+    <ul>
+      <li>目前只收 PTT 表特板和 C_Chat（Dcard 穩定中）</li>
+      <li>新出來的迷因有 4-8 小時延遲（爬蟲頻率）</li>
+      <li>標題不在中文上下文裡的圖（純圖無敘述）找不到</li>
+    </ul>
+
+    <h2>替代方案 2：Yandex 以圖搜圖</h2>
+
+    <p>Yandex 的 reverse image search 是業界公認最強的之一——準確度勝過 Google 的「以圖搜圖」、特別在臉部辨識和場景比對。</p>
+
+    <p>適用情境：<strong>你已經有那張圖檔案</strong>、想找原始出處或同一張圖在哪些網站出現過。</p>
+
+    <p>使用方式：<code>yandex.com/images</code> → 相機 icon → 上傳圖或貼 URL → Yandex 回傳所有它找到的相似圖。</p>
+
+    <p>限制：</p>
+
+    <ul>
+      <li>必須已有圖檔案（網路上找不到的不能反查）</li>
+      <li>結果可能包含 Yandex 索引的俄語/英語網站、不一定能找到 PTT</li>
+      <li>對「我記得長什麼樣但沒檔案」的情境完全用不上</li>
+    </ul>
+
+    <h2>替代方案 3：SauceNAO（僅限二次元）</h2>
+
+    <p>SauceNAO 是 ACG（動漫）插畫反查專用、強在找 pixiv / Twitter / Danbooru / Gelbooru 等動漫圖站的原作。</p>
+
+    <p>適用情境：你看到一張<strong>動漫人物</strong>的二創、想找原圖、原作者、是哪部作品。</p>
+
+    <p>使用方式：<code>saucenao.com</code> → 上傳圖或貼 URL → 回傳含原作 URL 的相似圖列表。</p>
+
+    <p>限制：</p>
+
+    <ul>
+      <li>只索引動漫圖站、不收 PTT / Dcard</li>
+      <li>真實人物迷因、論壇反應圖完全找不到</li>
+      <li>需要已有圖檔案</li>
+    </ul>
+
+    <h2>選哪個？</h2>
+
+    <table style="width: 100%; border-collapse: collapse; margin: var(--s-md) 0">
+      <thead>
+        <tr style="background: var(--surface); border-bottom: 1px solid var(--border)">
+          <th style="text-align: left; padding: var(--s-sm)">情境</th>
+          <th style="text-align: left; padding: var(--s-sm)">最佳工具</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">記得 PTT 表特板某張圖、文字描述記得</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)"><strong>TWmeme</strong></td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">已下載某張圖、找原出處</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">Yandex</td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">動漫角色二創、找原作</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">SauceNAO</td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">商業攝影 stock photo</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">Google 圖搜</td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">國際英文 meme（Drake、Distracted Boyfriend）</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">Google 圖搜 / imgflip</td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">記得只是個梗、不確定哪個來源</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">先 TWmeme、再 Google</td></tr>
+      </tbody>
+    </table>
+
+    <h2>未來會改變嗎？</h2>
+
+    <p>Google 圖片搜尋的核心訊號從 2015 年到現在沒有大改、近 10 年 Google 主要在投資 multimodal AI（Lens、Bard/Gemini 視覺理解）、而不是改傳統圖片排序。短期內、台灣論壇圖被 Google 索引得好的可能性低。</p>
+
+    <p>有可能改變的點是 AI 搜尋——ChatGPT、Perplexity、Gemini 用視覺模型直接「看懂」圖、而不是依賴 metadata。但這類工具目前還沒大規模索引台灣論壇。所以 5 年內、用中文上下文反查圖的需求仍會存在。</p>
+
+    <h2>常見問題</h2>
+
+    <div class="faq-grid" style="grid-template-columns: 1fr">
+      <article class="faq-item">
+        <h3 class="faq-q">為什麼 Google 圖搜不到 PTT 上的圖？</h3>
+        <div class="faq-a">Google 圖片搜尋的排序訊號是「檔名 + alt 屬性 + 周圍文字 + 反向連結」。PTT 上的圖通常檔名是 imgur 自動產生的亂碼（如 HIHHJrabkAAyUkI.jpg）、alt 是空的（PTT 推文沒有圖片描述欄位）、周圍文字只是討論不是描述、反向連結都集中在同一篇 PTT 文章。結果是 Google 對這張圖能取得的「語意訊號」幾乎是 0、自然搜不到。</div>
+      </article>
+
+      <article class="faq-item">
+        <h3 class="faq-q">Yandex 圖搜對台灣迷因有幫助嗎？</h3>
+        <div class="faq-a">Yandex 的「以圖搜圖」（reverse image search）很強、號稱準確度勝過 Google。但前提是你已經有那張圖檔案——把圖上傳給 Yandex、它找相似的圖。對於「我記得長什麼樣但沒檔案」的情境用不上。如果你只是要找這張圖的原始出處（已下載），Yandex 是好選擇。</div>
+      </article>
+
+      <article class="faq-item">
+        <h3 class="faq-q">SauceNAO 是什麼？適合找台灣迷因嗎？</h3>
+        <div class="faq-a">SauceNAO 是 ACG（動漫）圖反查專用、強在找 pixiv / Twitter 上的二次元插畫原作。對台灣論壇上的反應圖、人物迷因幫助不大——SauceNAO 的索引主要來自 booru 系列圖站、不收 PTT / Dcard 內容。如果你要找的是動漫角色二創、SauceNAO 比 Google 圖搜好；如果是真實人物或論壇梗圖、用 TWmeme 或 Yandex。</div>
+      </article>
+    </div>
+
+    <div class="article-cta">
+      <p><a href="/" class="btn btn-primary">用 TWmeme 試試看</a></p>
+      <p style="margin-top: var(--s-md); color: var(--muted); font-size: 14px">
+        相關閱讀：<a href="/guide/taiwan-meme">台灣繁中迷因搜尋完整指南</a> ·
+        <a href="/guide/ptt-beauty-old-meme">PTT 表特板舊圖搜尋技巧</a>
+      </p>
+    </div>
+  </article>
+</main>
+
+<footer class="site-footer">
+  © 2026 TWmeme · 台灣繁中迷因搜尋 · <a href="/privacy.html">隱私政策</a>
+</footer>
+
+</body>
+</html>

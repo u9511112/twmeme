@@ -17,7 +17,7 @@
 // On Vercel: vercel.json `buildCommand` hooks this in.
 
 import { neon } from '@neondatabase/serverless';
-import { mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdir, writeFile, rm, readdir } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -299,14 +299,22 @@ ${relatedHtml}
 `;
 }
 
-function renderSitemap(memes) {
+function renderSitemap(memes, guideSlugs) {
   const staticEntries = [
     { loc: `${SITE_ORIGIN}/`, lastmod: TODAY, changefreq: 'daily', priority: '1.0' },
     // results.html is intentionally excluded — it's marked noindex,follow
     // since search-result URLs would create infinite Google index pages.
     { loc: `${SITE_ORIGIN}/privacy.html`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
     { loc: `${SITE_ORIGIN}/meme`, lastmod: TODAY, changefreq: 'daily', priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/guide`, lastmod: TODAY, changefreq: 'monthly', priority: '0.8' },
   ];
+
+  const guideEntries = guideSlugs.map(slug => ({
+    loc: `${SITE_ORIGIN}/guide/${slug}`,
+    lastmod: TODAY,
+    changefreq: 'monthly',
+    priority: slug === 'taiwan-meme' ? '0.9' : '0.7',  // pillar gets higher
+  }));
 
   const memeEntries = memes.map(m => ({
     loc: `${SITE_ORIGIN}/meme/${m.id}`,
@@ -315,7 +323,7 @@ function renderSitemap(memes) {
     priority: '0.7',
   }));
 
-  const entries = [...staticEntries, ...memeEntries]
+  const entries = [...staticEntries, ...guideEntries, ...memeEntries]
     .map(e =>
       `  <url>
     <loc>${e.loc}</loc>
@@ -509,9 +517,20 @@ async function main() {
   console.log('[ssg] writing meme index page...');
   await writeFile(join(MEME_DIR, 'index.html'), renderMemeIndexPage(memes), 'utf-8');
 
-  // Sitemap with all meme URLs
+  // Glob /guide/*.html (excluding index.html) for sitemap inclusion
+  const guideDir = join(WEB_DIR, 'guide');
+  let guideSlugs = [];
+  try {
+    const entries = await readdir(guideDir);
+    guideSlugs = entries
+      .filter(f => f.endsWith('.html') && f !== 'index.html')
+      .map(f => f.replace(/\.html$/, ''));
+  } catch (_) { /* guide dir might not exist on first build */ }
+  console.log('[ssg] found ' + guideSlugs.length + ' guide pages');
+
+  // Sitemap with all meme URLs + guides
   console.log('[ssg] writing sitemap.xml...');
-  await writeFile(join(WEB_DIR, 'sitemap.xml'), renderSitemap(memes), 'utf-8');
+  await writeFile(join(WEB_DIR, 'sitemap.xml'), renderSitemap(memes, guideSlugs), 'utf-8');
 
   // Shared meme.js
   console.log('[ssg] writing /meme.js...');
@@ -520,7 +539,7 @@ async function main() {
   console.log('[ssg] done.');
   console.log('  /meme/<uuid>.html × ' + memes.length);
   console.log('  /meme/index.html');
-  console.log('  /sitemap.xml (' + (memes.length + 3) + ' urls)');
+  console.log('  /sitemap.xml (' + (memes.length + 4 + guideSlugs.length) + ' urls)');
   console.log('  /meme.js');
 }
 

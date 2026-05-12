@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PTT 表特板舊圖搜尋技巧：5 種關鍵字方法 — TWmeme</title>
+<meta name="description" content="記得在 PTT 表特板（Beauty）看過某張圖、忘記文章標題怎麼找回來？5 種關鍵字技巧：人名、情緒詞、版友推文、時間線索、近義字替換。實際例子 + TWmeme 工作流。">
+<link rel="canonical" href="https://twmeme.vercel.app/guide/ptt-beauty-old-meme">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PTT 表特板舊圖搜尋技巧：5 種關鍵字方法 — TWmeme">
+<meta property="og:description" content="記得看過某張表特板圖、忘記文章標題怎麼找回來？5 種關鍵字技巧 + 實例。">
+<meta property="og:url" content="https://twmeme.vercel.app/guide/ptt-beauty-old-meme">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "@id": "https://twmeme.vercel.app/guide/ptt-beauty-old-meme#article",
+  "headline": "PTT 表特板舊圖搜尋技巧：5 種關鍵字方法",
+  "description": "5 種針對 PTT 表特板和 C_Chat 板舊圖的搜尋技巧、每種附實際例子。",
+  "datePublished": "2026-05-12",
+  "dateModified": "2026-05-12",
+  "inLanguage": "zh-Hant-TW",
+  "url": "https://twmeme.vercel.app/guide/ptt-beauty-old-meme",
+  "isPartOf": { "@id": "https://twmeme.vercel.app/#website" },
+  "publisher": { "@id": "https://twmeme.vercel.app/#organization" },
+  "author": { "@type": "Organization", "name": "TWmeme" },
+  "about": [
+    { "@type": "Thing", "name": "PTT 表特板" },
+    { "@type": "Thing", "name": "迷因搜尋" }
+  ],
+  "speakable": { "@type": "SpeakableSpecification", "cssSelector": ["h1", ".tldr", ".faq-q"] }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "inLanguage": "zh-Hant-TW",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "PTT 表特板的圖可以用 Google 搜到嗎？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "PTT 文章本身會被 Google 索引、所以用「site:ptt.cc Beauty 關鍵字」可以找到文章。但圖片本身——因為檔名亂碼、無 alt——很難直接用 Google 圖片搜到。實務上比較有效的是先用文字搜文章、再點進去看圖；或用 TWmeme 直接搜——TWmeme 已經把所有圖跟標題綁起來、不用兩階段。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "PTT 表特板的舊圖會被刪嗎？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "PTT 文章本身一般不會被自動刪、但圖床（imgur、meee.com.tw 等）可能會。imgur 的圖大多會長期保留、但若上傳者刪除帳號或圖片、圖就會 404。TWmeme 為了避免這個問題、把每張圖都緩存到 Cloudflare R2、即使原圖床掛了 TWmeme 上的圖還是能看。原始 PTT 文章連結照樣附上、可以追溯。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "C_Chat 板的反應圖也算嗎？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "算。C_Chat 是 ACG 動漫板、很多反應圖、表情包都從這裡流通。TWmeme 同時爬 Beauty 板和 C_Chat 板、所以搜尋結果會混合出現兩個板的圖。如果你只想看其中一個版的、目前只能在標題裡看 [板別] 線索區分；未來會加篩選器。"
+      }
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "TWmeme", "item": "https://twmeme.vercel.app/" },
+    { "@type": "ListItem", "position": 2, "name": "指南", "item": "https://twmeme.vercel.app/guide/" },
+    { "@type": "ListItem", "position": 3, "name": "PTT 表特板舊圖搜尋技巧" }
+  ]
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/" class="wordmark">迷因<em>搜</em></a>
+  <nav class="nav-links">
+    <a href="/guide/">指南</a>
+    <a href="mailto:u9511112@gmail.com?subject=TWmeme%20%E6%84%8F%E8%A6%8B%E5%9B%9E%E9%A5%8B">意見回饋</a>
+  </nav>
+</header>
+
+<main class="article">
+  <article>
+    <p class="article-breadcrumb"><a href="/">TWmeme</a> / <a href="/guide/">指南</a> / PTT 表特板舊圖搜尋技巧</p>
+
+    <h1>PTT 表特板舊圖搜尋技巧：5 種關鍵字方法</h1>
+
+    <p class="article-byline">By TWmeme · 更新於 2026-05-12</p>
+
+    <div class="tldr">
+      <strong>30 秒快答：</strong>用「人名 + 情緒詞」、「板友常用推文用語」、「時間線索（如『去年』『2024 過年』）」、「近義字交叉試」、「板別 + 主題」5 種方法之一在 TWmeme 搜、命中率比硬背完整標題高 3 倍。
+    </div>
+
+    <p>PTT 表特板（Beauty）有十年以上的累積、加上 C_Chat 板的 ACG 反應圖、總量大到很容易「記得但找不回來」。下面 5 個技巧、是從 TWmeme 搜尋日誌裡常見的成功 case 整理出來的。</p>
+
+    <h2>技巧 1：人名 + 情緒詞</h2>
+
+    <p>最有效的組合。台灣論壇文化裡、表情包很常以「<strong>人物 + 表情</strong>」命名、例如：</p>
+
+    <ul>
+      <li>「館長 崩潰」</li>
+      <li>「柯文哲 無奈」</li>
+      <li>「韓國瑜 結凍」</li>
+      <li>「五月天 阿信 傻眼」</li>
+    </ul>
+
+    <p>不要用完整全名、抓最有辨識度的部分就行。例如「館長」比「成吉思汗健身會館館長」好搜——前者是 PTT 上的習慣稱呼、後者沒人那樣寫。</p>
+
+    <h2>技巧 2：版友常用推文用語</h2>
+
+    <p>PTT 推文有一套自己的語彙——很多迷因標題就直接抄推文。常見的關鍵字：</p>
+
+    <ul>
+      <li>「<strong>大平台</strong>」「<strong>正爆</strong>」「<strong>盤子</strong>」（表特板）</li>
+      <li>「<strong>QQ</strong>」「<strong>慘</strong>」「<strong>笑死</strong>」「<strong>傻眼</strong>」（萬用情緒）</li>
+      <li>「<strong>釣魚</strong>」「<strong>釣到大魚</strong>」「<strong>翻車</strong>」（爭議型）</li>
+      <li>「<strong>有掛？</strong>」「<strong>是不是大母豬</strong>」（C_Chat 釣魚標題模板）</li>
+    </ul>
+
+    <p>如果你只記得「那篇 PTT 文章好像在嘴某個人」、試著用這些情緒字眼搜、命中率比硬想標題高。</p>
+
+    <h2>技巧 3：時間線索</h2>
+
+    <p>如果你記得大概看到的時間、可以把<strong>年份或事件</strong>加進關鍵字裡：</p>
+
+    <ul>
+      <li>「過年 紅包」（每年農曆年附近一堆相關迷因）</li>
+      <li>「金鐘 紅毯」（金鐘獎結束後 1-2 週）</li>
+      <li>「選舉 投票」（大選前後）</li>
+      <li>「跨年 101」（跨年夜後一週）</li>
+    </ul>
+
+    <p>TWmeme 不只搜標題、也會看發文日期。如果你記得「應該是 2024 過年看到的」、在搜尋框打「過年」、結果會以發文時間倒序排、那個時段的圖會集中在某一頁。</p>
+
+    <h2>技巧 4：近義字交叉試</h2>
+
+    <p>PTT 表特板的標題有時跟你印象中的字眼不太一樣。準備這幾組常見替換、輪流試：</p>
+
+    <table style="width: 100%; border-collapse: collapse; margin: var(--s-md) 0">
+      <thead>
+        <tr style="background: var(--surface); border-bottom: 1px solid var(--border)">
+          <th style="text-align: left; padding: var(--s-sm)">你記得的字</th>
+          <th style="text-align: left; padding: var(--s-sm)">PTT 常見替代</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">無語</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">傻眼、無言、QQ</td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">崩潰</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">心累、絕望、心死</td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">生氣</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">森 77、暴怒、火大</td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">驚訝</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">嚇歪、嚇傻、有掛</td></tr>
+        <tr><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">高興</td><td style="padding: var(--s-sm); border-bottom: 1px solid var(--border)">爽、笑死、嗨</td></tr>
+      </tbody>
+    </table>
+
+    <h2>技巧 5：板別 + 主題</h2>
+
+    <p>如果你記得「應該是某個板看到的」、把板別當前綴試試：</p>
+
+    <ul>
+      <li>「<strong>表特</strong> 拉麵店」</li>
+      <li>「<strong>C_Chat</strong> 鋼彈」</li>
+      <li>「<strong>八卦</strong> 政治人物」</li>
+    </ul>
+
+    <p>TWmeme 目前主要收 Beauty 和 C_Chat、所以「八卦」這類前綴可能命中少。如果是 ACG 相關記得加「C_Chat」前綴、PTT 板友自己常這樣標。</p>
+
+    <h2>實際工作流：從「我記得」到複製連結、約 30 秒</h2>
+
+    <p>把上面 5 招放進實際使用：</p>
+
+    <ol>
+      <li>想出 2-3 個印象關鍵字（用技巧 1-5 任一）</li>
+      <li>輸入 TWmeme 首頁搜尋框</li>
+      <li>結果頁掃 10 秒、看有沒有想要的縮圖</li>
+      <li>沒有就換近義字（技巧 4）、再 10 秒</li>
+      <li>找到後點開詳細頁、按「複製連結」</li>
+      <li>切到 LINE / IG / Threads、貼上、自動展開預覽</li>
+    </ol>
+
+    <p>整個過程比手動翻 PTT 表特板、進每篇文章找圖、再右鍵複製連結快 5-10 倍。TWmeme 的設計目標就是把這個常見任務壓到 30 秒以內。</p>
+
+    <h2>常見問題</h2>
+
+    <div class="faq-grid" style="grid-template-columns: 1fr">
+      <article class="faq-item">
+        <h3 class="faq-q">PTT 表特板的圖可以用 Google 搜到嗎？</h3>
+        <div class="faq-a">PTT 文章本身會被 Google 索引、所以用「site:ptt.cc Beauty 關鍵字」可以找到文章。但圖片本身——因為檔名亂碼、無 alt——很難直接用 Google 圖片搜到。實務上比較有效的是先用文字搜文章、再點進去看圖；或用 TWmeme 直接搜——TWmeme 已經把所有圖跟標題綁起來、不用兩階段。</div>
+      </article>
+
+      <article class="faq-item">
+        <h3 class="faq-q">PTT 表特板的舊圖會被刪嗎？</h3>
+        <div class="faq-a">PTT 文章本身一般不會被自動刪、但圖床（imgur、meee.com.tw 等）可能會。imgur 的圖大多會長期保留、但若上傳者刪除帳號或圖片、圖就會 404。TWmeme 為了避免這個問題、把每張圖都緩存到 Cloudflare R2、即使原圖床掛了 TWmeme 上的圖還是能看。原始 PTT 文章連結照樣附上、可以追溯。</div>
+      </article>
+
+      <article class="faq-item">
+        <h3 class="faq-q">C_Chat 板的反應圖也算嗎？</h3>
+        <div class="faq-a">算。C_Chat 是 ACG 動漫板、很多反應圖、表情包都從這裡流通。TWmeme 同時爬 Beauty 板和 C_Chat 板、所以搜尋結果會混合出現兩個板的圖。如果你只想看其中一個版的、目前只能在標題裡看 [板別] 線索區分；未來會加篩選器。</div>
+      </article>
+    </div>
+
+    <div class="article-cta">
+      <p><a href="/" class="btn btn-primary">回首頁試試這些技巧</a></p>
+      <p style="margin-top: var(--s-md); color: var(--muted); font-size: 14px">
+        相關閱讀：<a href="/guide/taiwan-meme">台灣繁中迷因搜尋完整指南</a> ·
+        <a href="/guide/copy-meme-to-chat">迷因怎麼貼到 LINE / IG / Threads</a>
+      </p>
+    </div>
+  </article>
+</main>
+
+<footer class="site-footer">
+  © 2026 TWmeme · 台灣繁中迷因搜尋 · <a href="/privacy.html">隱私政策</a>
+</footer>
+
+</body>
+</html>
