@@ -14,10 +14,81 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="TWmeme — 找到那張你記得但搜不到的迷因">
 <meta name="twitter:description" content="早期版本、以 PTT 表特板為主。搜不到的告訴我們、會補上。">
+<link rel="canonical" href="https://twmeme.vercel.app/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://twmeme.vercel.app/#website",
+  "url": "https://twmeme.vercel.app/",
+  "name": "TWmeme",
+  "alternateName": "迷因搜",
+  "description": "台灣繁中迷因搜尋。早期版本以 PTT 表特板為主。",
+  "inLanguage": "zh-Hant-TW",
+  "publisher": { "@id": "https://twmeme.vercel.app/#organization" },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://twmeme.vercel.app/results.html?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": "https://twmeme.vercel.app/#webapp",
+  "name": "TWmeme",
+  "alternateName": "台灣迷因搜尋",
+  "url": "https://twmeme.vercel.app/",
+  "description": "搜尋台灣繁體中文迷因圖片的免費網頁工具。輸入印象中的關鍵字、人名或標題片段、找到那張你記得但搜不到的迷因。資料來源以 PTT 表特板為主、可一鍵複製連結貼到 LINE/IG/FB 或下載原圖。",
+  "applicationCategory": "UtilitiesApplication",
+  "applicationSubCategory": "Image Search",
+  "operatingSystem": "Any (web browser)",
+  "browserRequirements": "Requires JavaScript. Modern browsers (Chrome, Firefox, Safari, Edge).",
+  "inLanguage": "zh-Hant-TW",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "TWD"
+  },
+  "featureList": [
+    "繁體中文關鍵字搜尋",
+    "PTT 表特板 / C_Chat 反應圖收錄",
+    "pHash 自動去重（Hamming ≤ 8）",
+    "一鍵複製圖片連結到聊天室",
+    "一鍵下載原圖",
+    "畫質徽章標示（HD / 4K）",
+    "免費、無需註冊"
+  ],
+  "publisher": { "@id": "https://twmeme.vercel.app/#organization" }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://twmeme.vercel.app/#organization",
+  "name": "TWmeme",
+  "alternateName": "迷因搜",
+  "url": "https://twmeme.vercel.app/",
+  "description": "TWmeme 是台灣繁體中文迷因搜尋工具、由獨立開發者維護的開源專案。",
+  "sameAs": [
+    "https://github.com/u9511112/twmeme"
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -50,7 +121,130 @@
 
   <div class="broken-grid" id="trending-grid"></div>
 </section>
+
+<section class="section faq-section">
+  <div class="section-head">
+    <h2>常見問題</h2>
+  </div>
+
+  <div class="faq-grid">
+    <article class="faq-item">
+      <h3 class="faq-q">怎麼找我記得但忘記名字的迷因？</h3>
+      <div class="faq-a">在搜尋框輸入你印象最深的字眼就行——可能是圖裡的人物、講的話、發文者用的標題片段、甚至是場景。例如記得「柴犬被雷打到」、輸入「柴犬」或「雷」、TWmeme 會比對 PTT 表特板和 C_Chat 板上每篇文章的標題、推文內容、圖片附近的關鍵字。比 Google 圖搜的好處是：Google 比對的是檔名和 alt text、台灣論壇圖片大多沒這些；TWmeme 直接索引論壇的中文上下文、所以「印象式關鍵字」反而比較容易命中。</div>
+    </article>
+
+    <article class="faq-item">
+      <h3 class="faq-q">PTT 表特板的圖怎麼搜？</h3>
+      <div class="faq-a">PTT 表特板（Beauty）和 C_Chat 板每 4 小時被 TWmeme 自動爬一次、整理成可搜尋的資料庫。每張圖會記錄發文標題、版上推文、發文日期、原始連結。在 PTT 上要翻到一張舊圖通常得記得日期或編號、TWmeme 用關鍵字就能直接找到。圖片本身用 pHash（感知雜湊）去重、Hamming 距離 ≤ 8 的視為同一張、避免同一張迷因因為重複轉貼出現好幾次。原始 PTT 文章連結會一起附上、可以追溯出處。</div>
+    </article>
+
+    <article class="faq-item">
+      <h3 class="faq-q">Dcard 的迷因會收嗎？</h3>
+      <div class="faq-a">會、但目前還在穩定中。Dcard 的反爬機制比 PTT 嚴格（Cloudflare 擋住直接 API 存取）、TWmeme 用瀏覽器自動化攔截 GraphQL response 取資料、不過沒住宅代理時穩定度會掉、所以目前 Dcard 不是 CI 預設爬的平台、收錄量會慢慢補上。如果你急著找 Dcard 上某張圖、可以先用「意見回饋」告訴我們大概的關鍵字或日期、我們手動補。Threads 和 Instagram 也是同樣的狀況、優先補 Dcard。</div>
+    </article>
+
+    <article class="faq-item">
+      <h3 class="faq-q">為什麼 Google 圖搜不到？</h3>
+      <div class="faq-a">Google 圖片以「檔名 + alt 屬性 + 周圍文字」為主要訊號、台灣論壇的迷因圖通常檔名是亂碼（imgur 的 hash）、沒有 alt、周圍文字也只是討論不是描述、所以 Google 圖片爬蟲很難建立有用的索引。TWmeme 反過來、直接從論壇的中文標題、推文、發文日期建立索引、用中文關鍵字反查圖片、命中率比 Google 圖搜在「台灣本土迷因」這個 niche 上高很多。Google 比較適合找有版權標示的網路圖、不適合找台灣社群迷因。</div>
+    </article>
+
+    <article class="faq-item">
+      <h3 class="faq-q">圖片可以直接拿來用嗎？版權怎麼算？</h3>
+      <div class="faq-a">TWmeme 本身不持有圖片版權、所有圖片都是從公開的 PTT / Dcard 等論壇索引、原始版權歸發文者或圖片作者所有。建議的使用方式是：聊天室 / LINE / 私訊等私人非商業情境一般沒問題（迷因文化本來就建立在轉發上）；公開貼文、商業使用、廣告素材建議標註來源或先取得授權。每張迷因的詳細頁面都會附原始 PTT 連結、方便追溯出處。如果你是發文者、發現自己的圖被收錄想下架、用首頁「意見回饋」聯絡即可。</div>
+    </article>
+
+    <article class="faq-item">
+      <h3 class="faq-q">怎麼複製到 LINE / IG / Threads？</h3>
+      <div class="faq-a">點開任何一張迷因的詳細頁、會看到兩個按鈕：「複製連結」會把圖片的直接 URL 複製到剪貼簿、貼到 LINE / IG 訊息 / Threads 就會自動展開預覽圖；「下載原圖」會把原始解析度的檔案存到電腦、適合做 FB 粉專封面或 IG 限時動態。手機版瀏覽器點圖長按也可以「儲存圖片」。所有複製和下載都不需要登入、也不會被追蹤點擊次數。</div>
+    </article>
+
+    <article class="faq-item">
+      <h3 class="faq-q">迷因更新頻率？多久收一次新的？</h3>
+      <div class="faq-a">TWmeme 的爬蟲跑在 GitHub Actions 上、每 4 小時自動執行一次（cron 0 */4 * * *）、PTT 表特板和 C_Chat 板各抓最近 3 頁、再用 pHash 比對排掉重複的。所以新發出來的熱門迷因通常 4-8 小時內會出現在 TWmeme 搜尋結果裡。早期版本不會自己挑「熱門」、按發文時間倒序排、最近的會出現在首頁的「目前收錄」區塊。</div>
+    </article>
+
+    <article class="faq-item">
+      <h3 class="faq-q">搜不到我想要的迷因怎麼辦？</h3>
+      <div class="faq-a">兩個方法。第一、換關鍵字試試看：可能 PTT 上的標題用法跟你印象中的字眼不一樣（例如你記得「無語」、PTT 文章可能寫「傻眼」），多試幾個近義字或當時的流行用法。第二、用首頁右上角「意見回饋」直接告訴我們、附上你大概記得的內容（什麼動物、什麼情緒、大概什麼時候看到的）、我們會手動補進資料庫。早期版本資料量還在累積、回饋對改進很有用。</div>
+    </article>
+  </div>
+</section>
 </main>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://twmeme.vercel.app/#faq",
+  "inLanguage": "zh-Hant-TW",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "怎麼找我記得但忘記名字的迷因？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "在搜尋框輸入你印象最深的字眼就行——可能是圖裡的人物、講的話、發文者用的標題片段、甚至是場景。例如記得「柴犬被雷打到」、輸入「柴犬」或「雷」、TWmeme 會比對 PTT 表特板和 C_Chat 板上每篇文章的標題、推文內容、圖片附近的關鍵字。比 Google 圖搜的好處是：Google 比對的是檔名和 alt text、台灣論壇圖片大多沒這些；TWmeme 直接索引論壇的中文上下文、所以「印象式關鍵字」反而比較容易命中。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "PTT 表特板的圖怎麼搜？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "PTT 表特板（Beauty）和 C_Chat 板每 4 小時被 TWmeme 自動爬一次、整理成可搜尋的資料庫。每張圖會記錄發文標題、版上推文、發文日期、原始連結。在 PTT 上要翻到一張舊圖通常得記得日期或編號、TWmeme 用關鍵字就能直接找到。圖片本身用 pHash（感知雜湊）去重、Hamming 距離 ≤ 8 的視為同一張、避免同一張迷因因為重複轉貼出現好幾次。原始 PTT 文章連結會一起附上、可以追溯出處。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Dcard 的迷因會收嗎？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "會、但目前還在穩定中。Dcard 的反爬機制比 PTT 嚴格（Cloudflare 擋住直接 API 存取）、TWmeme 用瀏覽器自動化攔截 GraphQL response 取資料、不過沒住宅代理時穩定度會掉、所以目前 Dcard 不是 CI 預設爬的平台、收錄量會慢慢補上。如果你急著找 Dcard 上某張圖、可以先用「意見回饋」告訴我們大概的關鍵字或日期、我們手動補。Threads 和 Instagram 也是同樣的狀況、優先補 Dcard。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "為什麼 Google 圖搜不到？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Google 圖片以「檔名 + alt 屬性 + 周圍文字」為主要訊號、台灣論壇的迷因圖通常檔名是亂碼（imgur 的 hash）、沒有 alt、周圍文字也只是討論不是描述、所以 Google 圖片爬蟲很難建立有用的索引。TWmeme 反過來、直接從論壇的中文標題、推文、發文日期建立索引、用中文關鍵字反查圖片、命中率比 Google 圖搜在「台灣本土迷因」這個 niche 上高很多。Google 比較適合找有版權標示的網路圖、不適合找台灣社群迷因。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "圖片可以直接拿來用嗎？版權怎麼算？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TWmeme 本身不持有圖片版權、所有圖片都是從公開的 PTT / Dcard 等論壇索引、原始版權歸發文者或圖片作者所有。建議的使用方式是：聊天室 / LINE / 私訊等私人非商業情境一般沒問題（迷因文化本來就建立在轉發上）；公開貼文、商業使用、廣告素材建議標註來源或先取得授權。每張迷因的詳細頁面都會附原始 PTT 連結、方便追溯出處。如果你是發文者、發現自己的圖被收錄想下架、用首頁「意見回饋」聯絡即可。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "怎麼複製到 LINE / IG / Threads？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "點開任何一張迷因的詳細頁、會看到兩個按鈕：「複製連結」會把圖片的直接 URL 複製到剪貼簿、貼到 LINE / IG 訊息 / Threads 就會自動展開預覽圖；「下載原圖」會把原始解析度的檔案存到電腦、適合做 FB 粉專封面或 IG 限時動態。手機版瀏覽器點圖長按也可以「儲存圖片」。所有複製和下載都不需要登入、也不會被追蹤點擊次數。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "迷因更新頻率？多久收一次新的？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TWmeme 的爬蟲跑在 GitHub Actions 上、每 4 小時自動執行一次（cron 0 */4 * * *）、PTT 表特板和 C_Chat 板各抓最近 3 頁、再用 pHash 比對排掉重複的。所以新發出來的熱門迷因通常 4-8 小時內會出現在 TWmeme 搜尋結果裡。早期版本不會自己挑「熱門」、按發文時間倒序排、最近的會出現在首頁的「目前收錄」區塊。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "搜不到我想要的迷因怎麼辦？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "兩個方法。第一、換關鍵字試試看：可能 PTT 上的標題用法跟你印象中的字眼不一樣（例如你記得「無語」、PTT 文章可能寫「傻眼」），多試幾個近義字或當時的流行用法。第二、用首頁右上角「意見回饋」直接告訴我們、附上你大概記得的內容（什麼動物、什麼情緒、大概什麼時候看到的）、我們會手動補進資料庫。早期版本資料量還在累積、回饋對改進很有用。"
+      }
+    }
+  ]
+}
+</script>
 
 <footer class="site-footer">
   © 2026 TWmeme · 台灣繁中迷因搜尋（早期版本）· 資料來源：PTT 表特板
