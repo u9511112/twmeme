@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       platforms:
-        description: 'Platforms to scrape (space-separated). Dcard needs residential proxy (see DCARD-CI-STATUS.md). Threads/IG also need residential proxy.'
+        description: 'Platforms to scrape (space-separated). ptt, dcard, threads, instagram.'
         required: false
-        default: 'ptt'
+        default: 'ptt dcard threads instagram'
 
 jobs:
   scrape:
@@ -45,18 +45,16 @@ jobs:
             libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
             libxfixes3 libxrandr2 libgbm1 libasound2t64
 
+      - name: Install Doppler CLI
+        uses: dopplerhq/cli-action@v3
+
       - name: Run scraper
         working-directory: scraper
         env:
-          NEON_DATABASE_URL:     ${{ secrets.NEON_DATABASE_URL }}
-          R2_ENDPOINT:           ${{ secrets.R2_ENDPOINT }}
-          R2_ACCESS_KEY_ID:      ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY:  ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET:             ${{ secrets.R2_BUCKET }}
-          R2_PUBLIC_URL:         ${{ secrets.R2_PUBLIC_URL }}
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
-          PLATFORMS="${{ github.event.inputs.platforms || 'ptt' }}"
-          python main.py --platforms $PLATFORMS
+          PLATFORMS="${{ github.event.inputs.platforms || 'ptt dcard threads instagram' }}"
+          doppler run -- python main.py --platforms $PLATFORMS
 
       - name: Trigger Vercel redeploy to regenerate /meme/*.html SSG pages
         # Runs after a successful scrape so new memes get static long-tail

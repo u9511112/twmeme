@@ -13,10 +13,12 @@ Features:
 
 import asyncio
 import logging
+import os
 import random
 
 from fake_useragent import UserAgent
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from apify_client import ApifyClient
 
 try:
     from patchright.async_api import async_playwright
@@ -154,3 +156,44 @@ class BaseScraper:
     async def scrape(self) -> list[dict]:
         """Override in subclasses. Return list of meme dicts."""
         raise NotImplementedError
+
+
+class ApifyBaseScraper(BaseScraper):
+    def __init__(self):
+        super().__init__()
+        self.api_key = os.getenv("APIFY_API_KEY")
+        if not self.api_key:
+            raise ValueError("APIFY_API_KEY environment variable is not set")
+        self.client = ApifyClient(self.api_key)
+
+    def check_apify_budget_safe(self) -> bool:
+        try:
+            limits_data = self.client.user().limits()
+            
+            # Extract monthly_usage_usd
+            current_usage = 0.0
+            if hasattr(limits_data, "current"):
+                current = limits_data.current
+                current_usage = getattr(current, "monthly_usage_usd", 0.0)
+            elif isinstance(limits_data, dict):
+                current_usage = limits_data.get("current", {}).get("monthly_usage_usd", 0.0)
+            
+            # Extract max_monthly_usage_usd (default to 5.0 if not found)
+            free_limit = 5.0
+            if hasattr(limits_data, "limits"):
+                limits_obj = limits_data.limits
+                free_limit = getattr(limits_obj, "max_monthly_usage_usd", 5.0)
+            elif isinstance(limits_data, dict):
+                free_limit = limits_data.get("limits", {}).get("max_monthly_usage_usd", 5.0)
+
+            remaining = free_limit - current_usage
+            self.logger.info(f"[Apify Guard] Current monthly usage: ${current_usage:.6f} USD, remaining: ${remaining:.6f} USD")
+            
+            # 剩餘額度不足 $0.5 時拒絕執行
+            if remaining < 0.5:
+                self.logger.warning(f"[Apify Guard] Remaining budget too low (${remaining:.2f} USD). Skipping tasks.")
+                return False
+            return True
+        except Exception as e:
+            self.logger.error(f"[Apify Guard] Failed to check Apify budget: {e}")
+            return False

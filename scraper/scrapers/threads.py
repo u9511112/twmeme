@@ -1,161 +1,99 @@
+# -*- coding: utf-8 -*-
 """
-Threads Scraper — browser automation via patchright (stealth).
-
-Threads loads content via XHR after initial JS hydration.
-We intercept network responses to capture the GraphQL API payload
-instead of parsing HTML, which is more resilient to layout changes.
-
-Note: Threads/Meta actively fights scrapers. Residential proxies
-significantly improve success rate. Without proxies, expect ~50% success.
+Threads Scraper — uses Apify Threads Scraper to bypass WAF.
 """
 
 import asyncio
-import json
 import logging
-import random
-import re
 
-from .base import BaseScraper, async_playwright
+from .base import ApifyBaseScraper
 
 logger = logging.getLogger(__name__)
 
-THREADS_TAGS = ["台灣迷因", "迷因", "幹話", "台灣funny"]
+# Using Unicode escape to ensure no encoding issues on Windows
+THREADS_TAGS = ["\u53f0\u7063\u8ff7\u56e0", "\u8ff7\u56e0", "\u5e79\u8a71", "\u53f0\u7063funny"]
 THREADS_BASE = "https://www.threads.net"
 
 
-class ThreadsScraper(BaseScraper):
+class ThreadsScraper(ApifyBaseScraper):
     async def scrape(self) -> list[dict]:
+        if not self.check_apify_budget_safe():
+            logger.warning("Apify budget check failed or insufficient, skipping Threads scrape.")
+            return []
+
         results: list[dict] = []
-        for tag in THREADS_TAGS:
-            try:
-                items = await self._scrape_tag(tag)
-                results.extend(items)
-                logger.info(f"Threads/#{tag}: {len(items)} items")
-            except Exception as e:
-                logger.error(f"Threads/#{tag} failed: {e}")
-            await asyncio.sleep(random.uniform(3.0, 6.0))
-        return results
 
-    async def _scrape_tag(self, tag: str) -> list[dict]:
-        url = f"{THREADS_BASE}/search?q={tag}&type=posts"
-        captured: list[dict] = []
+        run_input = {
+            "mode": "search",
+            "searchQueries": THREADS_TAGS,
+            "maxPostsPerSource": 10,
+            "proxyConfiguration": {
+                "useApifyProxy": True,
+                "countryCode": "TW"
+            }
+        }
 
-        async with async_playwright() as p:
-            from .base import _pick_proxy, UA
-            proxy = _pick_proxy()
-            browser = await p.chromium.launch(
-                headless=True,
-                proxy=proxy,
-                args=["--no-sandbox", "--disable-blink-features=AutomationControlled"],
-            )
-            ctx = await browser.new_context(
-                user_agent=UA.random,
-                viewport={"width": random.randint(390, 430), "height": 844},  # mobile
-                locale="zh-TW",
-                timezone_id="Asia/Taipei",
-            )
-            page = await ctx.new_page()
-            await page.add_init_script(
-                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
-            )
-
-            # Intercept GraphQL responses
-            async def handle_response(response):
-                try:
-                    if "graphql" in response.url or "api/graphql" in response.url:
-                        text = await response.text()
-                        self._parse_graphql_response(text, tag, captured)
-                except Exception:
-                    pass
-
-            page.on("response", handle_response)
-
-            try:
-                await page.goto(url, wait_until="networkidle", timeout=30_000)
-                await asyncio.sleep(random.uniform(2.0, 4.0))
-                # Scroll to trigger lazy-loading
-                for _ in range(3):
-                    await page.mouse.wheel(0, random.randint(400, 700))
-                    await asyncio.sleep(random.uniform(1.0, 2.0))
-            except Exception as e:
-                logger.warning(f"Threads page load error: {e}")
-            finally:
-                await browser.close()
-
-        # Fallback: regex parse raw HTML if no API captured
-        if not captured:
-            try:
-                html = await self.fetch_page(url)
-                captured.extend(self._parse_html_fallback(html, tag))
-            except Exception as e:
-                logger.warning(f"Threads HTML fallback failed: {e}")
-
-        return captured
-
-    def _parse_graphql_response(
-        self, text: str, tag: str, captured: list[dict]
-    ) -> None:
+        logger.info(f"Calling automation-lab/threads-scraper for queries: {THREADS_TAGS}")
         try:
-            data = json.loads(text)
-        except json.JSONDecodeError:
-            return
+            run = self.client.actor("automation-lab/threads-scraper").call(run_input=run_input)
+            
+            # Compatible with both dict and Pydantic object
+            dataset_id = getattr(run, "default_dataset_id", None) or (run.get("defaultDatasetId") if isinstance(run, dict) else None)
+            if not dataset_id:
+                logger.error("Threads scraper failed: default_dataset_id not found in run response.")
+                return []
 
-        # Traverse nested JSON for image_versions2 / video_versions patterns
-        def extract(obj):
-            if isinstance(obj, dict):
-                # Image
-                if "image_versions2" in obj:
-                    candidates = obj["image_versions2"].get("candidates", [])
-                    if candidates:
-                        best = max(candidates, key=lambda c: c.get("width", 0))
-                        url  = best.get("url", "")
-                        if url:
-                            captured.append({
-                                "platform":   "threads",
-                                "source_url": f"https://www.threads.net/search?q={tag}",
-                                "media_url":  url,
-                                "media_type": "image",
-                                "title":      obj.get("accessibility_caption") or f"#{tag}",
-                                "like_count": obj.get("like_count", 0),
-                                "share_count": 0,
-                                "comment_count": obj.get("text_post_app_info", {})
-                                    .get("direct_reply_count", 0),
-                            })
-                # Video
-                if "video_versions" in obj:
-                    vids = obj.get("video_versions", [])
-                    if vids:
-                        captured.append({
-                            "platform":   "threads",
-                            "source_url": f"https://www.threads.net/search?q={tag}",
-                            "media_url":  vids[0].get("url", ""),
-                            "media_type": "video",
-                            "title":      f"#{tag}",
-                            "like_count": obj.get("like_count", 0),
-                            "share_count": 0,
-                            "comment_count": 0,
-                        })
-                for v in obj.values():
-                    extract(v)
-            elif isinstance(obj, list):
-                for item in obj:
-                    extract(item)
+            for item in self.client.dataset(dataset_id).iterate_items():
+                # Extract media. Some scrapers return a list of media under "media" or "media_attachments"
+                media_attachments = item.get("media") or item.get("mediaAttachments") or []
+                
+                # If there's no media list, try top-level image/video fields
+                if not media_attachments:
+                    img_url = item.get("imageUrl") or item.get("image") or item.get("displayUrl")
+                    vid_url = item.get("videoUrl") or item.get("video")
+                    if img_url or vid_url:
+                        media_attachments = [{
+                            "url": vid_url if vid_url else img_url,
+                            "type": "video" if vid_url else "image"
+                        }]
+                
+                if not media_attachments:
+                    continue
 
-        extract(data)
+                caption = item.get("caption") or item.get("text") or ""
+                title = caption[:100] if caption else "#迷因"
+                
+                likes = item.get("likesCount") or item.get("likes") or item.get("likeCount") or 0
+                comments = item.get("repliesCount") or item.get("commentsCount") or item.get("replyCount") or 0
+                
+                post_id = item.get("id") or item.get("postId")
+                source_url = item.get("url") or item.get("postUrl") or (f"{THREADS_BASE}/post/{post_id}" if post_id else THREADS_BASE)
 
-    def _parse_html_fallback(self, html: str, tag: str) -> list[dict]:
-        """Last resort: extract media URLs via regex from rendered HTML."""
-        results = []
-        for m in re.finditer(r'"(https://scontent[^"]+\.(?:jpg|jpeg|png|webp))"', html):
-            url = m.group(1).replace("\\u0026", "&")
-            results.append({
-                "platform":    "threads",
-                "source_url":  f"https://www.threads.net/search?q={tag}",
-                "media_url":   url,
-                "media_type":  "image",
-                "title":       f"#{tag}",
-                "like_count":  0,
-                "share_count": 0,
-                "comment_count": 0,
-            })
-        return results[:10]  # cap fallback results
+                for media in media_attachments:
+                    url = media.get("url")
+                    if not url:
+                        continue
+                    
+                    media_type = media.get("type", "image")
+                    # Map type if it's "video" or "image"
+                    if "video" in media_type.lower():
+                        media_type = "video"
+                    else:
+                        media_type = "image"
+
+                    results.append({
+                        "platform":      "threads",
+                        "source_url":    source_url,
+                        "media_url":     url,
+                        "media_type":    media_type,
+                        "title":         title,
+                        "like_count":    likes,
+                        "share_count":   0,
+                        "comment_count": comments,
+                    })
+
+            logger.info(f"Threads: successfully fetched and parsed {len(results)} items via Apify")
+        except Exception as e:
+            logger.error(f"Threads scraper failed: {e}")
+
+        return results

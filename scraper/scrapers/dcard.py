@@ -1,18 +1,16 @@
+# -*- coding: utf-8 -*-
 """
-Dcard Scraper — uses patchright browser with API interception.
-
-Dcard is protected by Cloudflare WAF. We launch a stealth browser,
-let it handle the Cloudflare challenge, then intercept the internal
-API calls the page makes to get structured JSON post data.
+Dcard Scraper — uses local patchright stealth with Apify Residential Proxy to bypass Cloudflare.
 """
 
 import asyncio
 import json
 import logging
+import os
 import random
 import re
 
-from .base import BaseScraper, _pick_proxy, human_scroll, accept_cookie_banner, UA, ScraperBlockedError
+from .base import BaseScraper, human_scroll, accept_cookie_banner, UA, ScraperBlockedError, _pick_proxy
 
 try:
     from patchright.async_api import async_playwright
@@ -43,6 +41,7 @@ class DcardScraper(BaseScraper):
         url = f"{DCARD_WEB}/f/{forum}?tab=popular"
         captured_posts: list[dict] = []
 
+        # Connect to local proxy if available
         proxy = _pick_proxy()
 
         async with async_playwright() as p:
@@ -89,7 +88,7 @@ class DcardScraper(BaseScraper):
             page.on("response", on_response)
 
             try:
-                response = await page.goto(url, wait_until="networkidle", timeout=45_000)
+                response = await page.goto(url, wait_until="domcontentloaded", timeout=45_000)
                 status = response.status if response else 0
                 if status in (403, 429):
                     logger.warning(f"Dcard/{forum} blocked ({status})")

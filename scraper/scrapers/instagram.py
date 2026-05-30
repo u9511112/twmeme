@@ -1,128 +1,90 @@
+# -*- coding: utf-8 -*-
 """
-Instagram Scraper — browser automation via patchright (stealth).
-
-Instagram is the most aggressively protected platform.
-Strategy: scrape public hashtag pages without login.
-Without residential proxies, success rate is low (~30%).
-
-We intercept the `api/v1/tags/{hashtag}/sections/` endpoint which
-returns structured JSON with media URLs, avoiding brittle HTML parsing.
+Instagram Scraper — uses Apify Instagram Scraper to bypass WAF.
 """
 
 import asyncio
-import json
 import logging
-import random
+import urllib.parse
 
-from .base import BaseScraper, async_playwright
+from .base import ApifyBaseScraper
 
 logger = logging.getLogger(__name__)
 
-IG_HASHTAGS = ["台灣迷因", "迷因", "幹話tw", "台灣funny"]
+IG_HASHTAGS = ["\u53f0\u7063\u8ff7\u56e0", "\u8ff7\u56e0", "\u5e79\u8a71tw", "\u53f0\u7063funny"]
 IG_BASE     = "https://www.instagram.com"
 
 
-class InstagramScraper(BaseScraper):
+class InstagramScraper(ApifyBaseScraper):
     async def scrape(self) -> list[dict]:
+        if not self.check_apify_budget_safe():
+            logger.warning("Apify budget check failed or insufficient, skipping Instagram scrape.")
+            return []
+
         results: list[dict] = []
+        
+        # Format direct tag URLs
+        direct_urls = []
         for tag in IG_HASHTAGS:
-            try:
-                items = await self._scrape_hashtag(tag)
-                results.extend(items)
-                logger.info(f"IG/#{tag}: {len(items)} items")
-            except Exception as e:
-                logger.error(f"IG/#{tag} failed: {e}")
-            await asyncio.sleep(random.uniform(5.0, 10.0))
-        return results
+            # Apify handles URL formatting. We encode the hashtag
+            encoded_tag = urllib.parse.quote(tag)
+            direct_urls.append(f"{IG_BASE}/explore/tags/{encoded_tag}/")
 
-    async def _scrape_hashtag(self, tag: str) -> list[dict]:
-        url = f"{IG_BASE}/explore/tags/{tag}/"
-        captured: list[dict] = []
+        run_input = {
+            "directUrls": direct_urls,
+            "resultsType": "posts",
+            "resultsLimit": 10,
+            "proxyConfiguration": {
+                "useApifyProxy": True,
+                "apifyProxyGroups": ["RESIDENTIAL"],
+                "countryCode": "TW"
+            }
+        }
 
-        async with async_playwright() as p:
-            from .base import _pick_proxy, UA
-            proxy = _pick_proxy()
-            browser = await p.chromium.launch(
-                headless=True,
-                proxy=proxy,
-                args=["--no-sandbox", "--disable-blink-features=AutomationControlled"],
-            )
-            ctx = await browser.new_context(
-                user_agent=UA.random,
-                viewport={"width": 390, "height": 844},  # iPhone 14 Pro
-                locale="zh-TW",
-                timezone_id="Asia/Taipei",
-                is_mobile=True,
-                has_touch=True,
-            )
-            page = await ctx.new_page()
-            await page.add_init_script(
-                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
-                "Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3]});"
-            )
-
-            async def handle_response(response):
-                try:
-                    if "api/v1/tags/" in response.url or "graphql/query" in response.url:
-                        text = await response.text()
-                        self._parse_api_response(text, tag, captured)
-                except Exception:
-                    pass
-
-            page.on("response", handle_response)
-
-            try:
-                await page.goto(url, wait_until="networkidle", timeout=35_000)
-                await asyncio.sleep(random.uniform(3.0, 6.0))
-                for _ in range(4):
-                    await page.touch_screen.tap(195, 400)
-                    await page.mouse.wheel(0, random.randint(300, 600))
-                    await asyncio.sleep(random.uniform(1.5, 3.0))
-            except Exception as e:
-                logger.warning(f"IG page load error for #{tag}: {e}")
-            finally:
-                await browser.close()
-
-        return captured
-
-    def _parse_api_response(
-        self, text: str, tag: str, captured: list[dict]
-    ) -> None:
+        logger.info(f"Calling apify/instagram-scraper for tags: {IG_HASHTAGS}")
         try:
-            data = json.loads(text)
-        except json.JSONDecodeError:
-            return
+            run = self.client.actor("apify/instagram-scraper").call(run_input=run_input)
+            
+            # Compatible with both dict and Pydantic object
+            dataset_id = getattr(run, "default_dataset_id", None) or (run.get("defaultDatasetId") if isinstance(run, dict) else None)
+            if not dataset_id:
+                logger.error("Instagram scraper failed: default_dataset_id not found in run response.")
+                return []
 
-        def extract(obj):
-            if isinstance(obj, dict):
-                # Image node
-                if "display_url" in obj:
-                    captured.append({
-                        "platform":      "instagram",
-                        "source_url":    f"{IG_BASE}/explore/tags/{tag}/",
-                        "media_url":     obj["display_url"],
-                        "media_type":    "image",
-                        "title":         obj.get("accessibility_caption") or f"#{tag}",
-                        "like_count":    obj.get("edge_liked_by", {}).get("count", 0),
-                        "comment_count": obj.get("edge_media_to_comment", {}).get("count", 0),
-                        "share_count":   0,
-                    })
-                # Video node
-                if obj.get("is_video") and "video_url" in obj:
-                    captured.append({
-                        "platform":      "instagram",
-                        "source_url":    f"{IG_BASE}/explore/tags/{tag}/",
-                        "media_url":     obj["video_url"],
-                        "media_type":    "video",
-                        "title":         f"#{tag}",
-                        "like_count":    obj.get("edge_liked_by", {}).get("count", 0),
-                        "comment_count": obj.get("edge_media_to_comment", {}).get("count", 0),
-                        "share_count":   0,
-                    })
-                for v in obj.values():
-                    extract(v)
-            elif isinstance(obj, list):
-                for item in obj:
-                    extract(item)
+            for item in self.client.dataset(dataset_id).iterate_items():
+                # Extract media info compatible with Apify Instagram Scraper output fields
+                video_url = item.get("videoUrl") or item.get("video_url")
+                display_url = item.get("displayUrl") or item.get("display_url") or item.get("thumbnailUrl")
+                
+                if not display_url and not video_url:
+                    continue
+                
+                media_url = video_url if video_url else display_url
+                media_type = "video" if video_url else "image"
+                
+                caption = item.get("caption") or item.get("accessibility_caption") or ""
+                # Cap the title
+                title = caption[:100] if caption else "#迷因"
+                
+                likes = item.get("likesCount") or item.get("likes_count") or 0
+                comments = item.get("commentsCount") or item.get("comments_count") or 0
+                
+                short_code = item.get("shortCode") or item.get("code")
+                source_url = item.get("url") or (f"{IG_BASE}/p/{short_code}/" if short_code else f"{IG_BASE}/explore/tags/{IG_HASHTAGS[0]}/")
 
-        extract(data)
+                results.append({
+                    "platform":      "instagram",
+                    "source_url":    source_url,
+                    "media_url":     media_url,
+                    "media_type":    media_type,
+                    "title":         title,
+                    "like_count":    likes,
+                    "share_count":   0,
+                    "comment_count": comments,
+                })
+                
+            logger.info(f"Instagram: successfully fetched and parsed {len(results)} items via Apify")
+        except Exception as e:
+            logger.error(f"Instagram scraper failed: {e}")
+
+        return results
