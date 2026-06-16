@@ -32,7 +32,7 @@ const NEON_URL = process.env.NEON_DATABASE_URL
   // env doesn't need a separate secret for read-only public content.
   || 'postgresql://web_anon:eSoHu1pLOwjbDiQQsO6IWt90Pr5G@ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
 
-const SITE_ORIGIN = 'https://twmeme.vercel.app';
+const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://twmeme.pages.dev';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const WEB_DIR = join(__dirname, '..', 'web');
 const MEME_DIR = join(WEB_DIR, 'meme');
