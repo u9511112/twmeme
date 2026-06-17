@@ -12,10 +12,15 @@ Features:
 """
 
 import asyncio
+import io
+import json
 import logging
 import os
 import random
+import re
 
+import google.generativeai as genai
+from PIL import Image
 from fake_useragent import UserAgent
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from apify_client import ApifyClient
@@ -197,3 +202,76 @@ class ApifyBaseScraper(BaseScraper):
         except Exception as e:
             self.logger.error(f"[Apify Guard] Failed to check Apify budget: {e}")
             return False
+
+
+# Configure Gemini API
+_gemini_configured = False
+
+def _setup_gemini():
+    global _gemini_configured
+    if _gemini_configured:
+        return
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        logger.warning("[Gemini] GEMINI_API_KEY is not set. AI metadata extraction will be skipped.")
+        return
+    genai.configure(api_key=api_key)
+    _gemini_configured = True
+
+async def analyze_meme_image(image_bytes: bytes) -> dict:
+    """
+    Analyze meme image bytes via Gemini 2.5 Flash.
+    Returns: {
+      "ocr_text": "text inside image",
+      "description": "visual description",
+      "tags": ["tag1", "tag2", ...]
+    }
+    """
+    _setup_gemini()
+    if not _gemini_configured:
+        return {"ocr_text": None, "description": None, "tags": []}
+
+    try:
+        # Load image via PIL
+        img = Image.open(io.BytesIO(image_bytes))
+        
+        # We use gemini-2.5-flash which is multimodal and fast
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        
+        prompt = (
+            "你是一隻專門分析繁體中文迷因（Meme）梗圖的 AI 專家。\n"
+            "請詳細閱讀並分析這張圖片，並嚴格只回傳一個符合以下格式的 JSON 物件（請勿包含 markdown ```json 標記或任何其他贅詞）：\n"
+            "{\n"
+            "  \"ocr_text\": \"圖片中出現的所有繁體中文對白、台詞或文字。如果沒有文字，請填 null。\",\n"
+            "  \"description\": \"簡短描述這張圖片的視覺畫面（例如：一隻戴著墨鏡露出驚訝表情的柴犬）。\",\n"
+            "  \"tags\": [\"5個繁體中文的關聯標籤，包含情緒、物件、或迷因名稱，例如：傻眼、貓咪、反應圖\"]\n"
+            "}"
+        )
+        
+        # Execute vision task
+        # PIL Image can be passed directly as part of contents list
+        # run in executor since genai is synchronous blocking IO
+        loop = asyncio.get_running_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: model.generate_content([prompt, img])
+        )
+        
+        text = response.text.strip()
+        
+        # Clean markdown code block if model outputted them anyway
+        if text.startswith("```"):
+            text = re.sub(r"^```(?:json)?\n", "", text)
+            text = re.sub(r"\n```$", "", text)
+            text = text.strip()
+            
+        data = json.loads(text)
+        return {
+            "ocr_text": data.get("ocr_text"),
+            "description": data.get("description"),
+            "tags": data.get("tags") if isinstance(data.get("tags"), list) else []
+        }
+    except Exception as e:
+        logger.error(f"[Gemini] Failed to analyze image: {e}")
+        return {"ocr_text": None, "description": None, "tags": []}
+

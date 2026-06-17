@@ -25,6 +25,7 @@ import boto3
 from botocore.config import Config
 
 from .dedup import is_duplicate
+from scrapers.base import analyze_meme_image
 
 logger = logging.getLogger(__name__)
 
@@ -77,10 +78,10 @@ async def close_client(client: dict) -> None:
 
 async def upload_media_to_storage(
     client: dict, media_url: str, meme_id: str, retries: int = 3
-) -> str | None:
+) -> tuple[str | None, bytes | None]:
     """
     Download media bytes → upload to R2 as memes/{meme_id}.{ext}.
-    Returns the public URL or None on failure. Retries up to `retries` times.
+    Returns (public_url, media_bytes) or (None, None) on failure.
     """
     headers = {
         "User-Agent": (
@@ -119,7 +120,7 @@ async def upload_media_to_storage(
             )
             public_url = f"{client['public_url']}/{key}"
             logger.debug(f"Uploaded to R2: {public_url}")
-            return public_url
+            return public_url, data
 
         except Exception as e:
             logger.warning(
@@ -129,7 +130,7 @@ async def upload_media_to_storage(
             if attempt < retries:
                 await asyncio.sleep(2 * attempt)
 
-    return None
+    return None, None
 
 
 async def backfill_missing_cache(client: dict) -> int:
@@ -148,7 +149,7 @@ async def backfill_missing_cache(client: dict) -> int:
         media_url = row["media_url"]
         logger.info(f"Backfill [{i}/{total}] {media_url[:60]}")
 
-        cached_url = await upload_media_to_storage(client, media_url, meme_id)
+        cached_url, _ = await upload_media_to_storage(client, media_url, meme_id)
         if cached_url:
             async with pool.acquire() as conn:
                 await conn.execute(
@@ -200,8 +201,13 @@ async def insert_meme(client: dict, item: dict, phash: str) -> str | None:
             logger.debug(f"pHash duplicate detected for {item['media_url']}")
             return None
 
-    meme_id    = str(uuid.uuid4())
-    cached_url = await upload_media_to_storage(client, item["media_url"], meme_id)
+    meme_id = str(uuid.uuid4())
+    cached_url, image_bytes = await upload_media_to_storage(client, item["media_url"], meme_id)
+
+    ai_meta = {"ocr_text": None, "description": None, "tags": []}
+    if image_bytes and item.get("media_type") == "image":
+        # Analyze image via Gemini
+        ai_meta = await analyze_meme_image(image_bytes)
 
     async with pool.acquire() as conn:
         async with conn.transaction():
@@ -235,8 +241,9 @@ async def insert_meme(client: dict, item: dict, phash: str) -> str | None:
                 """
                 INSERT INTO public.memes (
                     id, platform, source_url, media_url, cached_url, media_type,
-                    title, like_count, share_count, comment_count, phash
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                    title, like_count, share_count, comment_count, phash,
+                    ocr_text, description, tags
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
                 """,
                 uuid.UUID(meme_id),
                 item["platform"],
@@ -249,6 +256,9 @@ async def insert_meme(client: dict, item: dict, phash: str) -> str | None:
                 item.get("share_count", 0),
                 item.get("comment_count", 0),
                 phash,
+                ai_meta.get("ocr_text"),
+                ai_meta.get("description"),
+                ai_meta.get("tags")
             )
             await conn.execute(
                 """

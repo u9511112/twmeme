@@ -100,11 +100,17 @@ async function searchMemes(query, limit = 40) {
     if (!safe) return [];
     const s = await sql();
     const pattern = '%' + safe + '%';
-    const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform, trending_score
-                         FROM public.memes
-                         WHERE title ILIKE ${pattern}
-                         ORDER BY trending_score DESC
-                         LIMIT ${limit}`;
+    const rows = await s`
+      SELECT id, title, cached_url, media_url, media_type, platform, trending_score,
+             similarity(COALESCE(title, ''), ${safe}) AS sm
+      FROM public.memes
+      WHERE title ILIKE ${pattern}
+         OR ocr_text ILIKE ${pattern}
+         OR description ILIKE ${pattern}
+         OR ${safe} = ANY(tags)
+      ORDER BY sm DESC, trending_score DESC
+      LIMIT ${limit}
+    `;
     return rows;
   } catch (e) {
     logErr('search', e);
