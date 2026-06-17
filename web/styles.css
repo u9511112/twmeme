@@ -1,15 +1,16 @@
 /* TWmeme — Phase 1 front-end skeleton. Tokens from DESIGN.md. */
 
 :root {
-  /* Color */
-  --primary: #FF5B4B;
-  --primary-ink: #E04736;
-  --accent: #FFC233;
-  --bg: #FCFAF6;
-  --surface: #FFFFFF;
-  --ink: #1A1A1A;
-  --muted: #6B6459;
-  --border: #E8E2D6;
+  /* Color (OKLCH based for premium playful-editorial paper theme) */
+  --primary: oklch(64.5% 0.22 36);      /* 熱珊瑚 */
+  --primary-ink: oklch(58.0% 0.21 36);  /* 熱珊瑚偏深 */
+  --accent: oklch(82.0% 0.19 75);       /* 金盞花黃 */
+  --bg: oklch(98.5% 0.006 45);          /* 奶油紙白 */
+  --surface: oklch(100% 0 0);           /* 白卡 */
+  --ink: oklch(15.0% 0.008 45);         /* 深墨黑 */
+  --muted: oklch(50.0% 0.015 45);       /* 暖灰 */
+  --border: oklch(91.0% 0.008 45);      /* 紙質拼貼邊框灰 */
+  
   --shadow-sm: 0 2px 8px rgba(26, 26, 26, 0.04);
   --shadow-md: 0 4px 16px rgba(26, 26, 26, 0.06);
   --shadow-lg: 0 12px 40px rgba(26, 26, 26, 0.1);
@@ -404,38 +405,123 @@ a { color: inherit; text-decoration: none; }
   border-radius: var(--r-md);
   display: flex; align-items: center; justify-content: center; gap: var(--s-sm);
   transition: transform var(--d-short) var(--e-enter),
-              background var(--d-short) ease-out;
+              background var(--d-short) ease-out,
+              border-color var(--d-short) ease-out;
 }
 .btn-primary { background: var(--primary); color: white; }
 .btn-primary:hover { background: var(--primary-ink); transform: translateY(-2px); }
 .btn-secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
 .btn-secondary:hover { border-color: var(--ink); transform: translateY(-2px); }
+.btn:active { transform: scale(0.97); }
 
-/* AI upgrade teaser (Phase 1.5 preview placement) */
+/* AI upgrade teaser (Paper-Zine Editorial Ad styling) */
 .ai-teaser {
   margin-top: var(--s-xl);
   padding: var(--s-md);
-  background: linear-gradient(135deg, rgba(255, 194, 51, 0.15), rgba(255, 91, 75, 0.08));
-  border: 1px dashed var(--accent);
+  background: var(--surface);
+  border: 2px dashed var(--border);
   border-radius: var(--r-md);
   font-size: 13px;
+  position: relative;
+  overflow: hidden;
+}
+.ai-teaser::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  border-width: 0 16px 16px 0;
+  border-style: solid;
+  border-color: var(--bg) var(--bg) var(--border) var(--border);
+  box-shadow: -1px 1px 2px rgba(0,0,0,0.05);
 }
 .ai-teaser strong { color: var(--ink); }
 .ai-teaser .price { color: var(--primary); font-weight: 700; }
 
-/* ===== Toast ===== */
+/* ===== Toast (Branded Paper Notification) ===== */
 .toast {
   position: fixed; bottom: var(--s-2xl); left: 50%;
   transform: translateX(-50%) translateY(12px);
-  background: var(--ink); color: white;
+  background: var(--surface); color: var(--ink);
+  border: 2px solid var(--primary);
   padding: var(--s-sm) var(--s-lg);
   border-radius: var(--r-full);
   font-size: 14px;
+  font-weight: 600;
   opacity: 0; pointer-events: none;
   transition: opacity var(--d-short) ease-out, transform var(--d-short) var(--e-enter);
   box-shadow: var(--shadow-lg);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== AI Interpretation / OCR Block & Tag Cloud ===== */
+.ai-interpretation {
+  margin: var(--s-md) 0 var(--s-xl);
+  padding: var(--s-md);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+}
+
+.ai-interpretation blockquote {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: var(--s-sm);
+  position: relative;
+  padding: var(--s-sm) var(--s-md);
+  background: oklch(96.0% 0.006 45);
+  border-radius: var(--r-sm);
+}
+
+.ai-interpretation blockquote::before {
+  content: "“";
+  font-family: Georgia, serif;
+  font-size: 44px;
+  color: var(--primary);
+  position: absolute;
+  left: 4px;
+  top: -12px;
+  opacity: 0.25;
+  line-height: 1;
+}
+
+.ai-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: var(--s-md);
+}
+
+.ai-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-xs);
+}
+
+.chip-sm {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--s-2xs) var(--s-sm);
+  background: oklch(95.0% 0.008 45);
+  color: var(--muted);
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  transition: transform var(--d-short) var(--e-enter), 
+              background var(--d-short) ease-out,
+              color var(--d-short) ease-out;
+}
+
+.chip-sm:hover {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent);
+  transform: translateY(-1.5px);
+}
 
 /* ===== Image thumb (Supabase real meme) ===== */
 /* Used by both card thumbs (results/index) and the detail page image pane.

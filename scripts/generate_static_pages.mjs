@@ -252,6 +252,16 @@ ${JSON.stringify(breadcrumbLd, null, 2)}
       <span>${escapeHtml(date)}</span>
     </div>
 
+    ${(meme.ocr_text || meme.description || (meme.tags && meme.tags.length > 0)) ? `
+    <div class="ai-interpretation" id="ai-section">
+      ${meme.ocr_text ? `<blockquote id="ai-ocr">${escapeHtml(meme.ocr_text)}</blockquote>` : ''}
+      ${meme.description ? `<p class="ai-desc" id="ai-desc">${escapeHtml(meme.description)}</p>` : ''}
+      ${(meme.tags && meme.tags.length > 0) ? `
+      <div class="ai-tags" id="ai-tags">
+        ${meme.tags.map(tag => `<a class="chip-sm" href="/results.html?q=${encodeURIComponent(tag)}">#${escapeHtml(tag)}</a>`).join('')}
+      </div>` : ''}
+    </div>` : ''}
+
     <div class="actions">
       <button class="btn btn-primary" data-action="copy" data-url="${escapeAttr(imageUrl)}" data-title="${escapeAttr(title)}">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -483,7 +493,7 @@ async function main() {
   const memes = await sql`
     SELECT id, title, cached_url, media_url, media_type, platform,
            source_url, width, height, like_count, share_count, comment_count,
-           fetched_at
+           fetched_at, ocr_text, description, tags
     FROM public.memes
     ORDER BY fetched_at DESC
     LIMIT ${MEME_LIMIT}

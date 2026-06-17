@@ -83,7 +83,7 @@ async function getMemeById(id) {
     const s = await sql();
     const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform,
                                 source_url, width, height, like_count, share_count,
-                                comment_count, fetched_at
+                                comment_count, fetched_at, ocr_text, description, tags
                          FROM public.memes
                          WHERE id = ${safe}::uuid
                          LIMIT 1`;

@@ -74,6 +74,12 @@
       <!-- engagement stats injected here -->
     </div>
 
+    <div class="ai-interpretation" id="ai-section" hidden>
+      <blockquote id="ai-ocr"></blockquote>
+      <p class="ai-desc" id="ai-desc"></p>
+      <div class="ai-tags" id="ai-tags"></div>
+    </div>
+
     <div class="actions">
       <button class="btn btn-primary" id="btn-copy">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -191,6 +197,49 @@
     stat('❤', meme.like_count, '');
     stat('💬', meme.comment_count, '');
     stat('🔁', meme.share_count, '');
+
+    // Render AI Interpretation metadata
+    const aiSection = document.getElementById('ai-section');
+    const aiOcr = document.getElementById('ai-ocr');
+    const aiDesc = document.getElementById('ai-desc');
+    const aiTags = document.getElementById('ai-tags');
+
+    if (aiSection && (meme.ocr_text || meme.description || (meme.tags && meme.tags.length > 0))) {
+      aiSection.hidden = false;
+      
+      // OCR text
+      if (meme.ocr_text) {
+        aiOcr.textContent = meme.ocr_text;
+        aiOcr.hidden = false;
+      } else {
+        aiOcr.hidden = true;
+      }
+
+      // Description
+      if (meme.description) {
+        aiDesc.textContent = meme.description;
+        aiDesc.hidden = false;
+      } else {
+        aiDesc.hidden = true;
+      }
+
+      // Tags Pill Chips with search links
+      aiTags.replaceChildren();
+      if (meme.tags && meme.tags.length > 0) {
+        meme.tags.forEach(tag => {
+          const a = document.createElement('a');
+          a.className = 'chip-sm';
+          a.href = 'results.html?q=' + encodeURIComponent(tag);
+          a.textContent = '#' + tag;
+          aiTags.appendChild(a);
+        });
+        aiTags.hidden = false;
+      } else {
+        aiTags.hidden = true;
+      }
+    } else if (aiSection) {
+      aiSection.hidden = true;
+    }
 
     if (meme.source_url) {
       const src = document.getElementById('btn-source');
