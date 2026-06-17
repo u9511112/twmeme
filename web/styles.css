@@ -264,6 +264,8 @@ a { color: inherit; text-decoration: none; }
   font-size: 72px;
   overflow: hidden;
   transition: transform var(--d-medium) ease-out;
+  background: oklch(96.0% 0.006 45); /* 紙卡內膽微暖底色 */
+  padding: var(--s-sm); /* 卡片縮圖留白呼吸感 */
 }
 .card:hover .thumb { transform: scale(1.02); }
 .card .caption {
@@ -362,7 +364,7 @@ a { color: inherit; text-decoration: none; }
   .detail { grid-template-columns: 1fr; }
 }
 .detail .image-pane {
-  background: var(--surface);
+  background: oklch(96.0% 0.006 45); /* 紙質襯底暖灰色 */
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -370,6 +372,8 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
   font-size: 180px;
   position: relative;
+  padding: var(--s-md); /* 詳情頁大圖留白 */
+  border: 2px solid var(--border); /* 紙張邊框感 */
 }
 .detail .image-pane .quality-badge {
   top: var(--s-md); right: var(--s-md);
@@ -525,12 +529,12 @@ a { color: inherit; text-decoration: none; }
 
 /* ===== Image thumb (Supabase real meme) ===== */
 /* Used by both card thumbs (results/index) and the detail page image pane.
-   object-fit: cover ensures images fill their square containers without
-   distortion. The cards/panes themselves enforce the aspect ratio. */
+   object-fit: contain ensures images are shown fully without cropping.
+   The cards/panes themselves enforce aspect ratio and add padding. */
 .thumb-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
