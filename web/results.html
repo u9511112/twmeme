@@ -25,17 +25,45 @@
 </header>
 
 <div class="topbar">
-  <a href="index.html" class="back" aria-label="返回">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-  </a>
-  <form class="searchbox" onsubmit="event.preventDefault(); doSearch();">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-    <input id="q" type="text" value="">
-    <button class="btn-search" type="submit" aria-label="搜尋">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-    </button>
-  </form>
-  <div class="result-meta">找到 <strong id="count">—</strong> 張 · 按相關度</div>
+  <div class="topbar-main">
+    <a href="index.html" class="back" aria-label="返回">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <form class="searchbox" id="search-form">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="text" value="">
+      <button class="btn-search" type="submit" aria-label="搜尋">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+    </form>
+  </div>
+  
+  <div class="filter-bar">
+    <div class="filter-group">
+      <select id="filter-platform" class="filter-select">
+        <option value="all">所有平台</option>
+        <option value="ptt">PTT</option>
+        <option value="dcard">Dcard</option>
+        <option value="baha">巴哈姆特</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <select id="filter-type" class="filter-select">
+        <option value="all">所有格式</option>
+        <option value="image">靜態圖片</option>
+        <option value="gif">動態 GIF</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <select id="filter-sort" class="filter-select">
+        <option value="relevance">相關度排序</option>
+        <option value="latest">最新發佈</option>
+        <option value="popular">熱門程度</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="result-meta">找到 <strong id="count">—</strong> 張</div>
 </div>
 
 <main>
@@ -52,6 +80,15 @@
         placeholder="例：那張柴犬被雷打到的反應圖、或是 PTT 那個館長跪的梗"></textarea>
       <button type="submit" class="unmet-submit">送出</button>
     </form>
+  </div>
+
+  <div id="skeleton-grid" class="masonry skeleton-grid" hidden>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card tall"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card tall"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
   </div>
 
   <div class="masonry" id="grid"></div>
@@ -87,18 +124,36 @@
     { title:'怒火貓',       emoji:'🐱🔥',   bg:'t-mustard',quality:'4K' },
   ];
 
-  const params = new URLSearchParams(location.search);
-  const q = (params.get('q') || '').trim();
-  document.getElementById('q').value = q;
-
   const grid = document.getElementById('grid');
   const countEl = document.getElementById('count');
   const unmetForm = document.getElementById('unmet-form');
   const unmetQuerySpan = document.getElementById('unmet-query');
+  const skeleton = document.getElementById('skeleton-grid');
+
+  function initFiltersFromUrl() {
+    const params = new URLSearchParams(location.search);
+    document.getElementById('q').value = params.get('q') || '';
+    document.getElementById('filter-platform').value = params.get('platform') || 'all';
+    document.getElementById('filter-type').value = params.get('type') || 'all';
+    document.getElementById('filter-sort').value = params.get('sort') || 'relevance';
+  }
 
   async function loadResults() {
-    if (!q) {
-      // direct hit on results.html with no query → show mock as discovery
+    const q = document.getElementById('q').value.trim();
+    const platform = document.getElementById('filter-platform').value;
+    const media_type = document.getElementById('filter-type').value;
+    const sort_by = document.getElementById('filter-sort').value;
+
+    grid.style.display = 'none';
+    grid.innerHTML = '';
+    unmetForm.hidden = true;
+    skeleton.hidden = false;
+    countEl.textContent = '—';
+
+    // If no search input and no filter values, show fallback mock data
+    if (!q && platform === 'all' && media_type === 'all') {
+      skeleton.hidden = true;
+      grid.style.display = '';
       countEl.textContent = MOCK_RESULTS.length;
       window.TWmeme.render.renderGrid(grid, MOCK_RESULTS, {
         onCopy: (m) => {/* mock copy, no log */},
@@ -106,9 +161,15 @@
       return;
     }
 
-    let memes = await window.TWmeme.supa.searchMemes(q);
+    let memes = await window.TWmeme.supa.searchMemes(q, {
+      platform,
+      media_type,
+      sort_by
+    });
 
-    // null = fetch failed; [] = success but zero results
+    skeleton.hidden = true;
+    grid.style.display = '';
+
     let usingFallback = false;
     if (memes === null) {
       memes = MOCK_RESULTS;
@@ -118,26 +179,24 @@
     countEl.textContent = memes.length;
 
     if (memes.length === 0) {
-      // Zero result: show the unmet-search form, log query had_result=false
-      unmetQuerySpan.textContent = q;
+      unmetQuerySpan.textContent = q || '此篩選條件';
       unmetForm.hidden = false;
-      window.TWmeme.supa.logSearchQuery({
-        queryText: q, hadResult: false, resultCount: 0,
-      });
+      if (q) {
+        window.TWmeme.supa.logSearchQuery({
+          queryText: q, hadResult: false, resultCount: 0,
+        });
+      }
       return;
     }
 
     window.TWmeme.render.renderGrid(grid, memes, {
       onCopy: (m) => {
-        // copy click is implicit click signal; record it
         const idx = memes.indexOf(m);
-        window.TWmeme.supa.logClick(q, idx);
+        if (q) window.TWmeme.supa.logClick(q, idx);
       },
     });
 
-    // Don't log for the mock fallback — those queries didn't actually
-    // hit our index, treating them as had_result=true would lie.
-    if (!usingFallback) {
+    if (!usingFallback && q) {
       window.TWmeme.supa.logSearchQuery({
         queryText: q, hadResult: true, resultCount: memes.length,
       });
@@ -163,18 +222,48 @@
     }
   }
 
-  // Bind submit via JS to guarantee preventDefault (inline onsubmit lost the
-  // race in some browsers and the page navigated after writing to DB).
+  function syncUrl() {
+    const q = document.getElementById('q').value.trim();
+    const platform = document.getElementById('filter-platform').value;
+    const media_type = document.getElementById('filter-type').value;
+    const sort_by = document.getElementById('filter-sort').value;
+
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (platform !== 'all') params.set('platform', platform);
+    if (media_type !== 'all') params.set('type', media_type);
+    if (sort_by !== 'relevance') params.set('sort', sort_by);
+
+    const newUrl = location.pathname + (params.toString() ? '?' + params.toString() : '');
+    history.pushState(null, '', newUrl);
+  }
+
+  function handleFilterChange() {
+    syncUrl();
+    loadResults();
+  }
+
+  window.addEventListener('popstate', () => {
+    initFiltersFromUrl();
+    loadResults();
+  });
+
   document.getElementById('unmet-form-el').addEventListener('submit', (e) => {
     e.preventDefault();
     submitUnmet();
   });
 
-  function doSearch() {
-    const val = document.getElementById('q').value.trim();
-    if (val) location.href = 'results.html?q=' + encodeURIComponent(val);
-  }
+  document.getElementById('search-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleFilterChange();
+  });
 
+  document.getElementById('filter-platform').addEventListener('change', handleFilterChange);
+  document.getElementById('filter-type').addEventListener('change', handleFilterChange);
+  document.getElementById('filter-sort').addEventListener('change', handleFilterChange);
+
+  // Initialize
+  initFiltersFromUrl();
   loadResults();
 </script>
 </body>

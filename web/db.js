@@ -94,23 +94,57 @@ async function getMemeById(id) {
   }
 }
 
-async function searchMemes(query, limit = 40) {
+async function searchMemes(query, filters = {}, limit = 40) {
   try {
     const safe = String(query || '').trim();
-    if (!safe) return [];
     const s = await sql();
-    const pattern = '%' + safe + '%';
-    const rows = await s`
-      SELECT id, title, cached_url, media_url, media_type, platform, trending_score,
-             similarity(COALESCE(title, ''), ${safe}) AS sm
+    
+    let queryText = `
+      SELECT id, title, cached_url, media_url, media_type, platform, trending_score, fetched_at, like_count,
+             similarity(COALESCE(title, ''), $1) AS sm
       FROM public.memes
-      WHERE title ILIKE ${pattern}
-         OR ocr_text ILIKE ${pattern}
-         OR description ILIKE ${pattern}
-         OR ${safe} = ANY(tags)
-      ORDER BY sm DESC, trending_score DESC
-      LIMIT ${limit}
+      WHERE 1=1
     `;
+    const params = [safe];
+    let paramIdx = 2;
+    
+    if (safe) {
+      const pattern = '%' + safe + '%';
+      queryText += ` AND (title ILIKE $${paramIdx} 
+                       OR ocr_text ILIKE $${paramIdx} 
+                       OR description ILIKE $${paramIdx} 
+                       OR $${paramIdx} = ANY(tags))`;
+      params.push(pattern);
+      paramIdx++;
+    }
+    
+    if (filters.platform && filters.platform !== 'all') {
+      queryText += ` AND platform = $${paramIdx}::platform_enum`;
+      params.push(filters.platform);
+      paramIdx++;
+    }
+    
+    if (filters.media_type && filters.media_type !== 'all') {
+      queryText += ` AND media_type = $${paramIdx}::media_type_enum`;
+      params.push(filters.media_type);
+      paramIdx++;
+    }
+    
+    let orderBy = 'sm DESC, trending_score DESC';
+    if (!safe) {
+      orderBy = 'trending_score DESC, fetched_at DESC';
+    }
+    
+    if (filters.sort_by === 'latest') {
+      orderBy = 'fetched_at DESC, id DESC';
+    } else if (filters.sort_by === 'popular') {
+      orderBy = 'like_count DESC, trending_score DESC';
+    }
+    
+    queryText += ` ORDER BY ${orderBy} LIMIT $${paramIdx}`;
+    params.push(limit);
+    
+    const rows = await s(queryText, params);
     return rows;
   } catch (e) {
     logErr('search', e);

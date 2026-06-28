@@ -27,6 +27,7 @@ from scrapers.ptt import PTTScraper
 from scrapers.dcard import DcardScraper
 from scrapers.threads import ThreadsScraper
 from scrapers.instagram import InstagramScraper
+from scrapers.baha import BahaScraper
 from pipeline.dedup import compute_phash
 from pipeline.uploader import get_client, insert_meme, close_client
 
@@ -42,11 +43,12 @@ SCRAPER_MAP = {
     "dcard":     DcardScraper,
     "threads":   ThreadsScraper,
     "instagram": InstagramScraper,
+    "baha":      BahaScraper,
 }
 
 # Threads/IG need residential proxies to be reliable (~30-50% without).
 # Run them explicitly via --platforms when you have proxies set up.
-DEFAULT_PLATFORMS = ["ptt", "dcard"]
+DEFAULT_PLATFORMS = ["ptt", "dcard", "baha"]
 
 
 async def process_item(client, item: dict) -> bool:
