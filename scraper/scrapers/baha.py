@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Baha Scraper — uses plain aiohttp.
-Scrapes Gamer forum (bsn=60076: 場外休憩區) list and extracts image URLs.
-"""
-
 import asyncio
 import logging
 import random
@@ -18,10 +12,7 @@ logger = logging.getLogger(__name__)
 
 BAHA_BASE = "https://forum.gamer.com.tw"
 BAHA_FORUM_URL = f"{BAHA_BASE}/B.php?bsn=60076"
-
-# Valid image extension pattern
 IMG_PATTERN = re.compile(r"\.(jpg|jpeg|png|gif|webp)$", re.I)
-# Excluded sub-strings (avatars, layout elements, emojis, official gamer graphics)
 EXCLUDE_PATTERN = re.compile(r"(i2\.bahamut\.com\.tw|face/|avatar/|ad/|css/|images/)", re.I)
 
 class BahaScraper(BaseScraper):
@@ -47,7 +38,6 @@ class BahaScraper(BaseScraper):
         
         cookies = {"BAHASID": bahasid}
         async with aiohttp.ClientSession(headers=headers, cookies=cookies) as session:
-            # Scrape self.pages pages
             for page in range(1, self.pages + 1):
                 url = f"{BAHA_FORUM_URL}&page={page}"
                 try:
@@ -72,11 +62,9 @@ class BahaScraper(BaseScraper):
         rows = soup.select(".b-list__row")
         
         for row in rows:
-            # 1. Skip sticky posts (pinned posts)
             if "b-list__row--top" in row.get("class", []):
                 continue
                 
-            # 2. Get title and post link
             title_el = row.select_one(".b-list__main__title")
             if not title_el:
                 continue
@@ -84,12 +72,10 @@ class BahaScraper(BaseScraper):
             post_url = BAHA_BASE + "/" + title_el.get("href", "").strip()
             title = title_el.text.strip()
             
-            # 3. Parse GP (like_count)
             gp_el = row.select_one(".b-list__summary__gp")
             gp_text = gp_el.text.strip() if gp_el else "0"
             
             like_count = 0
-            # GP count normally is 'GP 10', 'GP 100', 'GP 1.2k'
             match = re.search(r"(\d+(\.\d+)?)", gp_text)
             if match:
                 val = float(match.group(1))
@@ -98,7 +84,6 @@ class BahaScraper(BaseScraper):
                 like_count = int(val)
                     
             try:
-                # 4. Extract image media inside the post detail page
                 media_urls = await self._extract_post_images(session, post_url)
                 for img_url in media_urls:
                     items.append({
