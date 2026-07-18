@@ -56,6 +56,13 @@ jobs:
           PLATFORMS="${{ github.event.inputs.platforms || 'ptt dcard baha' }}"
           doppler run -- python main.py --platforms $PLATFORMS
 
+      - name: Backfill AI metadata
+        working-directory: scraper
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+        run: |
+          doppler run -- python scripts/backfill_gemini_metadata.py
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:

@@ -20,7 +20,7 @@ from scrapers.base import analyze_meme_image
 from pipeline.uploader import _get_pool
 
 # Cap on how many items to process in one run (adjust as needed)
-BACKFILL_LIMIT = 15
+BACKFILL_LIMIT = 20
 FETCH_TIMEOUT = aiohttp.ClientTimeout(total=30)
 
 async def apply_migration_002(conn):
@@ -116,6 +116,23 @@ async def main():
         description = ai_meta.get("description")
         tags = ai_meta.get("tags")
         
+        # Ensure ocr_text and description are strings (sometimes Gemini returns lists)
+        if isinstance(ocr_text, list):
+            ocr_text = "\n".join(str(x) for x in ocr_text)
+        elif ocr_text is not None:
+            ocr_text = str(ocr_text)
+            
+        if isinstance(description, list):
+            description = " ".join(str(x) for x in description)
+        elif description is not None:
+            description = str(description)
+            
+        # Ensure tags is a list
+        if isinstance(tags, str):
+            tags = [tags]
+        elif not isinstance(tags, list):
+            tags = []
+        
         if ocr_text or description:
             # Update database
             async with pool.acquire() as conn:
@@ -134,7 +151,7 @@ async def main():
             
         processed += 1
         # Avoid hitting API rate limits
-        await asyncio.sleep(2.0)
+        await asyncio.sleep(4.0)
         
     logger.info(f"Backfill finished. Processed: {processed}, Successfully updated: {success}")
     
