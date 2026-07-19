@@ -9,7 +9,6 @@ Videos are deduped by URL hash (not pHash) since downloading full
 videos just to hash them would be too slow in a scraping pipeline.
 """
 
-import asyncio
 import hashlib
 import io
 import logging

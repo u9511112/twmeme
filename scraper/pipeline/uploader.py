@@ -106,7 +106,7 @@ async def upload_media_to_storage(
                         if attempt < retries:
                             await asyncio.sleep(2 * attempt)
                             continue
-                        return None
+                        return None, None
                     content_type = r.content_type or "image/jpeg"
                     data = await r.read()
 

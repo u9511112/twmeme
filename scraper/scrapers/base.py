@@ -19,7 +19,8 @@ import os
 import random
 import re
 
-import google.generativeai as genai
+import google.genai as genai
+from google.genai.types import Part
 from PIL import Image
 from fake_useragent import UserAgent
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
@@ -52,7 +53,6 @@ def load_proxies(path: str = "proxies.txt") -> None:
 def _pick_proxy() -> dict | None:
     if not PROXIES:
         return None
-    # Subnet-diversity: avoid same /24 consecutively
     proxy_str = random.choice(PROXIES)
     return {"server": proxy_str}
 
@@ -215,28 +215,18 @@ def _setup_gemini():
     if not api_key:
         logger.warning("[Gemini] GEMINI_API_KEY is not set. AI metadata extraction will be skipped.")
         return
-    genai.configure(api_key=api_key)
     _gemini_configured = True
 
 async def analyze_meme_image(image_bytes: bytes) -> dict:
-    """
-    Analyze meme image bytes via Gemini 2.5 Flash.
-    Returns: {
-      "ocr_text": "text inside image",
-      "description": "visual description",
-      "tags": ["tag1", "tag2", ...]
-    }
-    """
     _setup_gemini()
     if not _gemini_configured:
         return {"ocr_text": None, "description": None, "tags": []}
 
     try:
-        # Load image via PIL
         img = Image.open(io.BytesIO(image_bytes))
         
-        # We use gemini-2.5-flash which is multimodal and fast
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        api_key = os.getenv("GEMINI_API_KEY")
+        client = genai.Client(api_key=api_key)
         
         prompt = (
             "你是一隻專門分析繁體中文迷因（Meme）梗圖的 AI 專家。\n"
@@ -248,18 +238,25 @@ async def analyze_meme_image(image_bytes: bytes) -> dict:
             "}"
         )
         
-        # Execute vision task
-        # PIL Image can be passed directly as part of contents list
-        # run in executor since genai is synchronous blocking IO
+        # Convert PIL image to bytes for the new SDK
+        buf = io.BytesIO()
+        img.save(buf, format=img.format or "JPEG")
+        img_bytes_for_api = buf.getvalue()
+        
         loop = asyncio.get_running_loop()
         response = await loop.run_in_executor(
             None,
-            lambda: model.generate_content([prompt, img])
+            lambda: client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[
+                    prompt,
+                    Part.from_bytes(data=img_bytes_for_api, mime_type="image/jpeg")
+                ]
+            )
         )
         
         text = response.text.strip()
         
-        # Clean markdown code block if model outputted them anyway
         if text.startswith("```"):
             text = re.sub(r"^```(?:json)?\n", "", text)
             text = re.sub(r"\n```$", "", text)

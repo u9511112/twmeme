@@ -62,14 +62,7 @@ async def main():
         logger.error("GEMINI_API_KEY not set in environment.")
         return
 
-    logger.info("Connecting to Neon database pool...")
     pool = await _get_pool()
-    
-    # 1. Apply Migration 002 (Already executed manually as owner)
-    # async with pool.acquire() as conn:
-    #     await apply_migration_002(conn)
-
-    # 2. Fetch memes that don't have OCR text yet
     logger.info(f"Fetching memes missing AI metadata (limit {BACKFILL_LIMIT})...")
     async with pool.acquire() as conn:
         rows = await conn.fetch(

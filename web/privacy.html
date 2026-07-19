@@ -67,7 +67,7 @@
   <li><code>https://ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/sql</code> — to query the public TWmeme meme catalog (PostgreSQL over HTTPS).</li>
   <li><code>https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/*</code> — to load meme images (Cloudflare R2 public bucket).</li>
 </ul>
-<p>These are the same endpoints <a href="https://twmeme.pages.dev/">twmeme.vercel.app</a> uses. The connection is read-only by Postgres-level GRANT permissions (the <code>web_anon</code> role can <code>SELECT</code> public memes and <code>INSERT</code> anonymous search logs only; it cannot read logs back, cannot modify the catalog).</p>
+<p>These are the same endpoints <a href="https://twmeme.pages.dev/">twmeme.pages.dev</a> uses. The connection is read-only by Postgres-level GRANT permissions (the <code>web_anon</code> role can <code>SELECT</code> public memes and <code>INSERT</code> anonymous search logs only; it cannot read logs back, cannot modify the catalog).</p>
 
 <h2>What gets logged on the server side</h2>
 <p>When you complete a search (the overlay actually returns results), the extension inserts a row into TWmeme's <code>search_queries</code> table containing:</p>

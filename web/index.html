@@ -9,13 +9,13 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="TWmeme — 找到那張你記得但搜不到的迷因">
 <meta property="og:description" content="早期版本、以 PTT 表特板為主。搜不到的告訴我們、會補上。">
-<meta property="og:url" content="https://twmeme.vercel.app/">
+<meta property="og:url" content="https://twmeme.pages.dev/">
 <meta property="og:site_name" content="TWmeme">
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="TWmeme — 找到那張你記得但搜不到的迷因">
 <meta name="twitter:description" content="早期版本、以 PTT 表特板為主。搜不到的告訴我們、會補上。">
-<link rel="canonical" href="https://twmeme.vercel.app/">
+<link rel="canonical" href="https://twmeme.pages.dev/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -25,18 +25,18 @@
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "@id": "https://twmeme.vercel.app/#website",
-  "url": "https://twmeme.vercel.app/",
+  "@id": "https://twmeme.pages.dev/#website",
+  "url": "https://twmeme.pages.dev/",
   "name": "TWmeme",
   "alternateName": "迷因搜",
   "description": "台灣繁中迷因搜尋。早期版本以 PTT 表特板為主。",
   "inLanguage": "zh-Hant-TW",
-  "publisher": { "@id": "https://twmeme.vercel.app/#organization" },
+  "publisher": { "@id": "https://twmeme.pages.dev/#organization" },
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": "https://twmeme.vercel.app/results.html?q={search_term_string}"
+      "urlTemplate": "https://twmeme.pages.dev/results.html?q={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
@@ -47,10 +47,10 @@
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "@id": "https://twmeme.vercel.app/#webapp",
+  "@id": "https://twmeme.pages.dev/#webapp",
   "name": "TWmeme",
   "alternateName": "台灣迷因搜尋",
-  "url": "https://twmeme.vercel.app/",
+  "url": "https://twmeme.pages.dev/",
   "description": "搜尋台灣繁體中文迷因圖片的免費網頁工具。輸入印象中的關鍵字、人名或標題片段、找到那張你記得但搜不到的迷因。資料來源以 PTT 表特板為主、可一鍵複製連結貼到 LINE/IG/FB 或下載原圖。",
   "applicationCategory": "UtilitiesApplication",
   "applicationSubCategory": "Image Search",
@@ -72,7 +72,7 @@
     "畫質徽章標示（HD / 4K）",
     "免費、無需註冊"
   ],
-  "publisher": { "@id": "https://twmeme.vercel.app/#organization" }
+  "publisher": { "@id": "https://twmeme.pages.dev/#organization" }
 }
 </script>
 
@@ -80,10 +80,10 @@
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "@id": "https://twmeme.vercel.app/#organization",
+  "@id": "https://twmeme.pages.dev/#organization",
   "name": "TWmeme",
   "alternateName": "迷因搜",
-  "url": "https://twmeme.vercel.app/",
+  "url": "https://twmeme.pages.dev/",
   "description": "TWmeme 是台灣繁體中文迷因搜尋工具、由獨立開發者維護的開源專案。",
   "sameAs": [
     "https://github.com/u9511112/twmeme"
@@ -108,7 +108,7 @@
 
   <form class="searchbox" onsubmit="event.preventDefault(); goResults();">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-    <input id="q" type="text" placeholder="輸入你記得的關鍵字、人名、或標題片段">
+    <input id="q" type="text" aria-label="搜尋迷因關鍵字" placeholder="輸入你記得的關鍵字、人名、或標題片段">
     <button class="btn-search" type="submit" aria-label="搜尋">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
     </button>
@@ -222,7 +222,7 @@
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  "@id": "https://twmeme.vercel.app/#faq",
+  "@id": "https://twmeme.pages.dev/#faq",
   "inLanguage": "zh-Hant-TW",
   "mainEntity": [
     {

@@ -3,7 +3,6 @@
 Instagram Scraper — uses Apify Instagram Scraper to bypass WAF.
 """
 
-import asyncio
 import logging
 import urllib.parse
 

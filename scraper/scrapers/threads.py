@@ -3,7 +3,6 @@
 Threads Scraper — uses Apify Threads Scraper to bypass WAF.
 """
 
-import asyncio
 import logging
 
 from .base import ApifyBaseScraper
