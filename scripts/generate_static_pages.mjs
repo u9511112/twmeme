@@ -17,7 +17,7 @@
 // On Vercel: vercel.json `buildCommand` hooks this in.
 
 import { neon } from '@neondatabase/serverless';
-import { mkdir, writeFile, rm, readdir } from 'node:fs/promises';
+import { mkdir, writeFile, rm, readdir, readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -546,11 +546,61 @@ async function main() {
   console.log('[ssg] writing /meme.js...');
   await writeFile(join(WEB_DIR, 'meme.js'), renderMemeJs(), 'utf-8');
 
+  // Update web/index.html with static trending memes and count
+  console.log('[ssg] updating web/index.html with static trending memes and count...');
+  try {
+    const indexHtmlPath = join(WEB_DIR, 'index.html');
+    let indexHtml = await readFile(indexHtmlPath, 'utf-8');
+
+    // Get 12 trending memes based on likes (like_count DESC, fetched_at DESC)
+    const trending = [...memes]
+      .sort((a, b) => {
+        const diffLike = (b.like_count || 0) - (a.like_count || 0);
+        if (diffLike !== 0) return diffLike;
+        return new Date(b.fetched_at || 0) - new Date(a.fetched_at || 0);
+      })
+      .slice(0, 12);
+
+    const trendingHtml = trending
+      .map(r => {
+        const rUrl = `/meme/${r.id}`;
+        const rTitle = String(r.title || '迷因').trim();
+        const rImg = pickImageUrl(r);
+        return `      <article class="card-wrap">
+        <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
+          <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
+          <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
+        </a>
+      </article>`;
+      })
+      .join('\n');
+
+    // Replace count in hero
+    const countStr = memes.length.toLocaleString('en');
+    const countText = `早期版本、目前 ${countStr} 張、以 PTT 表特板為主。搜不到的告訴我們、會補上。`;
+    indexHtml = indexHtml.replace(
+      /<p class="sub" id="hero-sub">([\s\S]*?)<\/p>/,
+      `<p class="sub" id="hero-sub">${countText}</p>`
+    );
+
+    // Replace trending grid content
+    indexHtml = indexHtml.replace(
+      /<div class="broken-grid" id="trending-grid">([\s\S]*?)<\/div>/,
+      `<div class="broken-grid" id="trending-grid">\n${trendingHtml}\n  </div>`
+    );
+
+    await writeFile(indexHtmlPath, indexHtml, 'utf-8');
+    console.log('[ssg] successfully updated web/index.html statically.');
+  } catch (err) {
+    console.error('[ssg] failed to update web/index.html statically:', err);
+  }
+
   console.log('[ssg] done.');
   console.log('  /meme/<uuid>.html × ' + memes.length);
   console.log('  /meme/index.html');
   console.log('  /sitemap.xml (' + (memes.length + 4 + guideSlugs.length) + ' urls)');
   console.log('  /meme.js');
+  console.log('  /index.html (updated statically)');
 }
 
 main().catch(e => {
