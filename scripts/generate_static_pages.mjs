@@ -575,8 +575,10 @@ async function main() {
       })
       .join('\n');
 
-    // Replace count in hero
-    const countStr = memes.length.toLocaleString('en');
+    // Fetch real total meme count from DB (not capped by MEME_LIMIT)
+    const countRes = await sql`SELECT count(*) FROM public.memes`;
+    const totalCount = Number(countRes[0]?.count || memes.length);
+    const countStr = totalCount.toLocaleString('en');
     const countText = `早期版本、目前 ${countStr} 張、以 PTT 表特板為主。搜不到的告訴我們、會補上。`;
     indexHtml = indexHtml.replace(
       /<p class="sub" id="hero-sub">([\s\S]*?)<\/p>/,
