@@ -192,6 +192,7 @@
     }
 
     window.TWmeme.render.renderGrid(grid, memes, {
+      query: q,
       onCopy: (m) => {
         const idx = memes.indexOf(m);
         if (q) window.TWmeme.supa.logClick(q, idx);

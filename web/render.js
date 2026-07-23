@@ -63,7 +63,27 @@ function renderCard(meme, opts) {
   caption.className = 'caption';
   const nameSpan = document.createElement('span');
   nameSpan.className = 'name';
-  nameSpan.textContent = displayName;
+
+  if (opts.query && typeof opts.query === 'string' && opts.query.trim()) {
+    const q = opts.query.trim();
+    const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp('(' + escapedQ + ')', 'gi');
+    const parts = displayName.split(regex);
+    nameSpan.replaceChildren();
+    parts.forEach(part => {
+      if (part.toLowerCase() === q.toLowerCase()) {
+        const mark = document.createElement('mark');
+        mark.className = 'highlight-term';
+        mark.textContent = part;
+        nameSpan.appendChild(mark);
+      } else if (part) {
+        nameSpan.appendChild(document.createTextNode(part));
+      }
+    });
+  } else {
+    nameSpan.textContent = displayName;
+  }
+
   caption.appendChild(nameSpan);
 
   link.appendChild(thumb);
