@@ -10,7 +10,8 @@
 // All read paths fall back to mock data on failure so the static site
 // never goes blank if the DB is unreachable / paused / network blips.
 
-const NEON_URL = "postgresql://web_anon:eSoHu1pLOwjbDiQQsO6IWt90Pr5G@ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require";
+const NEON_URL = (typeof window !== "undefined" && (window.TWmeme_NEON_URL || window.NEON_URL))
+  || "postgresql://web_anon:eSoHu1pLOwjbDiQQsO6IWt90Pr5G@ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require";
 
 // Lazy-loaded Neon driver. Resolved on first call; stays cached.
 let _sqlPromise = null;

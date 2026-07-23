@@ -26,11 +26,11 @@ import { fileURLToPath } from 'node:url';
 // ---------------------------------------------------------------------------
 
 const NEON_URL = process.env.NEON_DATABASE_URL
-  || process.env.NEON_WEB_ANON_URL
-  // Fallback: same web_anon string baked into web/db.js (GRANT-restricted,
-  // SELECT-only on public.memes). Safe to keep here because Vercel build
-  // env doesn't need a separate secret for read-only public content.
-  || 'postgresql://web_anon:eSoHu1pLOwjbDiQQsO6IWt90Pr5G@ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+  || process.env.NEON_WEB_ANON_URL;
+if (!NEON_URL) {
+  console.error('[ssg] FATAL: NEON_DATABASE_URL or NEON_WEB_ANON_URL environment variable is required.');
+  process.exit(1);
+}
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://twmeme.pages.dev';
 const __dirname = dirname(fileURLToPath(import.meta.url));

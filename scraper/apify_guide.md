@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 > **Apify 帳戶共享資訊**
-> - **API Key**：`apify_api_jkoqZcARggDuvixgmztr5Ur6aRylIH0bdVCl`
+> - **API Key**：從環境變數 `APIFY_API_KEY` 讀取 (例如：置於 `.env.local` 或 Doppler)
 > - **免費額度**：每月 **$5 USD**（與 VinHardLink、EasyPcBuild 共享）。
 > - **7 天保留限制**：Apify 免費版之 Dataset/Key-Value Store 資料僅暫存 7 天。**所有爬取到的迷因與資料必須立即讀取，計算 pHash，上傳 R2，並寫入 Neon Database**，避免因過期而遺失。
 
@@ -27,9 +27,10 @@
 在發起任何 Apify 請求前，必須先驗證帳戶剩餘額度：
 
 ```python
+import os
 from apify_client import ApifyClient
 
-APIFY_API_KEY = "apify_api_jkoqZcARggDuvixgmztr5Ur6aRylIH0bdVCl"
+APIFY_API_KEY = os.getenv("APIFY_API_KEY")
 client = ApifyClient(APIFY_API_KEY)
 
 def check_apify_budget_safe() -> bool:
