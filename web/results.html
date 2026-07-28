@@ -47,6 +47,8 @@
         <option value="ptt">PTT</option>
         <option value="dcard">Dcard</option>
         <option value="baha">巴哈姆特</option>
+        <option value="threads">Threads</option>
+        <option value="instagram">Instagram</option>
       </select>
     </div>
     <div class="filter-group">
@@ -63,6 +65,20 @@
         <option value="popular">熱門程度</option>
       </select>
     </div>
+  </div>
+
+  <div class="quick-tags" id="quick-tags">
+    <button type="button" class="chip emotion" onclick="quickSearch('崩潰')">崩潰 😭</button>
+    <button type="button" class="chip emotion" onclick="quickSearch('傻眼')">傻眼 🙄</button>
+    <button type="button" class="chip role" onclick="quickSearch('貓')">貓咪 🐱</button>
+    <button type="button" class="chip role" onclick="quickSearch('狗')">柴犬 🐕</button>
+    <button type="button" class="chip role" onclick="quickSearch('統神')">統神 🐷</button>
+    <button type="button" class="chip role" onclick="quickSearch('館長')">館長 💪</button>
+    <button type="button" class="chip acg" onclick="quickSearch('吉伊卡哇')">吉伊卡哇 🐹</button>
+    <button type="button" class="chip acg" onclick="quickSearch('芙莉蓮')">芙莉蓮 🪄</button>
+    <button type="button" class="chip scene" onclick="quickSearch('職場')">社畜職場 💼</button>
+    <button type="button" class="chip scene" onclick="quickSearch('地獄')">地獄梗 ☠️</button>
+    <button type="button" class="chip format" onclick="quickSearch('諧音梗')">諧音 🤪</button>
   </div>
   
   <div class="result-meta">找到 <strong id="count">—</strong> 張</div>
@@ -239,6 +255,11 @@
 
     const newUrl = location.pathname + (params.toString() ? '?' + params.toString() : '');
     history.pushState(null, '', newUrl);
+  }
+
+  function quickSearch(tag) {
+    document.getElementById('q').value = tag;
+    handleFilterChange();
   }
 
   function handleFilterChange() {
