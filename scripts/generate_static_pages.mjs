@@ -585,6 +585,31 @@ async function main() {
       `<p class="sub" id="hero-sub">${countText}</p>`
     );
 
+    // Inject weekly hot memes (last 7 days, sorted by popularity)
+    const weeklyRows = await sql`
+      SELECT * FROM public.memes
+      WHERE fetched_at > now() - interval '7 days'
+      ORDER BY like_count DESC, comment_count DESC
+      LIMIT 8`;
+    const weeklyHtml = weeklyRows
+      .map(r => {
+        const rUrl = `/meme/${r.id}`;
+        const rTitle = String(r.title || '迷因').trim();
+        const rImg = pickImageUrl(r);
+        return `      <article class="card-wrap">
+        <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
+          <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
+          <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
+        </a>
+      </article>`;
+      })
+      .join('\n');
+    indexHtml = indexHtml.replace(
+      /<div class="broken-grid" id="weekly-hot-grid">([\s\S]*?)<\/div>/,
+      `<div class="broken-grid" id="weekly-hot-grid">\n${weeklyHtml}\n  </div>`
+    );
+    console.log(`[ssg] injected ${weeklyRows.length} weekly hot memes`);
+
     // Replace trending grid content
     indexHtml = indexHtml.replace(
       /<div class="broken-grid" id="trending-grid">([\s\S]*?)<\/div>/,
