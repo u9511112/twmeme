@@ -567,8 +567,11 @@ async function main() {
       const rUrl = `/meme/${r.id}`;
       const rTitle = String(r.title || '迷因').trim();
       const rImg = pickImageUrl(r);
+      const platform = String(r.platform || 'ptt').toLowerCase();
+      const platformLabel = PLATFORM_LABEL[platform] || platform.toUpperCase();
       return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
+          <span class="platform-badge ${escapeAttr(platform)}">${escapeHtml(platformLabel)}</span>
           <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
           <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
         </a>
