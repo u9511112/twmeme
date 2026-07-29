@@ -577,8 +577,8 @@ async function main() {
     const injectGrid = (html, gridId, rows) => {
       const cards = rows.map(cardHtml).join('\n');
       return html.replace(
-        new RegExp(`<div class="broken-grid" id="${gridId}">([\\s\\S]*?)</div>`),
-        `<div class="broken-grid" id="${gridId}">\n${cards}\n  </div>`
+        new RegExp(`<!-- SSG:${gridId}:START -->[\\\\s\\\\S]*?<!-- SSG:${gridId}:END -->`),
+        `<!-- SSG:${gridId}:START -->\n${cards}\n    <!-- SSG:${gridId}:END -->`
       );
     };
 
