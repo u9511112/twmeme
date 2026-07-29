@@ -552,30 +552,7 @@ async function main() {
     const indexHtmlPath = join(WEB_DIR, 'index.html');
     let indexHtml = await readFile(indexHtmlPath, 'utf-8');
 
-    // Get 12 trending memes based on likes (like_count DESC, fetched_at DESC)
-    const trending = [...memes]
-      .sort((a, b) => {
-        const diffLike = (b.like_count || 0) - (a.like_count || 0);
-        if (diffLike !== 0) return diffLike;
-        return new Date(b.fetched_at || 0) - new Date(a.fetched_at || 0);
-      })
-      .slice(0, 12);
-
-    const trendingHtml = trending
-      .map(r => {
-        const rUrl = `/meme/${r.id}`;
-        const rTitle = String(r.title || '迷因').trim();
-        const rImg = pickImageUrl(r);
-        return `      <article class="card-wrap">
-        <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
-          <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
-          <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
-        </a>
-      </article>`;
-      })
-      .join('\n');
-
-    // Fetch real total meme count from DB (not capped by MEME_LIMIT)
+    // Update hero subtitle with real meme count
     const countRes = await sql`SELECT count(*) FROM public.memes`;
     const totalCount = Number(countRes[0]?.count || memes.length);
     const countStr = totalCount.toLocaleString('en');
@@ -585,36 +562,50 @@ async function main() {
       `<p class="sub" id="hero-sub">${countText}</p>`
     );
 
-    // Inject weekly hot memes (last 7 days, sorted by popularity)
-    const weeklyRows = await sql`
-      SELECT * FROM public.memes
-      WHERE fetched_at > now() - interval '7 days'
-      ORDER BY like_count DESC, comment_count DESC
-      LIMIT 8`;
-    const weeklyHtml = weeklyRows
-      .map(r => {
-        const rUrl = `/meme/${r.id}`;
-        const rTitle = String(r.title || '迷因').trim();
-        const rImg = pickImageUrl(r);
-        return `      <article class="card-wrap">
+    // Helper: render card HTML for a meme row
+    const cardHtml = (r) => {
+      const rUrl = `/meme/${r.id}`;
+      const rTitle = String(r.title || '迷因').trim();
+      const rImg = pickImageUrl(r);
+      return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
           <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
           <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
         </a>
       </article>`;
-      })
-      .join('\n');
-    indexHtml = indexHtml.replace(
-      /<div class="broken-grid" id="weekly-hot-grid">([\s\S]*?)<\/div>/,
-      `<div class="broken-grid" id="weekly-hot-grid">\n${weeklyHtml}\n  </div>`
-    );
+    };
+    const injectGrid = (html, gridId, rows) => {
+      const cards = rows.map(cardHtml).join('\n');
+      return html.replace(
+        new RegExp(`<div class="broken-grid" id="${gridId}">([\\s\\S]*?)</div>`),
+        `<div class="broken-grid" id="${gridId}">\n${cards}\n  </div>`
+      );
+    };
+
+    // 🔥 本週熱門 (last 7 days, by popularity)
+    const weeklyRows = await sql`
+      SELECT * FROM public.memes
+      WHERE fetched_at > now() - interval '7 days'
+      ORDER BY like_count DESC, comment_count DESC
+      LIMIT 8`;
+    indexHtml = injectGrid(indexHtml, 'weekly-hot-grid', weeklyRows);
     console.log(`[ssg] injected ${weeklyRows.length} weekly hot memes`);
 
-    // Replace trending grid content
-    indexHtml = indexHtml.replace(
-      /<div class="broken-grid" id="trending-grid">([\s\S]*?)<\/div>/,
-      `<div class="broken-grid" id="trending-grid">\n${trendingHtml}\n  </div>`
-    );
+    // 👀 最多人氣 (all-time, by likes)
+    const popularRows = await sql`
+      SELECT * FROM public.memes
+      ORDER BY like_count DESC, comment_count DESC
+      LIMIT 8`;
+    indexHtml = injectGrid(indexHtml, 'popular-grid', popularRows);
+    console.log(`[ssg] injected ${popularRows.length} popular memes`);
+
+    // 🆕 最新上架 (newest first)
+    const latestRows = await sql`
+      SELECT * FROM public.memes
+      ORDER BY fetched_at DESC
+      LIMIT 8`;
+    indexHtml = injectGrid(indexHtml, 'latest-grid', latestRows);
+    console.log(`[ssg] injected ${latestRows.length} latest memes`);
 
     await writeFile(indexHtmlPath, indexHtml, 'utf-8');
     console.log('[ssg] successfully updated web/index.html statically.');
