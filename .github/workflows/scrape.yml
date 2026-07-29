@@ -76,7 +76,7 @@ jobs:
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
         run: |
-          doppler run -- node scripts/generate_static_pages.mjs
+          doppler run -- npm run build
 
       - name: Deploy to Cloudflare Pages
         env:

@@ -52,16 +52,45 @@ function throttled(key) {
 }
 
 // ---- READS -----------------------------------------------------------
-async function getTrendingMemes(limit = 12) {
+async function getWeeklyHotMemes(limit = 8) {
   try {
     const s = await sql();
     const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform
                          FROM public.memes
-                         ORDER BY trending_score DESC
+                         WHERE fetched_at > now() - interval '7 days'
+                         ORDER BY like_count DESC, comment_count DESC
                          LIMIT ${limit}`;
     return rows.length > 0 ? rows : null;
   } catch (e) {
-    logErr('trending fetch', e);
+    logErr('weekly hot fetch', e);
+    return null;
+  }
+}
+
+async function getPopularMemes(limit = 8) {
+  try {
+    const s = await sql();
+    const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform
+                         FROM public.memes
+                         ORDER BY like_count DESC, comment_count DESC
+                         LIMIT ${limit}`;
+    return rows.length > 0 ? rows : null;
+  } catch (e) {
+    logErr('popular fetch', e);
+    return null;
+  }
+}
+
+async function getLatestMemes(limit = 8) {
+  try {
+    const s = await sql();
+    const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform
+                         FROM public.memes
+                         ORDER BY fetched_at DESC
+                         LIMIT ${limit}`;
+    return rows.length > 0 ? rows : null;
+  } catch (e) {
+    logErr('latest fetch', e);
     return null;
   }
 }
@@ -189,6 +218,8 @@ async function submitUnmetSearch(description) {
 
 window.TWmeme = window.TWmeme || {};
 window.TWmeme.supa = {
-  getTrendingMemes, searchMemes, getMemeById, getMemeCount,
+  getWeeklyHotMemes, getPopularMemes, getLatestMemes,
+  searchMemes, getMemeById, getMemeCount,
   logSearchQuery, logClick, submitUnmetSearch,
 };
+
