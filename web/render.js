@@ -120,8 +120,17 @@ function renderCard(meme, opts) {
 function renderGrid(container, memes, opts) {
   if (!container) return;
   container.replaceChildren();
+  const isMasonry = container.classList.contains('masonry');
   const frag = document.createDocumentFragment();
-  memes.forEach(m => frag.appendChild(renderCard(m, opts)));
+  memes.forEach((m, idx) => {
+    // Break monotonous card grid in dynamic masonry
+    const cardOpts = { ...opts };
+    const memeData = { ...m };
+    if (isMasonry && memeData.tall === undefined) {
+      memeData.tall = (idx % 5 === 1 || idx % 7 === 3);
+    }
+    frag.appendChild(renderCard(memeData, cardOpts));
+  });
   container.appendChild(frag);
 }
 

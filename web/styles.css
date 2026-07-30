@@ -6,7 +6,7 @@
   --primary-ink: oklch(58.0% 0.21 36);  /* 熱珊瑚偏深 */
   --accent: oklch(82.0% 0.19 75);       /* 金盞花黃 */
   --bg: oklch(98.5% 0.006 45);          /* 奶油紙白 */
-  --surface: oklch(100% 0 0);           /* 白卡 */
+  --surface: oklch(99.5% 0.005 45);     /* 微暖白卡 */
   --ink: oklch(15.0% 0.008 45);         /* 深墨黑 */
   --muted: oklch(50.0% 0.015 45);       /* 暖灰 */
   --border: oklch(91.0% 0.008 45);      /* 紙質拼貼邊框灰 */
@@ -47,6 +47,25 @@ html { font-size: 16px; }
   position: absolute; width: 1px; height: 1px;
   padding: 0; margin: -1px; overflow: hidden;
   clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* A11y: Skip to content link for keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 9999;
+  padding: 12px 20px;
+  background: var(--primary);
+  color: oklch(99.5% 0.005 45);
+  font-weight: 600;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  text-decoration: none;
+  transition: top 150ms ease-out;
+}
+.skip-link:focus {
+  top: 16px;
 }
 
 /* A11y: keyboard focus ring — visible on all interactive elements */
@@ -145,7 +164,7 @@ a { color: inherit; text-decoration: none; }
 .btn-search {
   width: 48px; height: 48px;
   border: none; cursor: pointer;
-  background: var(--primary); color: white;
+  background: var(--primary); color: oklch(99.5% 0.005 45);
   border-radius: var(--r-full);
   display: flex; align-items: center; justify-content: center;
   transition: background var(--d-short) ease-out, transform var(--d-short) var(--e-enter);
@@ -197,7 +216,7 @@ a { color: inherit; text-decoration: none; }
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 6px 14px;
+  padding: 12px 16px;
   border-radius: var(--r-full);
   font-size: 14px;
   font-weight: 500;
@@ -441,7 +460,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 600;
   padding: 2px 7px;
   border-radius: var(--r-full);
-  background: rgba(255, 255, 255, 0.85);
+  background: oklch(99.5% 0.005 45 / 0.88);
   backdrop-filter: blur(4px);
   color: oklch(35% 0.05 45);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -485,7 +504,7 @@ a { color: inherit; text-decoration: none; }
   opacity: 1;
   visibility: visible;
 }
-.copy-ghost:hover { background: var(--primary); color: white; }
+.copy-ghost:hover { background: var(--primary); color: oklch(99.5% 0.005 45); }
 
 .quality-badge {
   position: absolute; top: var(--s-sm); right: var(--s-sm);
@@ -496,15 +515,15 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Gradient placeholders for meme thumbs */
-.t-coral { background: linear-gradient(135deg, #FFD3C8, #FFA08C); }
-.t-mustard { background: linear-gradient(135deg, #FFE9B5, #FFC233); }
-.t-sage { background: linear-gradient(135deg, #D5E8C4, #9BC084); }
-.t-sky { background: linear-gradient(135deg, #C8DCF0, #8AB6E0); }
-.t-plum { background: linear-gradient(135deg, #E8CFE0, #C2A0BA); }
-.t-sand { background: linear-gradient(135deg, #EFE2CC, #C9B494); }
-.t-mint { background: linear-gradient(135deg, #CBEBDE, #8ECEB0); }
-.t-rose { background: linear-gradient(135deg, #F5D4D0, #E09890); }
-.t-steel { background: linear-gradient(135deg, #D6D9DE, #9AA0AA); }
+.t-coral { background: linear-gradient(135deg, oklch(90% 0.06 25), oklch(78% 0.12 25)); }
+.t-mustard { background: linear-gradient(135deg, oklch(93% 0.06 85), oklch(83% 0.14 80)); }
+.t-sage { background: linear-gradient(135deg, oklch(91% 0.05 145), oklch(78% 0.1 145)); }
+.t-sky { background: linear-gradient(135deg, oklch(90% 0.04 240), oklch(78% 0.08 240)); }
+.t-plum { background: linear-gradient(135deg, oklch(88% 0.04 330), oklch(76% 0.06 330)); }
+.t-sand { background: linear-gradient(135deg, oklch(92% 0.03 70), oklch(82% 0.05 70)); }
+.t-mint { background: linear-gradient(135deg, oklch(92% 0.05 165), oklch(82% 0.08 165)); }
+.t-rose { background: linear-gradient(135deg, oklch(90% 0.04 15), oklch(76% 0.08 15)); }
+.t-steel { background: linear-gradient(135deg, oklch(89% 0.01 260), oklch(72% 0.02 260)); }
 
 /* ===== Footer ===== */
 .site-footer {
@@ -608,7 +627,7 @@ a { color: inherit; text-decoration: none; }
               background var(--d-short) ease-out,
               border-color var(--d-short) ease-out;
 }
-.btn-primary { background: var(--primary); color: white; }
+.btn-primary { background: var(--primary); color: oklch(99.5% 0.005 45); }
 .btn-primary:hover { background: var(--primary-ink); transform: translateY(-2px); }
 .btn-secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
 .btn-secondary:hover { border-color: var(--ink); transform: translateY(-2px); }
@@ -814,7 +833,7 @@ mark.highlight-term {
   font-size: 15px;
   font-weight: 600;
   background: var(--primary);
-  color: white;
+  color: oklch(99.5% 0.005 45);
   border: none;
   border-radius: var(--r-full);
   padding: var(--s-sm) var(--s-xl);
@@ -879,6 +898,7 @@ mark.highlight-term {
   line-height: 1.7;
   color: var(--ink);
   margin: 0;
+  max-width: 65ch;
 }
 
 /* ===== Static meme detail page (Phase 2 SSG) ===== */
@@ -969,13 +989,14 @@ mark.highlight-term {
   margin: 0 0 var(--s-xl);
 }
 .tldr {
-  background: #FFF6E6;
-  border-left: 4px solid var(--accent);
+  background: oklch(97% 0.03 75);
+  border: 1px solid oklch(90% 0.06 75);
   border-radius: var(--r-sm);
   padding: var(--s-md) var(--s-lg);
   margin: var(--s-xl) 0 var(--s-2xl);
   font-size: 15px;
   line-height: 1.7;
+  max-width: 65ch;
 }
 .tldr strong { color: #6B4A00; }
 .article-cta {
@@ -1145,10 +1166,10 @@ mark.highlight-term {
   transform: translateX(-100%);
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.6) 20%,
-    rgba(255, 255, 255, 0.8) 60%,
-    rgba(255, 255, 255, 0) 100%
+    oklch(99.5% 0.005 45 / 0) 0%,
+    oklch(99.5% 0.005 45 / 0.6) 20%,
+    oklch(99.5% 0.005 45 / 0.8) 60%,
+    oklch(99.5% 0.005 45 / 0) 100%
   );
   animation: shimmer 1.5s infinite;
 }
