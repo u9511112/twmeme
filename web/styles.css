@@ -49,6 +49,9 @@ html { font-size: 16px; }
   clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
+/* Universal hidden attribute override prevention */
+[hidden] { display: none !important; }
+
 /* A11y: Skip to content link for keyboard navigation */
 .skip-link {
   position: absolute;

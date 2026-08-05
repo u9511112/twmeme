@@ -158,11 +158,13 @@
     grid.innerHTML = '';
     unmetForm.hidden = true;
     skeleton.hidden = false;
+    skeleton.style.display = '';
     countEl.textContent = '—';
 
     // If no search input and no filter values, show fallback mock data
     if (!q && platform === 'all' && media_type === 'all') {
       skeleton.hidden = true;
+      skeleton.style.display = 'none';
       grid.style.display = '';
       countEl.textContent = MOCK_RESULTS.length;
       window.TWmeme.render.renderGrid(grid, MOCK_RESULTS, {
@@ -178,6 +180,7 @@
     });
 
     skeleton.hidden = true;
+    skeleton.style.display = 'none';
     grid.style.display = '';
 
     let usingFallback = false;
