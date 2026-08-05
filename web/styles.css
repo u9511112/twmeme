@@ -439,14 +439,19 @@ a { color: inherit; text-decoration: none; }
 
 .card .thumb {
   flex: 1; position: relative;
+  min-height: 180px;
   display: flex; align-items: center; justify-content: center;
   font-size: 72px;
   overflow: hidden;
-  transition: transform var(--d-medium) ease-out;
+  transition: transform var(--d-medium) ease-out, background var(--d-medium) ease-out;
   background: linear-gradient(90deg, oklch(96% 0.005 55) 0%, oklch(98.5% 0.01 55) 50%, oklch(96% 0.005 55) 100%);
   background-size: 200% 100%;
   animation: shimmer 3s infinite ease-in-out;
   padding: var(--s-sm); /* 卡片縮圖留白呼吸感 */
+}
+.card .thumb.loaded {
+  animation: none;
+  background: var(--surface);
 }
 .card:hover .thumb { transform: scale(1.02); }
 

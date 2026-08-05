@@ -36,19 +36,42 @@ function renderCard(meme, opts) {
   const bgClass = ALLOWED_BGS.has(meme.bg) ? meme.bg : 't-sand';
   thumb.className = 'thumb ' + bgClass;
 
-  if (meme.cached_url) {
+  const primaryUrl = meme.cached_url || meme.media_url;
+  const fallbackUrl = (meme.cached_url && meme.media_url && meme.cached_url !== meme.media_url) ? meme.media_url : null;
+
+  if (primaryUrl) {
     const img = document.createElement('img');
-    img.src = meme.cached_url;
     img.alt = displayName;
-    img.loading = 'lazy';
     img.className = 'thumb-img';
-    img.addEventListener('error', () => {
-      // network or 404 → fall through to emoji-style empty thumb
-      img.remove();
-      thumb.textContent = meme.emoji || '🖼️';
+    // Eager loading for the first 8 items on screen, lazy load for the rest
+    if (typeof opts.index === 'number' && opts.index >= 8) {
+      img.loading = 'lazy';
+    }
+
+    img.addEventListener('load', () => {
+      thumb.classList.add('loaded');
     });
+
+    let attemptedFallback = false;
+    img.addEventListener('error', () => {
+      if (fallbackUrl && !attemptedFallback) {
+        attemptedFallback = true;
+        img.src = fallbackUrl;
+      } else {
+        img.remove();
+        thumb.classList.add('loaded');
+        thumb.textContent = meme.emoji || '🖼️';
+      }
+    });
+
+    img.src = primaryUrl;
+    // Check if already completed (cached by browser)
+    if (img.complete && img.naturalWidth !== 0) {
+      thumb.classList.add('loaded');
+    }
     thumb.appendChild(img);
   } else {
+    thumb.classList.add('loaded');
     thumb.textContent = meme.emoji || '🖼️';
   }
 
@@ -124,7 +147,7 @@ function renderGrid(container, memes, opts) {
   const frag = document.createDocumentFragment();
   memes.forEach((m, idx) => {
     // Break monotonous card grid in dynamic masonry
-    const cardOpts = { ...opts };
+    const cardOpts = { ...opts, index: idx };
     const memeData = { ...m };
     if (isMasonry && memeData.tall === undefined) {
       memeData.tall = (idx % 5 === 1 || idx % 7 === 3);

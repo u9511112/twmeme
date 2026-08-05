@@ -559,19 +559,21 @@ async function main() {
     );
 
     // Helper: render card HTML for a meme row
-    const cardHtml = (r) => {
+    const cardHtml = (r, idx) => {
       const rUrl = `/meme/${r.id}`;
       const rTitle = String(r.title || '迷因').trim();
-      const rImg = pickImageUrl(r);
+      const primaryUrl = pickImageUrl(r);
+      const fallbackUrl = (r.cached_url && r.media_url && r.cached_url !== r.media_url) ? r.media_url : '';
+      const loadingAttr = (typeof idx === 'number' && idx < 8) ? '' : 'loading="lazy"';
       return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
-          <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
+          <div class="thumb t-sand">${primaryUrl ? `<img src="${escapeAttr(primaryUrl)}" alt="${escapeAttr(rTitle)}" ${loadingAttr} class="thumb-img" onload="this.parentElement.classList.add('loaded')" onerror="if('${escapeAttr(fallbackUrl)}' && this.src !== '${escapeAttr(fallbackUrl)}'){this.src='${escapeAttr(fallbackUrl)}';}else{this.remove();this.parentElement.classList.add('loaded');}">` : '🖼️'}</div>
           <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
         </a>
       </article>`;
     };
     const injectGrid = (html, gridId, rows) => {
-      const cards = rows.map(cardHtml).join('\n');
+      const cards = rows.map((r, i) => cardHtml(r, i)).join('\n');
       return html.replace(
         new RegExp(`<!-- SSG:${gridId}:START -->[\\\\s\\\\S]*?<!-- SSG:${gridId}:END -->`),
         `<!-- SSG:${gridId}:START -->\n${cards}\n    <!-- SSG:${gridId}:END -->`
