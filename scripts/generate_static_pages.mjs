@@ -172,9 +172,11 @@ function renderMemePage(meme, related) {
       const rUrl = `/meme/${r.id}`;
       const rTitle = String(r.title || '迷因').trim();
       const rImg = pickImageUrl(r);
+      const rFallback = (r.cached_url && r.media_url && r.cached_url !== r.media_url) ? r.media_url : '';
+      const fbAttr = rFallback ? ` data-fallback="${escapeAttr(rFallback)}"` : '';
       return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
-          <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
+          <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img"${fbAttr} onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}">` : '🖼️'}</div>
           <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
         </a>
       </article>`;
@@ -358,9 +360,11 @@ function renderMemeIndexPage(memes) {
     const img = pickImageUrl(m);
     const platform = platformLabel(m.platform);
     const date = fmtDate(m.fetched_at);
+    const mFallback = (m.cached_url && m.media_url && m.cached_url !== m.media_url) ? m.media_url : '';
+    const fbAttr = mFallback ? ` data-fallback="${escapeAttr(mFallback)}"` : '';
     return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(url)}" aria-label="${escapeAttr(title)}">
-          <div class="thumb t-sand">${img ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
+          <div class="thumb t-sand">${img ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" loading="lazy" class="thumb-img"${fbAttr} onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}">` : '🖼️'}</div>
           <div class="caption">
             <span class="name">${escapeHtml(title)}</span>
             <span class="meta-sm">${escapeHtml(date)}</span>
@@ -567,9 +571,10 @@ async function main() {
       const primaryUrl = pickImageUrl(r);
       const fallbackUrl = (r.cached_url && r.media_url && r.cached_url !== r.media_url) ? r.media_url : '';
       const loadingAttr = (typeof idx === 'number' && idx < 8) ? '' : 'loading="lazy"';
+      const fallbackAttr = fallbackUrl ? ` data-fallback="${escapeAttr(fallbackUrl)}"` : '';
       return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
-          <div class="thumb t-sand">${primaryUrl ? `<img src="${escapeAttr(primaryUrl)}" alt="${escapeAttr(rTitle)}" ${loadingAttr} class="thumb-img" onload="this.parentElement.classList.add('loaded')" onerror="if('${escapeAttr(fallbackUrl)}' && this.src !== '${escapeAttr(fallbackUrl)}'){this.src='${escapeAttr(fallbackUrl)}';}else{this.remove();this.parentElement.classList.add('loaded');}">` : '🖼️'}</div>
+          <div class="thumb t-sand">${primaryUrl ? `<img src="${escapeAttr(primaryUrl)}" alt="${escapeAttr(rTitle)}" ${loadingAttr} class="thumb-img"${fallbackAttr} onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}">` : '🖼️'}</div>
           <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
         </a>
       </article>`;

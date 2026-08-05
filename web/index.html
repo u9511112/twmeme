@@ -565,9 +565,9 @@ Day58
     const supa = window.TWmeme?.supa;
     if (!supa) return;
     await Promise.allSettled([
-      loadGridFallback('weekly-hot-grid', () => supa.getTrendingMemes(8)),
-      loadGridFallback('popular-grid', () => supa.getTrendingMemes(8)),
-      loadGridFallback('latest-grid', () => supa.getTrendingMemes(8)),
+      loadGridFallback('weekly-hot-grid', () => supa.getWeeklyHotMemes(8)),
+      loadGridFallback('popular-grid', () => supa.getPopularMemes(8)),
+      loadGridFallback('latest-grid', () => supa.getLatestMemes(8)),
     ]);
   }
 
