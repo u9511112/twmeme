@@ -583,7 +583,7 @@ async function main() {
       const cards = rows.map((r, i) => cardHtml(r, i)).join('\n');
       return html.replace(
         new RegExp(`<!-- SSG:${gridId}:START -->[\\\\s\\\\S]*?<!-- SSG:${gridId}:END -->`),
-        `<!-- SSG:${gridId}:START -->\n${cards}\n    <!-- SSG:${gridId}:END -->`
+        () => `<!-- SSG:${gridId}:START -->\n${cards}\n    <!-- SSG:${gridId}:END -->`
       );
     };
 
