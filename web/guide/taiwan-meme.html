@@ -188,27 +188,16 @@
     <p class="article-byline">By TWmeme · 更新於 2026-05-12</p>
 
     <div class="tldr">
-      <strong>30 秒快答：</strong>台灣論壇上的迷因圖、Google 圖搜很難找到——因為檔名是亂碼、alt 屬性是空的、周圍文字只是討論不是描述。TWmeme 反過來、直接從 PTT / Dcard 的中文標題和推文建立索引、用「印象式關鍵字」反查圖片。每 4 小時自動更新、目前以 PTT 表特板和 C_Chat 板為主。
+      <strong>30 秒快答：</strong>台灣網路討論區上的迷因圖、Google 圖搜很難找到——因為檔名是亂碼、alt 屬性是空的、周圍文字只是討論不是描述。TWmeme 反過來、直接從中文話題和貼文建立索引、用「印象式關鍵字」反查圖片。
     </div>
 
     <h2>什麼是「台灣迷因」？</h2>
 
-    <p>這裡講的「迷因」不是廣義的網路梗、而是台灣繁體中文社群裡流通的<strong>反應圖、表情包、論壇梗圖</strong>——你想用一張柴犬翻白眼的圖回某個 LINE 訊息、想找館長那張經典的崩潰表情、想抓 PTT 表特板某個常被當頭貼的女星圖。這類圖片有個共同特徵：<strong>原始發文者沒打算讓它被搜尋</strong>、檔名是 imgur 上傳時自動產的亂碼、圖片本身沒有 alt 文字、周圍只是討論串、不是圖片描述。</p>
+    <p>這裡講的「迷因」不是廣義的網路梗、而是台灣繁體中文社群裡流通的<strong>反應圖、表情包、梗圖</strong>——你想用一張柴犬翻白眼的圖回訊息、想找經典的崩潰表情。這類圖片有個共同特徵：<strong>原始發文者沒打算讓它被搜尋</strong>、檔名是自動產生的亂碼、圖片本身沒有 alt 文字、周圍只是討論串、不是圖片描述。</p>
 
-    <p>傳統的 Google 圖片搜尋對這類圖片基本無能為力。你只能記得「在某個 PTT 文章看過」、然後手動翻文章。TWmeme 解決的就是這個問題——把論壇的中文上下文當索引、讓你用印象中的關鍵字反查到圖。</p>
+    <p>傳統的 Google 圖片搜尋對這類圖片基本無能為力。TWmeme 解決的就是這個問題——把社群上下文當索引、讓你用印象中的關鍵字反查到圖。</p>
 
-    <h2>TWmeme 收錄哪些平台的迷因？</h2>
-
-    <p>目前收錄狀況：</p>
-
-    <ul>
-      <li><strong>PTT 表特板（Beauty）</strong>：穩定收錄、每 4 小時更新最近 3 頁文章</li>
-      <li><strong>PTT C_Chat 板</strong>：穩定收錄、ACG 反應圖、表情包大宗來源</li>
-      <li><strong>Dcard</strong>：穩定中——Cloudflare 反爬比 PTT 嚴格、用 patchright 瀏覽器自動化攔截 GraphQL response、沒住宅代理時穩定度約 50%</li>
-      <li><strong>Threads / Instagram</strong>：實驗中——平台限制大、目前優先補 Dcard</li>
-    </ul>
-
-    <p>每張圖會記錄：發文標題、版上推文、發文日期、原始 PTT 文章連結、圖片 R2 緩存連結（避免熱連結原始 imgur 圖床）、寬高（如果能解出來）。圖片本身用 pHash（perceptual hash）演算法去重——Hamming 距離 ≤ 8 視為同一張、避免同一張被重複轉貼的迷因在搜尋結果中重複出現好幾次。</p>
+    <p>每張圖會記錄：話題標題、發文日期、圖片緩存連結、寬高（如果能解出來）。圖片本身用 pHash（perceptual hash）演算法去重——Hamming 距離 ≤ 8 視為同一張、避免同一張被重複轉貼的迷因在搜尋結果中重複出現好幾次。</p>
 
     <h2>怎麼找一張記得但搜不到的迷因？5 步搜尋法</h2>
 
@@ -227,8 +216,8 @@
     <p>每張迷因的詳細頁面有 3 個按鈕：</p>
 
     <ul>
-      <li><strong>複製連結</strong>：把圖片的直接 URL（從 Cloudflare R2 出來的）放到剪貼簿。貼到 LINE 群組訊息、Discord 私訊、IG 訊息、Threads 留言——所有支援自動 unfurl 的平台都會展開預覽圖。</li>
-      <li><strong>下載原圖</strong>：把原始解析度檔案存到電腦。適合作為 FB 粉專封面、IG 限時動態素材、簡報插圖。檔名會自動取自 PTT 標題（去掉特殊符號）。</li>
+      <li><strong>複製連結</strong>：把圖片的直接 URL 放到剪貼簿。貼到聊天訊息——所有支援自動 unfurl 的平台都會展開預覽圖。</li>
+      <li><strong>下載原圖</strong>：把原始解析度檔案存到電腦。適合作為桌布、社群限時動態素材、簡報插圖。</li>
       <li><strong>分享</strong>：呼叫瀏覽器原生分享面板（手機版好用）、桌面版會降級成複製目前頁面 URL。</li>
     </ul>
 
@@ -258,10 +247,8 @@
     <p>實務上的使用建議：</p>
 
     <ul>
-      <li><strong>聊天室 / LINE / 私訊 / 限動</strong>：一般沒問題。迷因文化本來就建立在轉發上、原發文者通常也預期被傳。</li>
-      <li><strong>FB 粉專貼文 / IG 公開貼文</strong>：建議標註來源（原 PTT 文章連結）或註明「圖片來自網路」。</li>
-      <li><strong>商業素材 / 廣告</strong>：盡量先聯絡原作者取得授權。法律風險最高的是把網路找的圖直接做成商品或廣告主視覺。</li>
-      <li><strong>新聞 / 評論引用</strong>：合理使用一般 OK、但仍應標註來源。</li>
+      <li><strong>聊天室 / 私訊 / 限動</strong>：一般沒問題。迷因文化本來就建立在轉發上。</li>
+      <li><strong>公開貼文 / 商業素材 / 廣告</strong>：盡量先聯絡原創作者取得授權。</li>
     </ul>
 
     <p>如果你是發文者、發現自己的圖被收錄想下架、用首頁右上角「意見回饋」聯絡即可、不需要走法律程序。</p>
@@ -271,10 +258,9 @@
     <p>網路上有幾類其他選項：</p>
 
     <ul>
-      <li><strong>imgur / imgflip</strong>：強在 meme template 製作（Drake、Distracted Boyfriend 那類）、弱在台灣本土內容。</li>
-      <li><strong>Google 圖搜</strong>：強在有版權標示的網路圖、弱在論壇截圖（如上面解釋）。</li>
-      <li><strong>SauceNAO / Yandex 圖搜</strong>：以圖搜圖很強、但你得已經有那張圖。對「我記得長什麼樣但沒檔案」的情境用不上。</li>
-      <li><strong>PTT 表特板手動翻</strong>：能找到但慢、要記得日期或編號。</li>
+      <li><strong>imgur / imgflip</strong>：強在 meme template 製作、弱在台灣在地內容。</li>
+      <li><strong>Google 圖搜</strong>：強在有版權標示的網路圖、弱在社群梗圖。</li>
+      <li><strong>SauceNAO / Yandex 圖搜</strong>：以圖搜圖很強、但你得已經有那張圖。</li>
     </ul>
 
     <p>TWmeme 的定位是<strong>「用中文印象式關鍵字反查台灣論壇圖」</strong>——這個切片其他工具沒做得好、也是為什麼一個獨立開發者的小工具有存在價值。</p>

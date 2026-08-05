@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PTT 表特板舊圖搜尋技巧：5 種關鍵字方法 — TWmeme</title>
-<meta name="description" content="記得在 PTT 表特板（Beauty）看過某張圖、忘記文章標題怎麼找回來？5 種關鍵字技巧：人名、情緒詞、版友推文、時間線索、近義字替換。實際例子 + TWmeme 工作流。">
+<title>熱門舊圖搜尋技巧：5 種關鍵字方法 — TWmeme</title>
+<meta name="description" content="記得看過某張熱門梗圖、忘記標題怎麼找回來？5 種關鍵字技巧：人名、情緒詞、社群用語、時間線索、近義字替換。實際例子 + TWmeme 工作流。">
 <link rel="canonical" href="https://twmeme.pages.dev/guide/ptt-beauty-old-meme">
 <meta property="og:type" content="article">
-<meta property="og:title" content="PTT 表特板舊圖搜尋技巧：5 種關鍵字方法 — TWmeme">
-<meta property="og:description" content="記得看過某張表特板圖、忘記文章標題怎麼找回來？5 種關鍵字技巧 + 實例。">
+<meta property="og:title" content="熱門舊圖搜尋技巧：5 種關鍵字方法 — TWmeme">
+<meta property="og:description" content="記得看過某張熱門梗圖、忘記標題怎麼找回來？5 種關鍵字技巧 + 實例。">
 <meta property="og:url" content="https://twmeme.pages.dev/guide/ptt-beauty-old-meme">
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
@@ -22,8 +22,8 @@
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "@id": "https://twmeme.pages.dev/guide/ptt-beauty-old-meme#article",
-  "headline": "PTT 表特板舊圖搜尋技巧：5 種關鍵字方法",
-  "description": "5 種針對 PTT 表特板和 C_Chat 板舊圖的搜尋技巧、每種附實際例子。",
+  "headline": "熱門舊圖搜尋技巧：5 種關鍵字方法",
+  "description": "5 種針對熱門梗圖與舊圖的搜尋技巧、每種附實際例子。",
   "datePublished": "2026-05-12",
   "dateModified": "2026-05-12",
   "inLanguage": "zh-Hant-TW",
@@ -32,7 +32,6 @@
   "publisher": { "@id": "https://twmeme.pages.dev/#organization" },
   "author": { "@type": "Organization", "name": "TWmeme" },
   "about": [
-    { "@type": "Thing", "name": "PTT 表特板" },
     { "@type": "Thing", "name": "迷因搜尋" }
   ],
   "speakable": { "@type": "SpeakableSpecification", "cssSelector": ["h1", ".tldr", ".faq-q"] }
@@ -47,26 +46,18 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "PTT 表特板的圖可以用 Google 搜到嗎？",
+      "name": "熱門舊圖可以用 Google 搜到嗎？",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "PTT 文章本身會被 Google 索引、所以用「site:ptt.cc Beauty 關鍵字」可以找到文章。但圖片本身——因為檔名亂碼、無 alt——很難直接用 Google 圖片搜到。實務上比較有效的是先用文字搜文章、再點進去看圖；或用 TWmeme 直接搜——TWmeme 已經把所有圖跟標題綁起來、不用兩階段。"
+        "text": "貼文本身會被 Google 索引、所以用關鍵字可以找到文章。但圖片本身——因為檔名亂碼、無 alt——很難直接用 Google 圖片搜到。實務上 TWmeme 直接搜更有效——TWmeme 已經把所有圖跟上下文綁起來、不用兩階段。"
       }
     },
     {
       "@type": "Question",
-      "name": "PTT 表特板的舊圖會被刪嗎？",
+      "name": "舊圖會被刪除失連嗎？",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "PTT 文章本身一般不會被自動刪、但圖床（imgur、meee.com.tw 等）可能會。imgur 的圖大多會長期保留、但若上傳者刪除帳號或圖片、圖就會 404。TWmeme 為了避免這個問題、把每張圖都緩存到 Cloudflare R2、即使原圖床掛了 TWmeme 上的圖還是能看。原始 PTT 文章連結照樣附上、可以追溯。"
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "C_Chat 板的反應圖也算嗎？",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "算。C_Chat 是 ACG 動漫板、很多反應圖、表情包都從這裡流通。TWmeme 同時爬 Beauty 板和 C_Chat 板、所以搜尋結果會混合出現兩個板的圖。如果你只想看其中一個版的、目前只能在標題裡看 [板別] 線索區分；未來會加篩選器。"
+        "text": "圖床可能會刪除。TWmeme 為了避免這個問題、把每張圖都緩存到 Cloudflare R2、即使原圖床掛了 TWmeme 上的圖還是能看。"
       }
     }
   ]
