@@ -124,6 +124,26 @@ async function getMemeById(id) {
   }
 }
 
+const SYNONYM_MAP = {
+  '傻眼': ['傻眼', '無語', '白眼', '眼神死', '無奈', '問號', '離譜', '傻眼貓咪', '蛤', '誇張', '黑人問號'],
+  '無語': ['傻眼', '無語', '白眼', '眼神死', '無奈', '問號', '離譜', '傻眼貓咪'],
+  '崩潰': ['崩潰', '痛哭', '哭了', '救命', '太難了', '哭哭', '悲傷', '絕望', '哭爆'],
+  '貓': ['貓', '貓咪', '橘貓', '貓咪驚恐', '貓貓', '喵'],
+  '貓咪': ['貓', '貓咪', '橘貓', '貓咪驚恐', '貓貓', '喵'],
+  '狗': ['狗', '柴犬', '汪', '狗勾', '犬', '狗狗'],
+  '柴犬': ['狗', '柴犬', '汪', '狗勾', '犬', '狗狗'],
+  '統神': ['統神', '張嘉航', '癢癢', '賴皮', '神聖', '亞統'],
+  '館長': ['館長', '陳之漢', '成吉思汗', '阿館', '肌肉'],
+  '吉伊卡哇': ['吉伊卡哇', 'chiikawa', '小八', '烏薩奇', '兔兔', '小八貓', '吉伊'],
+  '芙莉蓮': ['芙莉蓮', '葬送', '費倫', '修爾克', '阿嬤', '魔法'],
+  '職場': ['職場', '社畜', '上班', '加班', '老闆', '工作', '辭職', '薪水', '公司', '打工人'],
+  '社畜': ['職場', '社畜', '上班', '加班', '老闆', '工作', '辭職', '薪水', '公司', '打工人'],
+  '地獄': ['地獄', '地獄梗', '地獄圖', '壞', '黑色幽默'],
+  '地獄梗': ['地獄', '地獄梗', '地獄圖', '壞', '黑色幽默'],
+  '諧音': ['諧音', '諧音梗', '梗圖', '雙關', '發音'],
+  '諧音梗': ['諧音', '諧音梗', '梗圖', '雙關', '發音']
+};
+
 async function searchMemes(query, filters = {}, limit = 40) {
   try {
     const safe = String(query || '').trim();
@@ -139,13 +159,18 @@ async function searchMemes(query, filters = {}, limit = 40) {
     let paramIdx = 2;
     
     if (safe) {
-      const pattern = '%' + safe + '%';
-      queryText += ` AND (title ILIKE $${paramIdx} 
-                       OR ocr_text ILIKE $${paramIdx} 
-                       OR description ILIKE $${paramIdx} 
-                       OR array_to_string(tags, ',') ILIKE $${paramIdx})`;
-      params.push(pattern);
-      paramIdx++;
+      const terms = SYNONYM_MAP[safe] || [safe];
+      const termConditions = [];
+      for (const term of terms) {
+        const pattern = '%' + term + '%';
+        termConditions.push(`(title ILIKE $${paramIdx} 
+                              OR ocr_text ILIKE $${paramIdx} 
+                              OR description ILIKE $${paramIdx} 
+                              OR array_to_string(tags, ',') ILIKE $${paramIdx})`);
+        params.push(pattern);
+        paramIdx++;
+      }
+      queryText += ` AND (${termConditions.join(' OR ')})`;
     }
     
     if (filters.platform && filters.platform !== 'all') {
