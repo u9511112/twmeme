@@ -101,6 +101,8 @@ function descriptionTitle(title) {
 // Templates
 // ---------------------------------------------------------------------------
 
+const safeJsonLd = (obj) => JSON.stringify(obj, null, 2).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
+
 function renderMemePage(meme, related) {
   const id = meme.id;
   const title = String(meme.title || '迷因').trim();
@@ -204,15 +206,15 @@ function renderMemePage(meme, related) {
 <link rel="stylesheet" href="/styles.css">
 
 <script type="application/ld+json">
-${JSON.stringify(imageObjectLd, null, 2)}
+${safeJsonLd(imageObjectLd)}
 </script>
 
 <script type="application/ld+json">
-${JSON.stringify(webPageLd, null, 2)}
+${safeJsonLd(webPageLd)}
 </script>
 
 <script type="application/ld+json">
-${JSON.stringify(breadcrumbLd, null, 2)}
+${safeJsonLd(breadcrumbLd)}
 </script>
 </head>
 <body>

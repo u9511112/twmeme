@@ -143,7 +143,7 @@ async function searchMemes(query, filters = {}, limit = 40) {
       queryText += ` AND (title ILIKE $${paramIdx} 
                        OR ocr_text ILIKE $${paramIdx} 
                        OR description ILIKE $${paramIdx} 
-                       OR $${paramIdx} = ANY(tags))`;
+                       OR array_to_string(tags, ',') ILIKE $${paramIdx})`;
       params.push(pattern);
       paramIdx++;
     }

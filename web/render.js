@@ -129,8 +129,8 @@ function renderCard(meme, opts) {
         showToast('複製失敗、長按圖片用瀏覽器複製');
       }
     } else {
-      // mock entry without URL — keep old fake-toast behavior
-      showToast('已複製「' + displayName + '」');
+      // mock entry without URL
+      showToast('此卡片暫無連結可複製');
     }
     if (opts.onCopy) opts.onCopy(meme);
   });
