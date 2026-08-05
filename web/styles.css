@@ -452,6 +452,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Platform & Media Badge on Cards */
 .card .platform-badge {
+  display: none !important;
   position: absolute;
   top: 8px;
   left: 8px;

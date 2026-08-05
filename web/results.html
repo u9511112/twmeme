@@ -42,16 +42,6 @@
   
   <div class="filter-bar">
     <div class="filter-group">
-      <select id="filter-platform" class="filter-select">
-        <option value="all">所有平台</option>
-        <option value="ptt">PTT</option>
-        <option value="dcard">Dcard</option>
-        <option value="baha">巴哈姆特</option>
-        <option value="threads">Threads</option>
-        <option value="instagram">Instagram</option>
-      </select>
-    </div>
-    <div class="filter-group">
       <select id="filter-type" class="filter-select">
         <option value="all">所有格式</option>
         <option value="image">靜態圖片</option>
@@ -151,14 +141,16 @@
   function initFiltersFromUrl() {
     const params = new URLSearchParams(location.search);
     document.getElementById('q').value = params.get('q') || '';
-    document.getElementById('filter-platform').value = params.get('platform') || 'all';
+    const pEl = document.getElementById('filter-platform');
+    if (pEl) pEl.value = params.get('platform') || 'all';
     document.getElementById('filter-type').value = params.get('type') || 'all';
     document.getElementById('filter-sort').value = params.get('sort') || 'relevance';
   }
 
   async function loadResults() {
     const q = document.getElementById('q').value.trim();
-    const platform = document.getElementById('filter-platform').value;
+    const pEl = document.getElementById('filter-platform');
+    const platform = pEl ? pEl.value : 'all';
     const media_type = document.getElementById('filter-type').value;
     const sort_by = document.getElementById('filter-sort').value;
 
@@ -243,7 +235,8 @@
 
   function syncUrl() {
     const q = document.getElementById('q').value.trim();
-    const platform = document.getElementById('filter-platform').value;
+    const pEl = document.getElementById('filter-platform');
+    const platform = pEl ? pEl.value : 'all';
     const media_type = document.getElementById('filter-type').value;
     const sort_by = document.getElementById('filter-sort').value;
 
@@ -282,7 +275,8 @@
     handleFilterChange();
   });
 
-  document.getElementById('filter-platform').addEventListener('change', handleFilterChange);
+  const pEl = document.getElementById('filter-platform');
+  if (pEl) pEl.addEventListener('change', handleFilterChange);
   document.getElementById('filter-type').addEventListener('change', handleFilterChange);
   document.getElementById('filter-sort').addEventListener('change', handleFilterChange);
 

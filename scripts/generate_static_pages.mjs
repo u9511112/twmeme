@@ -160,7 +160,7 @@ function renderMemePage(meme, related) {
   };
 
   // Visible meme-context paragraph (200+ 字 zh for AI citation sweet spot)
-  const memeContext = `這張迷因「${cleanTitle}」取自 ${platform}、於 ${date} 被 TWmeme 自動收錄。${meme.source_url ? `原始發文連結可見頁面下方「看原文」按鈕。` : ''}${hasDims ? `圖片原始解析度為 ${meme.width}×${meme.height} pixels、` : ''}適合作為 LINE 群組的反應圖、IG 限時動態的素材、Threads 留言的回覆圖、或 FB 粉專貼文的配圖。點上方「複製連結」會把圖片直接 URL 放到剪貼簿、貼到任何聊天室都會自動展開預覽；點「下載原圖」會把原始解析度的檔案存到電腦。整個流程不需要登入、也不會記錄你點了哪張迷因。如果你是這張圖的原始發文者、希望從索引中下架、用首頁右上角「意見回饋」聯絡即可。`;
+  const memeContext = `這張迷因「${cleanTitle}」於 ${date} 被 TWmeme 自動收錄。${hasDims ? `圖片原始解析度為 ${meme.width}×${meme.height} pixels、` : ''}適合作為 LINE 群組的反應圖、IG 限時動態的素材、Threads 留言的回覆圖、或 FB 粉專貼文的配圖。點上方「複製連結」會把圖片直接 URL 放到剪貼簿、貼到任何聊天室都會自動展開預覽；點「下載原圖」會把原始解析度的檔案存到電腦。整個流程不需要登入、也不會記錄你點了哪張迷因。如果你是這張圖的原始創作者、希望從索引中下架、用首頁右上角「意見回饋」聯絡即可。`;
 
   // Related memes (12 most recent excluding current)
   const relatedHtml = related
@@ -248,7 +248,6 @@ ${JSON.stringify(breadcrumbLd, null, 2)}
   <aside>
     <h1>${escapeHtml(title)}</h1>
     <div class="meta-row">
-      <span>來源：${escapeHtml(platform)}</span>
       <span>${escapeHtml(date)}</span>
     </div>
 
@@ -275,10 +274,7 @@ ${JSON.stringify(breadcrumbLd, null, 2)}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
         分享
       </button>
-      ${meme.source_url ? `<a class="btn btn-secondary" href="${escapeAttr(meme.source_url)}" target="_blank" rel="noopener noreferrer">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        看原文
-      </a>` : ''}
+
     </div>
 
     <div class="meme-context">
@@ -365,7 +361,7 @@ function renderMemeIndexPage(memes) {
           <div class="thumb t-sand">${img ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
           <div class="caption">
             <span class="name">${escapeHtml(title)}</span>
-            <span class="meta-sm">${escapeHtml(platform)} · ${escapeHtml(date)}</span>
+            <span class="meta-sm">${escapeHtml(date)}</span>
           </div>
         </a>
       </article>`;
@@ -377,7 +373,7 @@ function renderMemeIndexPage(memes) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>所有迷因索引 — TWmeme</title>
-<meta name="description" content="TWmeme 收錄的所有台灣繁中迷因索引、來自 PTT 表特板與 C_Chat 板、依發文時間倒序排列。每張可點進詳細頁複製連結或下載原圖。">
+<meta name="description" content="TWmeme 收錄的所有台灣繁中迷因梗圖索引、依發文時間倒序排列。每張可點進詳細頁複製連結或下載原圖。">
 <link rel="canonical" href="${SITE_ORIGIN}/meme">
 <meta property="og:type" content="website">
 <meta property="og:title" content="所有迷因索引 — TWmeme">
@@ -556,7 +552,7 @@ async function main() {
     const countRes = await sql`SELECT count(*) FROM public.memes`;
     const totalCount = Number(countRes[0]?.count || memes.length);
     const countStr = totalCount.toLocaleString('en');
-    const countText = `早期版本、目前 ${countStr} 張、以 PTT 表特板為主。搜不到的告訴我們、會補上。`;
+    const countText = `早期版本、目前收錄 ${countStr} 張迷因梗圖。搜不到的告訴我們、會補上。`;
     indexHtml = indexHtml.replace(
       /<p class="sub" id="hero-sub">([\s\S]*?)<\/p>/,
       `<p class="sub" id="hero-sub">${countText}</p>`
@@ -567,11 +563,8 @@ async function main() {
       const rUrl = `/meme/${r.id}`;
       const rTitle = String(r.title || '迷因').trim();
       const rImg = pickImageUrl(r);
-      const platform = String(r.platform || 'ptt').toLowerCase();
-      const platformLabel = PLATFORM_LABEL[platform] || platform.toUpperCase();
       return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
-          <span class="platform-badge ${escapeAttr(platform)}">${escapeHtml(platformLabel)}</span>
           <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img">` : '🖼️'}</div>
           <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
         </a>
