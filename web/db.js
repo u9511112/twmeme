@@ -190,12 +190,12 @@ async function searchMemes(query, filters = {}, limit = 40) {
     }
     
     // Multi-tokenized Smart Query Strategy
-    const rawTokens = safe.split(/\s+/).filter(Boolean);
+    const rawTokens = safe.split(/\s+/).filter(Boolean).slice(0, 8);
     const allTerms = [];
     const tokenSynonymGroups = [];
     
     for (const tok of rawTokens) {
-      const syns = SYNONYM_MAP[tok] || [tok];
+      const syns = Object.prototype.hasOwnProperty.call(SYNONYM_MAP, tok) ? SYNONYM_MAP[tok] : [tok];
       tokenSynonymGroups.push(syns);
       allTerms.push(...syns);
     }
@@ -225,7 +225,7 @@ async function searchMemes(query, filters = {}, limit = 40) {
           groupOrConditions.push(`(title ILIKE $${paramIdx} 
                                    OR ocr_text ILIKE $${paramIdx} 
                                    OR description ILIKE $${paramIdx} 
-                                   OR array_to_string(tags, ',') ILIKE $${paramIdx})`);
+                                   OR tags::text ILIKE $${paramIdx})`);
           params.push(pattern);
           paramIdx++;
         }
