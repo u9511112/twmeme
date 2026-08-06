@@ -141,7 +141,11 @@ const SYNONYM_MAP = {
   '地獄': ['地獄', '地獄梗', '地獄圖', '壞', '黑色幽默'],
   '地獄梗': ['地獄', '地獄梗', '地獄圖', '壞', '黑色幽默'],
   '諧音': ['諧音', '諧音梗', '梗圖', '雙關', '發音'],
-  '諧音梗': ['諧音', '諧音梗', '梗圖', '雙關', '發音']
+  '諧音梗': ['諧音', '諧音梗', '梗圖', '雙關', '發音'],
+  '活俠傳': ['活俠傳', '活俠', '趙活'],
+  '蔚藍': ['蔚藍', '檔案', '蔚藍檔案', '羊師'],
+  '正妹': ['正妹', '美女', '妹子', '女孩', '妹'],
+  '閒聊': ['閒聊', '討論', '心得']
 };
 
 async function searchMemes(query, filters = {}, limit = 40) {
@@ -149,63 +153,131 @@ async function searchMemes(query, filters = {}, limit = 40) {
     const safe = String(query || '').trim();
     const s = await sql();
     
-    const terms = safe ? (SYNONYM_MAP[safe] || [safe]) : [];
-    // First N params are the synonym terms (for similarity scoring)
-    const params = [...terms];
-    let paramIdx = params.length + 1;
-    
-    const smExpr = terms.length > 0
-      ? `GREATEST(${terms.map((_, i) => `similarity(COALESCE(title, ''), $${i + 1})`).join(', ')})`
-      : '0';
-    
-    let queryText = `
-      SELECT id, title, cached_url, media_url, media_type, platform, trending_score, fetched_at, like_count,
-             ${smExpr} AS sm
-      FROM public.memes
-      WHERE 1=1
-    `;
-    
-    if (terms.length > 0) {
-      const termConditions = [];
-      for (const term of terms) {
-        const pattern = '%' + term + '%';
-        termConditions.push(`(title ILIKE $${paramIdx} 
-                              OR ocr_text ILIKE $${paramIdx} 
-                              OR description ILIKE $${paramIdx} 
-                              OR array_to_string(tags, ',') ILIKE $${paramIdx})`);
-        params.push(pattern);
+    if (!safe) {
+      // Empty query search (popular / latest)
+      let queryText = `
+        SELECT id, title, cached_url, media_url, media_type, platform, trending_score, fetched_at, like_count,
+               0 AS sm
+        FROM public.memes
+        WHERE 1=1
+      `;
+      const params = [];
+      let paramIdx = 1;
+      
+      if (filters.platform && filters.platform !== 'all') {
+        queryText += ` AND platform = $${paramIdx}::platform_enum`;
+        params.push(filters.platform);
         paramIdx++;
       }
-      queryText += ` AND (${termConditions.join(' OR ')})`;
+      
+      if (filters.media_type && filters.media_type !== 'all') {
+        queryText += ` AND media_type = $${paramIdx}::media_type_enum`;
+        params.push(filters.media_type);
+        paramIdx++;
+      }
+      
+      let orderBy = 'trending_score DESC, fetched_at DESC';
+      if (filters.sort_by === 'latest') {
+        orderBy = 'fetched_at DESC, id DESC';
+      } else if (filters.sort_by === 'popular') {
+        orderBy = 'like_count DESC, trending_score DESC';
+      }
+      
+      queryText += ` ORDER BY ${orderBy} LIMIT $${paramIdx}`;
+      params.push(limit);
+      
+      return await s(queryText, params);
     }
     
-    if (filters.platform && filters.platform !== 'all') {
-      queryText += ` AND platform = $${paramIdx}::platform_enum`;
-      params.push(filters.platform);
-      paramIdx++;
+    // Multi-tokenized Smart Query Strategy
+    const rawTokens = safe.split(/\s+/).filter(Boolean);
+    const allTerms = [];
+    const tokenSynonymGroups = [];
+    
+    for (const tok of rawTokens) {
+      const syns = SYNONYM_MAP[tok] || [tok];
+      tokenSynonymGroups.push(syns);
+      allTerms.push(...syns);
     }
     
-    if (filters.media_type && filters.media_type !== 'all') {
-      queryText += ` AND media_type = $${paramIdx}::media_type_enum`;
-      params.push(filters.media_type);
-      paramIdx++;
+    // Similarity scoring across all expanded terms
+    const smExpr = allTerms.length > 0
+      ? `GREATEST(${allTerms.map((_, i) => `similarity(COALESCE(title, ''), $${i + 1})`).join(', ')})`
+      : '0';
+      
+    // Execute Stage 1: Token AND matching (all tokens must match at least one synonym)
+    const runQuery = async (isOrMatch = false) => {
+      const params = [...allTerms];
+      let paramIdx = params.length + 1;
+      
+      let queryText = `
+        SELECT id, title, cached_url, media_url, media_type, platform, trending_score, fetched_at, like_count,
+               ${smExpr} AS sm
+        FROM public.memes
+        WHERE 1=1
+      `;
+      
+      const tokenConditions = [];
+      for (const group of tokenSynonymGroups) {
+        const groupOrConditions = [];
+        for (const syn of group) {
+          const pattern = '%' + syn + '%';
+          groupOrConditions.push(`(title ILIKE $${paramIdx} 
+                                   OR ocr_text ILIKE $${paramIdx} 
+                                   OR description ILIKE $${paramIdx} 
+                                   OR array_to_string(tags, ',') ILIKE $${paramIdx})`);
+          params.push(pattern);
+          paramIdx++;
+        }
+        tokenConditions.push(`(${groupOrConditions.join(' OR ')})`);
+      }
+      
+      if (tokenConditions.length > 0) {
+        const joinOperator = isOrMatch ? ' OR ' : ' AND ';
+        queryText += ` AND (${tokenConditions.join(joinOperator)})`;
+      }
+      
+      if (filters.platform && filters.platform !== 'all') {
+        queryText += ` AND platform = $${paramIdx}::platform_enum`;
+        params.push(filters.platform);
+        paramIdx++;
+      }
+      
+      if (filters.media_type && filters.media_type !== 'all') {
+        queryText += ` AND media_type = $${paramIdx}::media_type_enum`;
+        params.push(filters.media_type);
+        paramIdx++;
+      }
+      
+      let orderBy = 'sm DESC, trending_score DESC';
+      if (filters.sort_by === 'latest') {
+        orderBy = 'fetched_at DESC, id DESC';
+      } else if (filters.sort_by === 'popular') {
+        orderBy = 'like_count DESC, trending_score DESC';
+      }
+      
+      queryText += ` ORDER BY ${orderBy} LIMIT $${paramIdx}`;
+      params.push(limit);
+      
+      return await s(queryText, params);
+    };
+    
+    // Stage 1 (AND match)
+    let rows = await runQuery(false);
+    
+    // Stage 2 (OR fallback if AND returns fewer than 10 rows and there are multiple tokens)
+    if (rows.length < 10 && rawTokens.length > 1) {
+      const fallbackRows = await runQuery(true);
+      const existingIds = new Set(rows.map(r => r.id));
+      for (const fRow of fallbackRows) {
+        if (!existingIds.has(fRow.id)) {
+          rows.push(fRow);
+          existingIds.add(fRow.id);
+        }
+        if (rows.length >= limit) break;
+      }
     }
     
-    let orderBy = 'sm DESC, trending_score DESC';
-    if (!safe) {
-      orderBy = 'trending_score DESC, fetched_at DESC';
-    }
-    
-    if (filters.sort_by === 'latest') {
-      orderBy = 'fetched_at DESC, id DESC';
-    } else if (filters.sort_by === 'popular') {
-      orderBy = 'like_count DESC, trending_score DESC';
-    }
-    
-    queryText += ` ORDER BY ${orderBy} LIMIT $${paramIdx}`;
-    params.push(limit);
-    
-    const rows = await s(queryText, params);
     return rows;
   } catch (e) {
     logErr('search', e);
