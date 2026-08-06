@@ -149,17 +149,23 @@ async function searchMemes(query, filters = {}, limit = 40) {
     const safe = String(query || '').trim();
     const s = await sql();
     
+    const terms = safe ? (SYNONYM_MAP[safe] || [safe]) : [];
+    // First N params are the synonym terms (for similarity scoring)
+    const params = [...terms];
+    let paramIdx = params.length + 1;
+    
+    const smExpr = terms.length > 0
+      ? `GREATEST(${terms.map((_, i) => `similarity(COALESCE(title, ''), $${i + 1})`).join(', ')})`
+      : '0';
+    
     let queryText = `
       SELECT id, title, cached_url, media_url, media_type, platform, trending_score, fetched_at, like_count,
-             similarity(COALESCE(title, ''), $1) AS sm
+             ${smExpr} AS sm
       FROM public.memes
       WHERE 1=1
     `;
-    const params = [safe];
-    let paramIdx = 2;
     
-    if (safe) {
-      const terms = SYNONYM_MAP[safe] || [safe];
+    if (terms.length > 0) {
       const termConditions = [];
       for (const term of terms) {
         const pattern = '%' + term + '%';

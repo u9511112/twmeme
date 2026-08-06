@@ -107,7 +107,7 @@
 <main id="main">
 <section class="hero">
   <h1>找到那張你記得<br>但搜不到的迷因</h1>
-  <p class="sub" id="hero-sub">早期版本、目前收錄 9,705 張迷因梗圖。搜不到的告訴我們、會補上。</p>
+  <p class="sub" id="hero-sub">早期版本、目前收錄 9,677 張迷因梗圖。搜不到的告訴我們、會補上。</p>
 
   <form class="searchbox" onsubmit="event.preventDefault(); goResults();">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -183,56 +183,100 @@
     <span class="weekly-badge" id="weekly-date">每 4 小時自動更新</span>
   </div>
   <div class="broken-grid" id="weekly-hot-grid">
-    <!-- SSG:weekly-hot-grid:START -->
       <article class="card-wrap">
-        <a class="card" href="/meme/d80dd886-0e7a-4568-bddb-68c23b6e8218" aria-label="[蔚藍] 新制受益老師 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/d80dd886-0e7a-4568-bddb-68c23b6e8218.png" alt="[蔚藍] 新制受益老師"  class="thumb-img" data-fallback="https://images.plurk.com/6uQBNXpSS5s0vFFrJGGhX3.png" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[蔚藍] 新制受益老師</span></div>
+        <a class="card" href="/meme/b276f81f-b76e-42da-8fcc-dd438b8b8b05" aria-label="[蔚藍] 5.5週年 FES角 小的也來了 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/b276f81f-b76e-42da-8fcc-dd438b8b8b05.jpeg" alt="[蔚藍] 5.5週年 FES角 小的也來了" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[蔚藍] 5.5週年 FES角 小的也來了</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/efaec5b1-310e-4162-b149-651ac2987db4" aria-label="[閒聊] 警方證實：小羊老闆已經飛出去國外 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/efaec5b1-310e-4162-b149-651ac2987db4.jpeg" alt="[閒聊] 警方證實：小羊老闆已經飛出去國外"  class="thumb-img" data-fallback="https://i.urusai.cc/boPzp.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[閒聊] 警方證實：小羊老闆已經飛出去國外</span></div>
+        <a class="card" href="/meme/b0e4d21c-f304-4b63-afbc-b4909864408c" aria-label="[閒聊] 為什麼活俠傳在中國反而沒有爆紅? 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/b0e4d21c-f304-4b63-afbc-b4909864408c.jpeg" alt="[閒聊] 為什麼活俠傳在中國反而沒有爆紅?" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] 為什麼活俠傳在中國反而沒有爆紅?</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/a1661190-484f-4f1d-ba60-67cead69622c" aria-label="[鳴潮] 愛彌斯就是乖女兒 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/a1661190-484f-4f1d-ba60-67cead69622c.jpeg" alt="[鳴潮] 愛彌斯就是乖女兒"  class="thumb-img" data-fallback="https://i.meee.com.tw/5BI3GjM.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[鳴潮] 愛彌斯就是乖女兒</span></div>
+        <a class="card" href="/meme/7f2cf7e3-b43f-4e4d-9420-a1c232759d5a" aria-label="[蔚藍] 檔案大小保機制 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/7f2cf7e3-b43f-4e4d-9420-a1c232759d5a.jpeg" alt="[蔚藍] 檔案大小保機制" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[蔚藍] 檔案大小保機制</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/e96820b8-6bc0-4730-9f24-f287adef9681" aria-label="[新聞] 小羊自救會受害者4500人 一張卡20萬 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/e96820b8-6bc0-4730-9f24-f287adef9681.jpeg" alt="[新聞] 小羊自救會受害者4500人 一張卡20萬"  class="thumb-img" data-fallback="https://i.urusai.cc/9SfVH.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[新聞] 小羊自救會受害者4500人 一張卡20萬</span></div>
+        <a class="card" href="/meme/ca9701d1-34ec-4f36-bed5-f933e1c6eeca" aria-label="[閒聊] 1999聯動池(發錢) 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/ca9701d1-34ec-4f36-bed5-f933e1c6eeca.png" alt="[閒聊] 1999聯動池(發錢)" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] 1999聯動池(發錢)</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/50a3401d-e154-47ce-876d-52a674f419ae" aria-label="Re: [閒聊] 警方證實：小羊老闆已經飛出去國外 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/50a3401d-e154-47ce-876d-52a674f419ae.jpeg" alt="Re: [閒聊] 警方證實：小羊老闆已經飛出去國外"  class="thumb-img" data-fallback="https://i.urusai.cc/B4Nhv.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">Re: [閒聊] 警方證實：小羊老闆已經飛出去國外</span></div>
+        <a class="card" href="/meme/41ad5d9f-4dfa-4c46-ac6e-c00936cf7bb5" aria-label="[蔚藍] 新舊PU制：資金只有200抽羊師的風險變化 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/41ad5d9f-4dfa-4c46-ac6e-c00936cf7bb5.jpeg" alt="[蔚藍] 新舊PU制：資金只有200抽羊師的風險變化" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[蔚藍] 新舊PU制：資金只有200抽羊師的風險變化</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/4c77ac39-ade3-45c3-8c74-740648c5f2dc" aria-label="Re: [討論] 小羊卡牌詐欺  一堆人檢討受害者？？？ 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/4c77ac39-ade3-45c3-8c74-740648c5f2dc.jpeg" alt="Re: [討論] 小羊卡牌詐欺  一堆人檢討受害者？？？"  class="thumb-img" data-fallback="https://i.urusai.cc/xo3Zo.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">Re: [討論] 小羊卡牌詐欺  一堆人檢討受害者？？？</span></div>
+        <a class="card" href="/meme/642a0a47-c240-465f-89bb-8c4123da606b" aria-label="[閒聊] Hololive dreams 營收衝到日本第二 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/642a0a47-c240-465f-89bb-8c4123da606b.jpeg" alt="[閒聊] Hololive dreams 營收衝到日本第二" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] Hololive dreams 營收衝到日本第二</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/9b4b52c3-9cf9-42d2-9d22-e6b36af3612e" aria-label="[閒聊] 抽到明日奈，發錢 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/9b4b52c3-9cf9-42d2-9d22-e6b36af3612e.jpeg" alt="[閒聊] 抽到明日奈，發錢"  class="thumb-img" data-fallback="https://pbs.twimg.com/media/G_HVNXqWoAAUoSh.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[閒聊] 抽到明日奈，發錢</span></div>
+        <a class="card" href="/meme/ac7cf3f8-3266-4dec-864f-f7e4f6194b15" aria-label="[白銀] 短褲騎士團 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/ac7cf3f8-3266-4dec-864f-f7e4f6194b15.jpeg" alt="[白銀] 短褲騎士團" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[白銀] 短褲騎士團</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/03c574d7-05a6-46a0-b865-9f78cad9898a" aria-label="[鳴潮] 黃金菲比啾比盃冠軍-ragingzet 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/03c574d7-05a6-46a0-b865-9f78cad9898a.gif" alt="[鳴潮] 黃金菲比啾比盃冠軍-ragingzet"  class="thumb-img" data-fallback="https://i.verb.tw/pbcyFUFR.gif" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[鳴潮] 黃金菲比啾比盃冠軍-ragingzet</span></div>
+        <a class="card" href="/meme/a01194f5-ae92-423e-b9e5-7e1004613d9c" aria-label="[閒聊] 求適合放鬆的動畫慢歌(女生唱的) 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/a01194f5-ae92-423e-b9e5-7e1004613d9c.png" alt="[閒聊] 求適合放鬆的動畫慢歌(女生唱的)" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] 求適合放鬆的動畫慢歌(女生唱的)</span></div>
         </a>
       </article>
-    <!-- SSG:weekly-hot-grid:END -->
+  </div>
+          <div class="caption"><span class="name">[閒聊] 為什麼活俠傳在中國反而沒有爆紅?</span></div>
+        </a>
+      </article>
+      <article class="card-wrap">
+        <a class="card" href="/meme/b276f81f-b76e-42da-8fcc-dd438b8b8b05" aria-label="[蔚藍] 5.5週年 FES角 小的也來了 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/b276f81f-b76e-42da-8fcc-dd438b8b8b05.jpeg" alt="[蔚藍] 5.5週年 FES角 小的也來了" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[蔚藍] 5.5週年 FES角 小的也來了</span></div>
+        </a>
+      </article>
+      <article class="card-wrap">
+        <a class="card" href="/meme/7f2cf7e3-b43f-4e4d-9420-a1c232759d5a" aria-label="[蔚藍] 檔案大小保機制 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/7f2cf7e3-b43f-4e4d-9420-a1c232759d5a.jpeg" alt="[蔚藍] 檔案大小保機制" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[蔚藍] 檔案大小保機制</span></div>
+        </a>
+      </article>
+      <article class="card-wrap">
+        <a class="card" href="/meme/ca9701d1-34ec-4f36-bed5-f933e1c6eeca" aria-label="[閒聊] 1999聯動池(發錢) 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/ca9701d1-34ec-4f36-bed5-f933e1c6eeca.png" alt="[閒聊] 1999聯動池(發錢)" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] 1999聯動池(發錢)</span></div>
+        </a>
+      </article>
+      <article class="card-wrap">
+        <a class="card" href="/meme/41ad5d9f-4dfa-4c46-ac6e-c00936cf7bb5" aria-label="[蔚藍] 新舊PU制：資金只有200抽羊師的風險變化 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/41ad5d9f-4dfa-4c46-ac6e-c00936cf7bb5.jpeg" alt="[蔚藍] 新舊PU制：資金只有200抽羊師的風險變化" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[蔚藍] 新舊PU制：資金只有200抽羊師的風險變化</span></div>
+        </a>
+      </article>
+      <article class="card-wrap">
+        <a class="card" href="/meme/642a0a47-c240-465f-89bb-8c4123da606b" aria-label="[閒聊] Hololive dreams 營收衝到日本第二 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/642a0a47-c240-465f-89bb-8c4123da606b.jpeg" alt="[閒聊] Hololive dreams 營收衝到日本第二" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] Hololive dreams 營收衝到日本第二</span></div>
+        </a>
+      </article>
+      <article class="card-wrap">
+        <a class="card" href="/meme/ac7cf3f8-3266-4dec-864f-f7e4f6194b15" aria-label="[白銀] 短褲騎士團 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/ac7cf3f8-3266-4dec-864f-f7e4f6194b15.jpeg" alt="[白銀] 短褲騎士團" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[白銀] 短褲騎士團</span></div>
+        </a>
+      </article>
+      <article class="card-wrap">
+        <a class="card" href="/meme/a01194f5-ae92-423e-b9e5-7e1004613d9c" aria-label="[閒聊] 求適合放鬆的動畫慢歌(女生唱的) 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/a01194f5-ae92-423e-b9e5-7e1004613d9c.png" alt="[閒聊] 求適合放鬆的動畫慢歌(女生唱的)" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] 求適合放鬆的動畫慢歌(女生唱的)</span></div>
+        </a>
+      </article>
   </div>
 </section>
 
@@ -242,10 +286,9 @@
     <a class="more" href="results.html?sort=popular">看全部 →</a>
   </div>
   <div class="broken-grid" id="popular-grid">
-    <!-- SSG:popular-grid:START -->
       <article class="card-wrap">
         <a class="card" href="/meme/45e33f6b-adb5-41bb-9136-d0c61902315a" aria-label="台灣人真的什麼都可以扮 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/45e33f6b-adb5-41bb-9136-d0c61902315a.jpeg" alt="台灣人真的什麼都可以扮"  class="thumb-img" data-fallback="https://scontent-atl3-3.cdninstagram.com/v/t51.71878-15/572835827_1333900208484668_8589745831241267064_n.jpg?stp=dst-jpg_e15_tt6&amp;_nc_cat=108&amp;ig_cache_key=Mzc1NjI2OTY0NDY2ODY4NzcwOQ%3D%3D.3-ccb7-5&amp;ccb=7-5&amp;_nc_sid=58cdad&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuNjQwLnNkci52aWRlb19kZWZhdWx0X2NvdmVyX2ZyYW1lLkMzIn0%3D&amp;_nc_ohc=VGtDTWNqHLsQ7kNvwGCP8Xo&amp;_nc_oc=AdpZP6fF3IJMOGAmw47r1uCiYvtPI-ObNxvd_yYJVz-oo--B5PNxCNT3f_zzEL4MgMA&amp;_nc_ad=z-m&amp;_nc_cid=0&amp;_nc_zt=23&amp;_nc_ht=scontent-atl3-3.cdninstagram.com&amp;_nc_gid=d-19En68MLzAAmCCipspOg&amp;_nc_ss=7a22e&amp;oh=00_Af_Oe0EuFbhhT3ohrsgwl5THHQb6l5FVkFhx6B4kJ0sV_A&amp;oe=6A463D14" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/45e33f6b-adb5-41bb-9136-d0c61902315a.jpeg" alt="台灣人真的什麼都可以扮" loading="lazy" class="thumb-img"></div>
           <div class="caption"><span class="name">台灣人真的什麼都可以扮</span></div>
         </a>
       </article>
@@ -257,7 +300,7 @@ Day58
           <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/2a23bae1-f3f5-47de-b27f-c66d535b0a2e.jpeg" alt="每日一則經典迷因直到2027
 
 Day58
-《回鍋肉》"  class="thumb-img" data-fallback="https://scontent-dfw5-2.cdninstagram.com/v/t51.71878-15/658310255_957165920587948_1933839797319693733_n.jpg?stp=dst-jpg_e15_tt6&amp;_nc_cat=108&amp;ig_cache_key=Mzg2ODI0MTk3MDQwOTM2MjM2NQ%3D%3D.3-ccb7-5&amp;ccb=7-5&amp;_nc_sid=58cdad&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuNjQwLnNkci52aWRlb19kZWZhdWx0X2NvdmVyX2ZyYW1lLkMzIn0%3D&amp;_nc_ohc=9mA0-9m8Zx0Q7kNvwGd0bxo&amp;_nc_oc=AdpV0Bqeu7j81Fn-4TpBg7mtFYDHVrR00ZOKR7UwdVAxU4-u7jx4GJSdMYNnYG-8oUQ&amp;_nc_ad=z-m&amp;_nc_cid=0&amp;_nc_zt=23&amp;_nc_ht=scontent-dfw5-2.cdninstagram.com&amp;_nc_gid=QwjGj75NbelcABjkmmbOnA&amp;_nc_ss=7a22e&amp;oh=00_Af7dwy-LmH29X6EBSRHswwiGfQIQWxQKb71EYpjEoRiGsg&amp;oe=6A1EB27D" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
+《回鍋肉》" loading="lazy" class="thumb-img"></div>
           <div class="caption"><span class="name">每日一則經典迷因直到2027
 
 Day58
@@ -266,31 +309,31 @@ Day58
       </article>
       <article class="card-wrap">
         <a class="card" href="/meme/9f933510-572f-43c0-9f0b-d0baaa80abff" aria-label="POV: 愛講幹話的你對上善解人意的主管 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/9f933510-572f-43c0-9f0b-d0baaa80abff.jpeg" alt="POV: 愛講幹話的你對上善解人意的主管"  class="thumb-img" data-fallback="https://scontent-atl3-1.cdninstagram.com/v/t51.82787-15/712207480_17957520186129217_6327203403977449440_n.jpg?stp=dst-jpg_e35_tt6&amp;_nc_cat=100&amp;ig_cache_key=MzkxMDQ5NjE1MDM4MjM4ODI1OQ%3D%3D.3-ccb7-5&amp;ccb=7-5&amp;_nc_sid=58cdad&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuNzgwLnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&amp;_nc_ohc=3DtPgmN89UIQ7kNvwGEnl6g&amp;_nc_oc=Adquenz6_x0AE8JT_-VvtHPx5cxjHgAXn--9pl0CuptBCbyB2YXLhSNgerV7IOD70BE&amp;_nc_ad=z-m&amp;_nc_cid=0&amp;_nc_zt=23&amp;_nc_ht=scontent-atl3-1.cdninstagram.com&amp;_nc_gid=-UPGUAQiEEJIurofiid6yw&amp;_nc_ss=7a22e&amp;oh=00_Af9yCo8EJoOJhO7c-RRC8QLS8P79iL6w5pJ-EG4oSym8xQ&amp;oe=6A46E5EA" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/9f933510-572f-43c0-9f0b-d0baaa80abff.jpeg" alt="POV: 愛講幹話的你對上善解人意的主管" loading="lazy" class="thumb-img"></div>
           <div class="caption"><span class="name">POV: 愛講幹話的你對上善解人意的主管</span></div>
         </a>
       </article>
       <article class="card-wrap">
         <a class="card" href="/meme/2aed3560-d38f-4e99-b3e6-76df7c6621b3" aria-label="想不到最紅的是沒有唱歌的部分🤡 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/2aed3560-d38f-4e99-b3e6-76df7c6621b3.jpeg" alt="想不到最紅的是沒有唱歌的部分🤡"  class="thumb-img" data-fallback="https://scontent-lax7-1.cdninstagram.com/v/t51.71878-15/669795227_26970330569226512_8374664915799542784_n.jpg?stp=dst-jpg_e15_tt6&amp;_nc_cat=105&amp;ig_cache_key=Mzg3NTIyMjAyNjM1MzMxMzExNA%3D%3D.3-ccb7-5&amp;ccb=7-5&amp;_nc_sid=58cdad&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuNjQwLnNkci52aWRlb19kZWZhdWx0X2NvdmVyX2ZyYW1lLkMzIn0%3D&amp;_nc_ohc=36icjwkHCDAQ7kNvwGi8TId&amp;_nc_oc=AdpttX8HfR22H-dkgtmjTURqmoHezdx1EdaAaz0quFdGPIMP8Zd9k57_gCrKoMht7K4&amp;_nc_ad=z-m&amp;_nc_cid=0&amp;_nc_zt=23&amp;_nc_ht=scontent-lax7-1.cdninstagram.com&amp;_nc_gid=D6GVWUBvLSdKeM-rkyHtQQ&amp;_nc_ss=7a22e&amp;oh=00_Af8DMKQ8v93ICmbQiy4aMfAT7D_egVyBV4dRPoC3RWDWoQ&amp;oe=6A46A11E" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/2aed3560-d38f-4e99-b3e6-76df7c6621b3.jpeg" alt="想不到最紅的是沒有唱歌的部分🤡" loading="lazy" class="thumb-img"></div>
           <div class="caption"><span class="name">想不到最紅的是沒有唱歌的部分🤡</span></div>
         </a>
       </article>
       <article class="card-wrap">
         <a class="card" href="/meme/487ef268-db07-433b-810e-1fdde4058e46" aria-label="憑實力單身🤡,人家第四句就告訴你答案了 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/487ef268-db07-433b-810e-1fdde4058e46.webp" alt="憑實力單身🤡,人家第四句就告訴你答案了"  class="thumb-img" data-fallback="https://scontent-lax3-2.cdninstagram.com/v/t51.82787-15/711618188_17930561535317060_3260760788296847050_n.webp?_nc_cat=100&amp;ig_cache_key=MzkwODU4MjI3MDcxODYyODQ2NA%3D%3D.3-ccb7-5&amp;ccb=7-5&amp;_nc_sid=58cdad&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&amp;_nc_ohc=P-6J88jkjj8Q7kNvwF6F0fU&amp;_nc_oc=Ado50TLzAQP-ltBd5grVrLqfCWLLEaZJN_2QAYoEf8-HfgcIeN9dcpp5SA1oMJA3CQU&amp;_nc_ad=z-m&amp;_nc_cid=0&amp;_nc_zt=23&amp;_nc_ht=scontent-lax3-2.cdninstagram.com&amp;_nc_gid=D6GVWUBvLSdKeM-rkyHtQQ&amp;_nc_ss=7a22e&amp;oh=00_Af9rgEm6gRGXPZ7HawZFH95OY-NpAM-syGwkNJYx7tF6cg&amp;oe=6A46B74C" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/487ef268-db07-433b-810e-1fdde4058e46.webp" alt="憑實力單身🤡,人家第四句就告訴你答案了" loading="lazy" class="thumb-img"></div>
           <div class="caption"><span class="name">憑實力單身🤡,人家第四句就告訴你答案了</span></div>
         </a>
       </article>
       <article class="card-wrap">
         <a class="card" href="/meme/b05482ea-ae1a-41ff-a594-0a3d24428dfb" aria-label="覺得政治好無聊的人寫出來的書也好無聊&gt;&lt; 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/b05482ea-ae1a-41ff-a594-0a3d24428dfb.jpeg" alt="覺得政治好無聊的人寫出來的書也好無聊&gt;&lt;"  class="thumb-img" data-fallback="https://scontent-lax3-1.cdninstagram.com/v/t51.71878-15/730397608_2088566735340683_5596660211089825197_n.jpg?stp=dst-jpg_e15_tt6&amp;_nc_cat=100&amp;ig_cache_key=MzkyODA0ODM1MDU0OTA5NTgwOA%3D%3D.3-ccb7-5&amp;ccb=7-5&amp;_nc_sid=58cdad&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuNjQwLnNkci52aWRlb19kZWZhdWx0X2NvdmVyX2ZyYW1lLkMzIn0%3D&amp;_nc_ohc=Jm9UDGivvcQQ7kNvwEXaPR9&amp;_nc_oc=AdrTEXwFKarMlGeudU0cZZ9HHXGVZupdiSgES2UBFejbFGJDDUWkNot5VsAUTvIOhiU&amp;_nc_ad=z-m&amp;_nc_cid=0&amp;_nc_zt=23&amp;_nc_ht=scontent-lax3-1.cdninstagram.com&amp;_nc_gid=Zf4wnv7ZKt4owbx-_NoXrw&amp;_nc_ss=7a22e&amp;oh=00_Af-ay6xiac0d5-LIEY4mVsEghnWXr8G1gtS_ND1hX4w-eA&amp;oe=6A4671B7" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/b05482ea-ae1a-41ff-a594-0a3d24428dfb.jpeg" alt="覺得政治好無聊的人寫出來的書也好無聊&gt;&lt;" loading="lazy" class="thumb-img"></div>
           <div class="caption"><span class="name">覺得政治好無聊的人寫出來的書也好無聊&gt;&lt;</span></div>
         </a>
       </article>
       <article class="card-wrap">
         <a class="card" href="/meme/394ec7f0-f5c5-48d4-8c09-611f91308388" aria-label="這種幹話真的超好笑 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/394ec7f0-f5c5-48d4-8c09-611f91308388.jpeg" alt="這種幹話真的超好笑"  class="thumb-img" data-fallback="https://scontent-ord5-2.cdninstagram.com/v/t51.82787-15/624206138_18099401761896761_7347730995536301251_n.jpg?stp=dst-jpg_e35_tt6&amp;_nc_cat=102&amp;ig_cache_key=MzUyOTI0NDk4ODY0OTgzNDg4Nw%3D%3D.3-ccb7-5&amp;ccb=7-5&amp;_nc_sid=58cdad&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuNzg2LnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&amp;_nc_ohc=e7idIeFnbh4Q7kNvwG__ijQ&amp;_nc_oc=AdrzfeCRjaew0l0HlkrZgcsP9gzMoN57JXlYc2xQl_AF8XIJjCet6LdPTCFtvqfgFVE&amp;_nc_ad=z-m&amp;_nc_cid=0&amp;_nc_zt=23&amp;_nc_ht=scontent-ord5-2.cdninstagram.com&amp;_nc_gid=JPC_hWqqhR0qex-4FuLQdA&amp;_nc_ss=7a22e&amp;oh=00_Af9RYNvDJIxjHivjbXL2s_T0C7fe3Fzgr8MX34vbsFLX2A&amp;oe=6A46A6C6" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/394ec7f0-f5c5-48d4-8c09-611f91308388.jpeg" alt="這種幹話真的超好笑" loading="lazy" class="thumb-img"></div>
           <div class="caption"><span class="name">這種幹話真的超好笑</span></div>
         </a>
       </article>
@@ -300,13 +343,12 @@ Day58
 #Taiwan #🇹🇼 迷因詳細">
           <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/e035ec1d-4c60-4d4b-bb30-b64692ad959d.jpeg" alt="在台灣🇹🇼永遠都有奇蹟
 
-#Taiwan #🇹🇼"  class="thumb-img" data-fallback="https://scontent-lax3-1.cdninstagram.com/v/t51.82787-15/723831325_17954792655148519_4363765171096133_n.jpg?stp=dst-jpg_e35_tt6&amp;_nc_cat=109&amp;ig_cache_key=MzkyMDA3MDEzOTA5MDA3ODkzNA%3D%3D.3-ccb7-5&amp;ccb=7-5&amp;_nc_sid=58cdad&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuNTI2LnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&amp;_nc_ohc=WnFMuJM1tz0Q7kNvwFjYg2u&amp;_nc_oc=AdqUlOfoPJEdXViq2vnoYpZmIKHG-gaTMZJq3GwBEm1Y5B84BUL3oxLy7Erq0gSpbCs&amp;_nc_ad=z-m&amp;_nc_cid=0&amp;_nc_zt=23&amp;_nc_ht=scontent-lax3-1.cdninstagram.com&amp;_nc_gid=6OVpJNXzJkm_ldaj5ZT9qQ&amp;_nc_ss=7a22e&amp;oh=00_Af_IzavHu84QhJIXwSuVdVPKGLUPVLmd51rFI24AscDr2w&amp;oe=6A46F93F" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
+#Taiwan #🇹🇼" loading="lazy" class="thumb-img"></div>
           <div class="caption"><span class="name">在台灣🇹🇼永遠都有奇蹟
 
 #Taiwan #🇹🇼</span></div>
         </a>
       </article>
-    <!-- SSG:popular-grid:END -->
   </div>
 </section>
 
@@ -316,56 +358,54 @@ Day58
     <a class="more" href="results.html?sort=latest">看全部 →</a>
   </div>
   <div class="broken-grid" id="latest-grid">
-    <!-- SSG:latest-grid:START -->
       <article class="card-wrap">
-        <a class="card" href="/meme/5bdb9434-d1c5-4853-bd51-819eebccea64" aria-label="[閒聊] 如果讓薇歐拉來管母雞卡484就不會炸團了 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/5bdb9434-d1c5-4853-bd51-819eebccea64.jpeg" alt="[閒聊] 如果讓薇歐拉來管母雞卡484就不會炸團了"  class="thumb-img" data-fallback="https://i.verb.tw/gD4SesqV.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[閒聊] 如果讓薇歐拉來管母雞卡484就不會炸團了</span></div>
+        <a class="card" href="/meme/cc29f25e-0a12-4d83-86c6-f43109cc523a" aria-label="Re: [蔚藍] 日網友：檔案二創這麼多 手遊營收卻 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/cc29f25e-0a12-4d83-86c6-f43109cc523a.png" alt="Re: [蔚藍] 日網友：檔案二創這麼多 手遊營收卻" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">Re: [蔚藍] 日網友：檔案二創這麼多 手遊營收卻</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/fa7f3032-ec86-4f35-8480-42ec28ce99b9" aria-label="［光美］知識的妖精シュシュタン 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/fa7f3032-ec86-4f35-8480-42ec28ce99b9.jpeg" alt="［光美］知識的妖精シュシュタン"  class="thumb-img" data-fallback="https://pixiv.cat/147983834.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">［光美］知識的妖精シュシュタン</span></div>
+        <a class="card" href="/meme/556ab2a0-5fdd-4f79-930d-df41d4992bfb" aria-label="[閒聊] 對老師下詛咒的方法 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/556ab2a0-5fdd-4f79-930d-df41d4992bfb.jpeg" alt="[閒聊] 對老師下詛咒的方法" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] 對老師下詛咒的方法</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/b2ead2ea-a36b-4186-905d-a015045876c4" aria-label="[遊戲王] 看到聖王女的新卡圖我就在想 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/b2ead2ea-a36b-4186-905d-a015045876c4.jpeg" alt="[遊戲王] 看到聖王女的新卡圖我就在想"  class="thumb-img" data-fallback="https://pbs.twimg.com/media/HOiRqt7bwAAmHdM.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[遊戲王] 看到聖王女的新卡圖我就在想</span></div>
+        <a class="card" href="/meme/08cd9d49-46a0-4c39-bd3b-46b5dd830cde" aria-label="[蔚藍] 泳裝千秋太可愛了 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/08cd9d49-46a0-4c39-bd3b-46b5dd830cde.jpeg" alt="[蔚藍] 泳裝千秋太可愛了" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[蔚藍] 泳裝千秋太可愛了</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/c60ee577-dd02-4bee-a8f4-40fac72ddf36" aria-label="[蔚藍] 投資一定有風險，申購前應(下略) 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/c60ee577-dd02-4bee-a8f4-40fac72ddf36.png" alt="[蔚藍] 投資一定有風險，申購前應(下略)"  class="thumb-img" data-fallback="https://i.meee.com.tw/g4EyvCu.png" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[蔚藍] 投資一定有風險，申購前應(下略)</span></div>
+        <a class="card" href="/meme/ce68e6bf-107a-4235-aa9b-db5a90cb4705" aria-label="Re: [薯ki] hews 薰子 超大熱狗堡 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/ce68e6bf-107a-4235-aa9b-db5a90cb4705.jpeg" alt="Re: [薯ki] hews 薰子 超大熱狗堡" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">Re: [薯ki] hews 薰子 超大熱狗堡</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/bc199af4-1b9b-4d55-8404-83e5471eeba6" aria-label="[鋼鍊] 主角不開掛 反派很帥 中尉很騷 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/bc199af4-1b9b-4d55-8404-83e5471eeba6.png" alt="[鋼鍊] 主角不開掛 反派很帥 中尉很騷"  class="thumb-img" data-fallback="https://i.meee.com.tw/76GnceH.png" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[鋼鍊] 主角不開掛 反派很帥 中尉很騷</span></div>
+        <a class="card" href="/meme/1960a8af-bccc-4803-9854-cace5897554d" aria-label="[Vtub] Henya 直播台 20260729 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/1960a8af-bccc-4803-9854-cace5897554d.jpeg" alt="[Vtub] Henya 直播台 20260729" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[Vtub] Henya 直播台 20260729</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/1e2147cc-3d6f-4ff8-bdf1-de2799117c19" aria-label="Re: [情報](持續更新) 東離10週年日本展，首日門票週 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/1e2147cc-3d6f-4ff8-bdf1-de2799117c19.jpeg" alt="Re: [情報](持續更新) 東離10週年日本展，首日門票週"  class="thumb-img" data-fallback="https://i.mopix.cc/wO7PF4.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">Re: [情報](持續更新) 東離10週年日本展，首日門票週</span></div>
+        <a class="card" href="/meme/3c56153b-3c9f-493d-8676-e18c0ae7c86e" aria-label="[閒聊] 妖精尾巴 RE:FANTASIA 大! 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/3c56153b-3c9f-493d-8676-e18c0ae7c86e.jpeg" alt="[閒聊] 妖精尾巴 RE:FANTASIA 大!" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] 妖精尾巴 RE:FANTASIA 大!</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/e8ae1995-5959-4db7-89d1-162c2a5287a4" aria-label="[情報] 閃電霹靂車 35th紀念 復刻8cm CD單曲 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/e8ae1995-5959-4db7-89d1-162c2a5287a4.jpeg" alt="[情報] 閃電霹靂車 35th紀念 復刻8cm CD單曲"  class="thumb-img" data-fallback="https://pbs.twimg.com/media/HO8ZfwhbkAE3FDg.jpg" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[情報] 閃電霹靂車 35th紀念 復刻8cm CD單曲</span></div>
+        <a class="card" href="/meme/f8e646c7-c6d6-4316-88f4-63112fa016e2" aria-label="[Vtub] Ellise 歌回 唱輕柔的歌 やさしいうた １曲聴いていってね 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/f8e646c7-c6d6-4316-88f4-63112fa016e2.jpeg" alt="[Vtub] Ellise 歌回 唱輕柔的歌 やさしいうた １曲聴いていってね" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[Vtub] Ellise 歌回 唱輕柔的歌 やさしいうた １曲聴いていってね</span></div>
         </a>
       </article>
       <article class="card-wrap">
-        <a class="card" href="/meme/952d3c3f-b79d-4d41-b6d3-67f7cb24b02e" aria-label="[蔚藍] 新制追第二隻PU真的更痛苦嗎？ 迷因詳細">
-          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/952d3c3f-b79d-4d41-b6d3-67f7cb24b02e.png" alt="[蔚藍] 新制追第二隻PU真的更痛苦嗎？"  class="thumb-img" data-fallback="https://i.meee.com.tw/0MSgvc6.png" onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}"></div>
-          <div class="caption"><span class="name">[蔚藍] 新制追第二隻PU真的更痛苦嗎？</span></div>
+        <a class="card" href="/meme/cd5be439-473f-477c-a24d-24714e0b1e65" aria-label="[閒聊] 不才惡女/不完美惡女。 54 迷因詳細">
+          <div class="thumb t-sand"><img src="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/cd5be439-473f-477c-a24d-24714e0b1e65.jpeg" alt="[閒聊] 不才惡女/不完美惡女。 54" loading="lazy" class="thumb-img"></div>
+          <div class="caption"><span class="name">[閒聊] 不才惡女/不完美惡女。 54</span></div>
         </a>
       </article>
-    <!-- SSG:latest-grid:END -->
   </div>
 </section>
 

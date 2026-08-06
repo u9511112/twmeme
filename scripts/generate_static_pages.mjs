@@ -581,10 +581,12 @@ async function main() {
     };
     const injectGrid = (html, gridId, rows) => {
       const cards = rows.map((r, i) => cardHtml(r, i)).join('\n');
-      return html.replace(
-        new RegExp(`<!-- SSG:${gridId}:START -->[\\\\s\\\\S]*?<!-- SSG:${gridId}:END -->`),
-        () => `<!-- SSG:${gridId}:START -->\n${cards}\n    <!-- SSG:${gridId}:END -->`
-      );
+      const regex = new RegExp(`<!-- SSG:${gridId}:START -->[\\s\\S]*?<!-- SSG:${gridId}:END -->`);
+      if (!regex.test(html)) {
+        console.warn(`[ssg] WARNING: missing SSG markers for ${gridId}, skipping injection`);
+        return html;
+      }
+      return html.replace(regex, () => `<!-- SSG:${gridId}:START -->\n${cards}\n    <!-- SSG:${gridId}:END -->`);
     };
 
     // 🔥 本週熱門 (last 7 days, by popularity)
