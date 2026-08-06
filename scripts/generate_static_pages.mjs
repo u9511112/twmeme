@@ -44,10 +44,10 @@ const RELATED_COUNT = 12;
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const PLATFORM_LABEL = {
-  ptt: 'PTT',
-  dcard: 'Dcard',
-  threads: 'Threads',
-  instagram: 'Instagram',
+  ptt: '網路討論區',
+  dcard: '熱門論壇',
+  threads: '社群平台',
+  instagram: '社群平台',
 };
 
 // ---------------------------------------------------------------------------
