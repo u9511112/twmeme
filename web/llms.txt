@@ -1,0 +1,24 @@
+# TWmeme
+> 台灣繁體中文迷因梗圖搜尋引擎
+
+## 簡介
+TWmeme 是專為台灣網路使用者設計的迷因梗圖搜尋工具。收錄公開網路社群的熱門梗圖、表情包與迷因圖片，支援以「印象中的關鍵字」進行模糊搜尋。
+
+## 功能
+- 印象關鍵字搜尋：輸入你記得的任何片段文字，快速找到對應梗圖
+- 圖片文字辨識 (OCR)：可搜尋圖片內部的文字內容
+- 感知雜湊去重：自動過濾重複圖片
+- 每 4 小時自動更新最新內容
+
+## 資料範圍
+- 收錄台灣繁體中文網路社群的熱門圖片與梗圖
+- 涵蓋動漫、時事、日常、職場等多元主題
+
+## 網站結構
+- 首頁：https://twmeme.pages.dev/
+- 搜尋結果：https://twmeme.pages.dev/results.html?q={關鍵字}
+- 迷因詳細頁：https://twmeme.pages.dev/meme/{uuid}.html
+- 使用指南：https://twmeme.pages.dev/guide/
+
+## 聯絡
+- Email: twmeme.contact@gmail.com

@@ -19,9 +19,10 @@ sys.path.append(str(Path(__file__).parent.parent))
 from scrapers.base import analyze_meme_image
 from pipeline.uploader import _get_pool
 
-# Cap on how many items to process in one run (adjust as needed)
-BACKFILL_LIMIT = 20
+# Cap on how many items to process in one run (configurable via BACKFILL_LIMIT env var)
+BACKFILL_LIMIT = int(os.getenv("BACKFILL_LIMIT", "250"))
 FETCH_TIMEOUT = aiohttp.ClientTimeout(total=30)
+REQUEST_DELAY_SEC = float(os.getenv("GEMINI_DELAY_SEC", "2.5"))  # 30 RPM ceiling -> 2.5s = 24 RPM safe
 
 async def apply_migration_002(conn):
     """Ensure the new columns exist in the database."""
@@ -65,12 +66,13 @@ async def main():
     pool = await _get_pool()
     logger.info(f"Fetching memes missing AI metadata (limit {BACKFILL_LIMIT})...")
     async with pool.acquire() as conn:
+        # Prioritize memes that already have cached_url on Cloudflare R2 for lightning-fast downloads
         rows = await conn.fetch(
             """
             SELECT id, cached_url, media_url, title
             FROM public.memes
             WHERE ocr_text IS NULL
-            ORDER BY fetched_at DESC
+            ORDER BY (cached_url IS NOT NULL) DESC, fetched_at DESC
             LIMIT $1
             """,
             BACKFILL_LIMIT
@@ -83,13 +85,13 @@ async def main():
         await pool.close()
         return
 
-    # 3. Process each meme
+    # Process each meme
     processed = 0
     success = 0
+    failed = 0
     
     for i, row in enumerate(rows, 1):
         meme_id = row["id"]
-        # Prioritize cached_url (R2) over media_url (original CDN) for faster downloads and no rate-blocks
         img_url = row["cached_url"] or row["media_url"]
         title = row["title"] or "Meme"
         
@@ -99,17 +101,20 @@ async def main():
         img_bytes = await download_image(img_url)
         if not img_bytes:
             logger.warning(f"  → Skipping: Failed to download image from {img_url[:60]}")
+            # Mark failed image with empty string so it doesn't block future batches
+            async with pool.acquire() as conn:
+                await conn.execute("UPDATE public.memes SET ocr_text = '' WHERE id = $1", meme_id)
+            failed += 1
             continue
             
         # Analyze via Gemini
-        logger.info(f"  → Calling Gemini API for image analysis...")
+        logger.info("  → Calling Gemini API for image analysis...")
         ai_meta = await analyze_meme_image(img_bytes)
         
         ocr_text = ai_meta.get("ocr_text")
         description = ai_meta.get("description")
         tags = ai_meta.get("tags")
         
-        # Ensure ocr_text and description are strings (sometimes Gemini returns lists)
         if isinstance(ocr_text, list):
             ocr_text = "\n".join(str(x) for x in ocr_text)
         elif ocr_text is not None:
@@ -120,7 +125,6 @@ async def main():
         elif description is not None:
             description = str(description)
             
-        # Ensure tags is a list
         if isinstance(tags, str):
             tags = [tags]
         elif not isinstance(tags, list):
@@ -138,21 +142,20 @@ async def main():
                     ocr_text, description, tags, meme_id
                 )
             success += 1
-            logger.info(f"  → Success: OCR='{ocr_text[:30] if ocr_text else None}', Description='{description[:30] if description else None}', Tags={tags}")
+            logger.info(f"  → Success [{success}/{i}]: OCR='{ocr_text[:30] if ocr_text else None}', Description='{description[:30] if description else None}', Tags={tags}")
         else:
-            logger.warning("  → Gemini returned empty metadata (failed analysis).")
+            logger.warning("  → Gemini returned empty metadata. Marking as processed.")
+            async with pool.acquire() as conn:
+                await conn.execute("UPDATE public.memes SET ocr_text = '', description = '' WHERE id = $1", meme_id)
+            failed += 1
             
         processed += 1
-        # Avoid hitting API rate limits
-        await asyncio.sleep(4.0)
+        await asyncio.sleep(REQUEST_DELAY_SEC)
         
-    logger.info(f"Backfill finished. Processed: {processed}, Successfully updated: {success}")
-    
-    # Close pool
+    logger.info(f"Backfill finished. Processed: {processed}, Success: {success}, Failed/Empty: {failed}")
     await pool.close()
 
 if __name__ == "__main__":
-    # Load .env locally if present
     from dotenv import load_dotenv
     load_dotenv(Path(__file__).parent.parent / ".env")
     

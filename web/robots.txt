@@ -1,35 +1,7 @@
 User-agent: *
 Allow: /
+Allow: /guide/
+Allow: /meme/
+Disallow: /results.html
 
-# AI crawlers — explicitly welcome (training + live retrieval)
-User-agent: GPTBot
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: Bytespider
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: Applebot-Extended
-Allow: /
-
-Sitemap: https://twmeme.vercel.app/sitemap.xml
+Sitemap: https://twmeme.pages.dev/sitemap.xml

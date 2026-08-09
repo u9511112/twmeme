@@ -60,6 +60,7 @@ jobs:
         working-directory: scraper
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          BACKFILL_LIMIT: '250'
         run: |
           doppler run -- python scripts/backfill_gemini_metadata.py
 
