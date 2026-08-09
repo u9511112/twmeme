@@ -20,8 +20,9 @@ function showToast(msg) {
 
 function renderCard(meme, opts) {
   opts = opts || {};
+  const isTall = meme.tall || (meme.height && meme.width && (meme.height / meme.width > 1.25));
   const wrap = document.createElement('article');
-  wrap.className = 'card-wrap' + (meme.tall ? ' tall' : '');
+  wrap.className = 'card-wrap' + (isTall ? ' tall' : '');
 
   const link = document.createElement('a');
   link.className = 'card';
