@@ -298,7 +298,13 @@ ${relatedHtml}
 </section>
 
 <footer class="site-footer">
-  © 2026 TWmeme · 台灣繁中迷因搜尋 · <a href="/privacy.html">隱私政策</a>
+  <div style="margin-bottom: var(--s-xs);">
+    <a href="/guide/" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用指南</a> ·
+    <a href="/legal/privacy.html" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">隱私權政策</a> ·
+    <a href="/legal/terms.html" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用條款</a> ·
+    <a href="/legal/dmca.html" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a>
+  </div>
+  © 2026 TWmeme · 台灣繁中迷因搜尋
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -314,7 +320,9 @@ function renderSitemap(memes, guideSlugs) {
     { loc: `${SITE_ORIGIN}/`, lastmod: TODAY, changefreq: 'daily', priority: '1.0' },
     // results.html is intentionally excluded — it's marked noindex,follow
     // since search-result URLs would create infinite Google index pages.
-    { loc: `${SITE_ORIGIN}/privacy.html`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
+    { loc: `${SITE_ORIGIN}/legal/privacy.html`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
+    { loc: `${SITE_ORIGIN}/legal/terms.html`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
+    { loc: `${SITE_ORIGIN}/legal/dmca.html`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
     { loc: `${SITE_ORIGIN}/meme`, lastmod: TODAY, changefreq: 'daily', priority: '0.9' },
     { loc: `${SITE_ORIGIN}/guide`, lastmod: TODAY, changefreq: 'monthly', priority: '0.8' },
   ];
@@ -414,7 +422,13 @@ ${itemsHtml}
 </main>
 
 <footer class="site-footer">
-  © 2026 TWmeme · 台灣繁中迷因搜尋 · <a href="/privacy.html">隱私政策</a>
+  <div style="margin-bottom: var(--s-xs);">
+    <a href="/guide/" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用指南</a> ·
+    <a href="/legal/privacy.html" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">隱私權政策</a> ·
+    <a href="/legal/terms.html" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用條款</a> ·
+    <a href="/legal/dmca.html" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a>
+  </div>
+  © 2026 TWmeme · 台灣繁中迷因搜尋
 </footer>
 
 </body>

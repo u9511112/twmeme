@@ -96,70 +96,75 @@ async def main():
     success = 0
     failed = 0
     
-    for i, row in enumerate(rows, 1):
-        meme_id = row["id"]
-        img_url = row["cached_url"] or row["media_url"]
-        title = row["title"] or "Meme"
-        
-        logger.info(f"[{i}/{total_found}] Processing meme {meme_id} ({title[:30]})")
-        
-        # Download image bytes
-        img_bytes = await download_image(img_url)
-        if not img_bytes:
-            logger.warning(f"  → Skipping: Failed to download image from {img_url[:60]}")
-            # Mark failed image with empty string so it doesn't block future batches
-            async with pool.acquire() as conn:
-                await conn.execute("UPDATE public.memes SET ocr_text = '' WHERE id = $1", meme_id)
-            failed += 1
-            continue
+    try:
+        for i, row in enumerate(rows, 1):
+            meme_id = row["id"]
+            img_url = row["cached_url"] or row["media_url"]
+            title = row["title"] or "Meme"
             
-        # Analyze via Gemini
-        logger.info("  → Calling Gemini API for image analysis...")
-        ai_meta = await analyze_meme_image(img_bytes)
-        
-        ocr_text = ai_meta.get("ocr_text")
-        description = ai_meta.get("description")
-        tags = ai_meta.get("tags")
-        
-        if isinstance(ocr_text, list):
-            ocr_text = "\n".join(str(x) for x in ocr_text)
-        elif ocr_text is not None:
-            ocr_text = str(ocr_text)
+            logger.info(f"[{i}/{total_found}] Processing meme {meme_id} ({title[:30]})")
             
-        if isinstance(description, list):
-            description = " ".join(str(x) for x in description)
-        elif description is not None:
-            description = str(description)
+            # Download image bytes
+            img_bytes = await download_image(img_url)
+            if not img_bytes:
+                logger.warning(f"  → Skipping temporary download failure from {img_url[:60]}")
+                failed += 1
+                continue
+                
+            # Analyze via Gemini with resilience against 429/timeouts
+            logger.info("  → Calling Gemini API for image analysis...")
+            try:
+                ai_meta = await analyze_meme_image(img_bytes)
+            except Exception as e:
+                logger.error(f"  → Gemini API exception: {e}. Cooling down 10s...")
+                await asyncio.sleep(10.0)
+                failed += 1
+                continue
             
-        if isinstance(tags, str):
-            tags = [tags]
-        elif not isinstance(tags, list):
-            tags = []
-        
-        if ocr_text or description:
-            # Update database
-            async with pool.acquire() as conn:
-                await conn.execute(
-                    """
-                    UPDATE public.memes
-                    SET ocr_text = $1, description = $2, tags = $3
-                    WHERE id = $4
-                    """,
-                    ocr_text, description, tags, meme_id
-                )
-            success += 1
-            logger.info(f"  → Success [{success}/{i}]: OCR='{ocr_text[:30] if ocr_text else None}', Description='{description[:30] if description else None}', Tags={tags}")
-        else:
-            logger.warning("  → Gemini returned empty metadata. Marking as processed.")
-            async with pool.acquire() as conn:
-                await conn.execute("UPDATE public.memes SET ocr_text = '', description = '' WHERE id = $1", meme_id)
-            failed += 1
+            ocr_text = ai_meta.get("ocr_text")
+            description = ai_meta.get("description")
+            tags = ai_meta.get("tags")
             
-        processed += 1
-        await asyncio.sleep(REQUEST_DELAY_SEC)
-        
-    logger.info(f"Backfill finished. Processed: {processed}, Success: {success}, Failed/Empty: {failed}")
-    await pool.close()
+            if isinstance(ocr_text, list):
+                ocr_text = "\n".join(str(x) for x in ocr_text)
+            elif ocr_text is not None:
+                ocr_text = str(ocr_text)
+                
+            if isinstance(description, list):
+                description = " ".join(str(x) for x in description)
+            elif description is not None:
+                description = str(description)
+                
+            if isinstance(tags, str):
+                tags = [tags]
+            elif not isinstance(tags, list):
+                tags = []
+            
+            if ocr_text or description:
+                # Update database
+                async with pool.acquire() as conn:
+                    await conn.execute(
+                        """
+                        UPDATE public.memes
+                        SET ocr_text = $1, description = $2, tags = $3
+                        WHERE id = $4
+                        """,
+                        ocr_text, description, tags, meme_id
+                    )
+                success += 1
+                logger.info(f"  → Success [{success}/{i}]: OCR='{ocr_text[:30] if ocr_text else None}', Description='{description[:30] if description else None}', Tags={tags}")
+            else:
+                logger.warning("  → Gemini returned empty metadata. Marking as processed.")
+                async with pool.acquire() as conn:
+                    await conn.execute("UPDATE public.memes SET ocr_text = '', description = '' WHERE id = $1", meme_id)
+                failed += 1
+                
+            processed += 1
+            await asyncio.sleep(REQUEST_DELAY_SEC)
+            
+        logger.info(f"Backfill finished. Processed: {processed}, Success: {success}, Failed/Empty: {failed}")
+    finally:
+        await pool.close()
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
