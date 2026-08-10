@@ -278,7 +278,9 @@ ${safeJsonLd(breadcrumbLd)}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
         分享
       </button>
-
+      <a href="/sponsor" class="btn btn-sponsor" style="text-decoration: none;">
+        🍜 贊助小編
+      </a>
     </div>
 
     <div class="meme-context">
@@ -302,7 +304,8 @@ ${relatedHtml}
     <a href="/guide" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用指南</a> ·
     <a href="/legal/privacy" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">隱私權政策</a> ·
     <a href="/legal/terms" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用條款</a> ·
-    <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a>
+    <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a> ·
+    <a href="/sponsor" style="color: var(--primary); margin: 0 var(--s-xs); text-decoration: none; font-weight: 600;">贊助支持</a>
   </div>
   © 2026 TWmeme · 台灣繁中迷因搜尋
 </footer>
@@ -323,6 +326,7 @@ function renderSitemap(memes, guideSlugs) {
     { loc: `${SITE_ORIGIN}/legal/privacy`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
     { loc: `${SITE_ORIGIN}/legal/terms`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
     { loc: `${SITE_ORIGIN}/legal/dmca`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
+    { loc: `${SITE_ORIGIN}/sponsor`, lastmod: TODAY, changefreq: 'monthly', priority: '0.5' },
     { loc: `${SITE_ORIGIN}/meme`, lastmod: TODAY, changefreq: 'daily', priority: '0.9' },
     { loc: `${SITE_ORIGIN}/guide`, lastmod: TODAY, changefreq: 'monthly', priority: '0.8' },
   ];
@@ -426,7 +430,8 @@ ${itemsHtml}
     <a href="/guide" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用指南</a> ·
     <a href="/legal/privacy" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">隱私權政策</a> ·
     <a href="/legal/terms" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用條款</a> ·
-    <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a>
+    <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a> ·
+    <a href="/sponsor" style="color: var(--primary); margin: 0 var(--s-xs); text-decoration: none; font-weight: 600;">贊助支持</a>
   </div>
   © 2026 TWmeme · 台灣繁中迷因搜尋
 </footer>
