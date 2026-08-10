@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/generate_static_pages.mjs && node scripts/sync_clean_routes.mjs"
+    "build": "node scripts/generate_static_pages.mjs"
   },
   "repository": {
     "type": "git",
