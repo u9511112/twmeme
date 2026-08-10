@@ -1,7 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const BASE_DIR = 'C:/Users/Mars/TWmeme/web';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const BASE_DIR = path.resolve(__dirname, '../web');
 
 function syncToDirectory(filePath, destDir) {
   if (!fs.existsSync(filePath)) return;
@@ -23,10 +26,12 @@ syncToDirectory(path.join(BASE_DIR, 'legal/dmca.html'), path.join(BASE_DIR, 'leg
 
 // 3. Guide pages
 const guideDir = path.join(BASE_DIR, 'guide');
-const guideFiles = fs.readdirSync(guideDir).filter(f => f.endsWith('.html') && f !== 'index.html');
-for (const f of guideFiles) {
-  const slug = f.replace('.html', '');
-  syncToDirectory(path.join(guideDir, f), path.join(guideDir, slug));
+if (fs.existsSync(guideDir)) {
+  const guideFiles = fs.readdirSync(guideDir).filter(f => f.endsWith('.html') && f !== 'index.html');
+  for (const f of guideFiles) {
+    const slug = f.replace('.html', '');
+    syncToDirectory(path.join(guideDir, f), path.join(guideDir, slug));
+  }
 }
 
 console.log('All static directories synced successfully!');
