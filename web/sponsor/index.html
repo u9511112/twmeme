@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>贊助支持 TWmeme — 讓迷因搜尋持續運轉</title>
+  <meta name="description" content="梗圖無價，但伺服器電費與 AI 辨識有價！請小編吃碗泡麵或喝杯咖啡，支持 TWmeme 台灣迷因搜尋持續營運。">
+  <link rel="canonical" href="https://twmeme.pages.dev/sponsor">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .sponsor-wrap {
+      max-width: 68ch;
+      margin: 0 auto;
+      padding: var(--s-2xl) var(--s-lg);
+    }
+    .sponsor-hero {
+      text-align: center;
+      margin-bottom: var(--s-2xl);
+    }
+    .sponsor-hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: var(--s-sm);
+      letter-spacing: -0.02em;
+    }
+    .sponsor-hero p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .cost-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--s-lg);
+      margin: var(--s-xl) 0;
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+    .cost-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: var(--s-xs);
+      color: var(--primary-ink);
+    }
+    .btn-bmc {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s-sm);
+      background: #FFDD00;
+      color: #000000;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: var(--r-full);
+      text-decoration: none;
+      font-size: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--d-short) var(--e-enter), box-shadow var(--d-short) ease-out;
+    }
+    .btn-bmc:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: var(--shadow-md);
+    }
+    .legal-nav {
+      text-align: center;
+      margin-top: var(--s-2xl);
+      padding-top: var(--s-lg);
+      border-top: 1px solid var(--border);
+    }
+    .legal-nav a {
+      color: var(--muted);
+      margin: 0 var(--s-xs);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .legal-nav a:hover {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="sponsor-wrap">
+    <a href="/" style="color: var(--primary); text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: var(--s-lg);">← 回到迷因搜尋首頁</a>
+    
+    <div class="sponsor-hero">
+      <div style="font-size: 3rem; margin-bottom: var(--s-xs);">🍜 ☕ 💸</div>
+      <h1>贊助支持 TWmeme</h1>
+      <p>梗圖無價，但伺服器電費與 AI 算力有價！<br>覺得 TWmeme 救了你無數次尷尬的聊天？請小編吃碗泡麵，讓搜尋引擎持續發光 ✨</p>
+    </div>
+
+    <div class="sponsor-grid">
+      <!-- 管道 1: Buy Me a Coffee -->
+      <div class="sponsor-card">
+        <div class="sponsor-icon">☕</div>
+        <h2 class="sponsor-title">Buy Me a Coffee</h2>
+        <p class="sponsor-desc">支援信用卡、Apple Pay，單次打賞 $1 美金起（約台幣 30 元），無需註冊即可秒贊助！</p>
+        <a href="https://buymeacoffee.com/twmeme" target="_blank" rel="noopener noreferrer" class="btn-bmc">
+          <span>☕ 請小編喝杯咖啡</span>
+        </a>
+      </div>
+
+      <!-- 管道 2: 街口支付 / 台灣 Pay / 轉帳 QR Code -->
+      <div class="sponsor-card">
+        <div class="sponsor-icon">📱</div>
+        <h2 class="sponsor-title">街口支付 / 掃碼轉帳</h2>
+        <p class="sponsor-desc">打開手機街口支付或相機 App 掃描下方 QR Code，輸入任意金額即可直接打賞支持小編！</p>
+        <div class="qr-box">
+          <div style="font-size: 2rem; margin-bottom: 4px;">📷</div>
+          <span>[ 街口 / 轉帳 QR Code ]</span>
+          <span style="font-size: 11px; margin-top: 4px; color: var(--muted);">帳號：900000000</span>
+        </div>
+        <span style="font-size: 12px; color: var(--muted);">零手續費，每一塊錢都直接變成伺服器電費</span>
+      </div>
+    </div>
+
+    <div class="cost-box">
+      <h3>💡 贊助款項會用在哪裡？</h3>
+      <ul style="padding-left: var(--s-lg); margin-top: var(--s-xs);">
+        <li><strong>Neon PostgreSQL / PostGIS 雲端資料庫</strong>：索引萬張迷因與多詞智慧分詞的伺服器成本。</li>
+        <li><strong>Gemini 視覺模型 API 算力</strong>：自動為每張新梗圖進行 OCR 繁中對白萃取與詳細畫面視覺分析。</li>
+        <li><strong>Cloudflare R2 高速圖床與 CDN</strong>：確保每一張迷因都能毫秒級極速預覽與高清下載。</li>
+      </ul>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--s-xl); color: var(--muted); font-size: 0.95rem;">
+      ❤️ 感謝所有默默使用、分享與支持 TWmeme 的朋友！
+    </div>
+
+    <div class="legal-nav">
+      <a href="/guide">使用指南</a> ·
+      <a href="/legal/privacy">隱私權政策</a> ·
+      <a href="/legal/terms">使用條款</a> ·
+      <a href="/legal/dmca">著作權申訴</a> ·
+      <a href="/sponsor" style="color: var(--primary); font-weight: 600;">贊助支持</a>
+    </div>
+  </div>
+</body>
+</html>
