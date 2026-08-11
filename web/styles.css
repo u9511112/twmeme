@@ -1240,14 +1240,14 @@ mark.highlight-term {
   transform: translateY(-1px);
 }
 
-.sponsor-grid {
+.sponsor-grid, .support-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--s-lg);
   margin: var(--s-xl) 0;
 }
 
-.sponsor-card {
+.sponsor-card, .support-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -1259,24 +1259,24 @@ mark.highlight-term {
   text-align: center;
   transition: transform var(--d-short) var(--e-enter), box-shadow var(--d-short) ease-out;
 }
-.sponsor-card:hover {
+.sponsor-card:hover, .support-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
-.sponsor-icon {
+.sponsor-icon, .support-icon {
   font-size: 2.4rem;
   margin-bottom: var(--s-sm);
 }
 
-.sponsor-title {
+.sponsor-title, .support-title {
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: var(--s-xs);
   color: var(--ink);
 }
 
-.sponsor-desc {
+.sponsor-desc, .support-desc {
   font-size: 0.9rem;
   color: var(--muted);
   line-height: 1.6;
@@ -1303,4 +1303,5 @@ mark.highlight-term {
   max-height: 100%;
   border-radius: var(--r-sm);
 }
+
 
