@@ -1,0 +1,27 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/sponsor
+  Cache-Control: public, max-age=0, must-revalidate
+
+/legal/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/guide/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/styles.css
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  Content-Type: text/css; charset=utf-8
+
+/db.js
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  Content-Type: application/javascript; charset=utf-8
+
+/render.js
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  Content-Type: application/javascript; charset=utf-8
