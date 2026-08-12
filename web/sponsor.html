@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>贊助支持 TWmeme — 讓迷因搜尋持續運轉</title>
-  <meta name="description" content="梗圖無價，但伺服器電費與 AI 辨識有價！掃描街口 / TWQR 轉帳或複製帳號，請小編吃碗泡麵支持 TWmeme 持續營運。">
+  <meta name="description" content="梗圖無價，但伺服器電費與 AI 辨識有價！支援 Ko-fi 信用卡/PayPal 線上打賞與街口支付/TWQR 掃碼轉帳，請小編吃碗泡麵支持 TWmeme 持續營運。">
   <link rel="canonical" href="https://twmeme.pages.dev/sponsor">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,8 @@
       --primary: #FF5A36;
       --primary-ink: #D9381E;
       --accent: #FFB800;
+      --kofi-blue: #13C3FF;
+      --kofi-ink: #0D8ABC;
       --jko-red: #D7000F;
       --bg: #FAF8F5;
       --surface: #FFFFFF;
@@ -34,7 +36,7 @@
       min-height: 100vh;
     }
     .support-wrap {
-      max-width: 640px;
+      max-width: 840px;
       margin: 0 auto;
       padding: 40px 20px 60px;
     }
@@ -60,10 +62,10 @@
     }
     .support-hero {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
     .support-hero h1 {
-      font-size: 2.2rem;
+      font-size: 2.3rem;
       font-weight: 700;
       color: var(--ink);
       margin: 12px 0 8px;
@@ -74,64 +76,113 @@
       color: var(--muted);
       line-height: 1.7;
     }
-    .main-card {
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+    .channel-box {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 36px 28px;
+      padding: 32px 24px;
       box-shadow: var(--shadow-md);
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      margin-bottom: 32px;
+      transition: transform 150ms ease, box-shadow 150ms ease;
     }
-    .jko-badge {
+    .channel-box:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    .channel-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-bottom: 18px;
+    }
+    .badge-kofi {
+      background: #EBF8FF;
+      color: var(--kofi-ink);
+      border: 1px solid #BEE3F8;
+    }
+    .badge-jko {
       background: #FFF0F0;
       color: var(--jko-red);
-      font-weight: 700;
-      font-size: 14px;
-      padding: 6px 16px;
-      border-radius: 9999px;
       border: 1px solid #FFD0D0;
+    }
+    .channel-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .channel-desc {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
       margin-bottom: 20px;
+      flex-grow: 1;
+    }
+    .btn-kofi {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #13C3FF;
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 15px 24px;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(19, 195, 255, 0.3);
+      transition: background 150ms ease, transform 150ms ease;
+    }
+    .btn-kofi:hover {
+      background: #00B4F0;
+      transform: scale(1.02);
     }
     .qr-frame {
       background: #FFFFFF;
-      padding: 12px;
-      border-radius: 18px;
+      padding: 10px;
+      border-radius: 16px;
       border: 1px solid var(--border);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-      margin-bottom: 24px;
-      max-width: 320px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      margin-bottom: 16px;
+      max-width: 260px;
       width: 100%;
     }
     .qr-img {
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 12px;
+      border-radius: 10px;
     }
     .account-info-box {
       background: #FAF8F5;
       border: 1px solid #E8E2D6;
-      border-radius: 16px;
-      padding: 16px 20px;
+      border-radius: 14px;
+      padding: 14px 18px;
       width: 100%;
-      max-width: 420px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     .info-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 15px;
+      font-size: 14px;
     }
     .info-label {
       color: var(--muted);
@@ -140,12 +191,10 @@
       font-weight: 700;
       color: var(--ink);
       font-family: ui-monospace, 'SF Mono', monospace;
-      font-size: 17px;
-      letter-spacing: 0.05em;
+      font-size: 16px;
     }
     .btn-copy {
       width: 100%;
-      max-width: 420px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -153,8 +202,8 @@
       background: var(--primary);
       color: #FFFFFF;
       font-weight: 700;
-      font-size: 16px;
-      padding: 14px 24px;
+      font-size: 15px;
+      padding: 13px 20px;
       border-radius: 14px;
       border: none;
       cursor: pointer;
@@ -165,73 +214,21 @@
       background: var(--primary-ink);
       transform: translateY(-2px);
     }
-    .btn-copy:active {
-      transform: translateY(0);
-    }
     .twqr-note {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 13px;
+      font-size: 12px;
       color: var(--muted);
-      margin-top: 16px;
-      line-height: 1.5;
-    }
-    .guide-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 24px;
-      margin-bottom: 32px;
-    }
-    .guide-box h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--ink);
-    }
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 16px;
-      text-align: left;
-    }
-    .step-item {
-      background: #FAF8F5;
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-    .step-num {
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      line-height: 24px;
-      text-align: center;
-      background: var(--primary);
-      color: #FFFFFF;
-      font-weight: 700;
-      font-size: 13px;
-      border-radius: 50%;
-      margin-bottom: 8px;
-    }
-    .step-text {
-      font-size: 14px;
-      color: var(--ink);
-      line-height: 1.5;
+      margin-top: 12px;
+      line-height: 1.4;
     }
     .cost-box {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 24px;
+      border-radius: 20px;
+      padding: 28px;
       line-height: 1.8;
       font-size: 0.95rem;
       margin-bottom: 32px;
+      box-shadow: var(--shadow-sm);
     }
     .cost-box h3 {
       font-size: 1.15rem;
@@ -287,66 +284,61 @@
     <a href="/" class="back-link">← 回到迷因搜尋首頁</a>
     
     <div class="support-hero">
-      <div style="font-size: 3.2rem; margin-bottom: 8px;">🍜 💸 ✨</div>
+      <div style="font-size: 3.2rem; margin-bottom: 8px;">🍜 ☕ 💸</div>
       <h1>贊助支持 TWmeme</h1>
-      <p>梗圖無價，但伺服器電費與 AI 算力有價！<br>覺得 TWmeme 救了你無數次尷尬的聊天？請小編吃碗泡麵，讓搜尋引擎持續發光 ✨</p>
+      <p>梗圖無價，但伺服器電費與 AI 算力有價！<br>覺得 TWmeme 救了你無數次尷尬的聊天？請小編喝杯咖啡或吃碗泡麵，讓搜尋引擎持續發光 ✨</p>
     </div>
 
-    <!-- 主要收款卡片 -->
-    <div class="main-card">
-      <div class="jko-badge">
-        <span>📱 街口支付 / TWQR 全銀行支援</span>
+    <!-- 雙管道打賞區塊 -->
+    <div class="channels-grid">
+      <!-- 管道 1: Ko-fi 線上打賞 -->
+      <div class="channel-box">
+        <div class="channel-badge badge-kofi">
+          <span>☕ 信用卡 / PayPal / Apple Pay</span>
+        </div>
+        <div style="font-size: 3rem; margin-bottom: 12px;">☕</div>
+        <h2 class="channel-title">Ko-fi 線上打賞</h2>
+        <p class="channel-desc">支援全球各國信用卡、Apple Pay 與 PayPal，單次贊助 $1 美金起，免註冊即可秒打賞！</p>
+        <a href="https://ko-fi.com/wilsonhsieh" target="_blank" rel="noopener noreferrer" class="btn-kofi">
+          <span>☕ 在 Ko-fi 請小編喝杯咖啡</span>
+        </a>
       </div>
 
-      <div class="qr-frame">
-        <img src="/assets/jko_qr.jpg" alt="街口支付 / TWQR 贊助收款碼" class="qr-img">
-      </div>
+      <!-- 管道 2: 街口支付 / TWQR 掃碼轉帳 -->
+      <div class="channel-box">
+        <div class="channel-badge badge-jko">
+          <span>📱 街口支付 / TWQR 台灣全銀行支援</span>
+        </div>
+        <h2 class="channel-title">街口支付 / 掃碼轉帳</h2>
+        <p class="channel-desc">打開手機街口支付或各大銀行 App 掃描下方 QR Code，零手續費直接打賞！</p>
+        
+        <div class="qr-frame">
+          <img src="/assets/jko_qr.jpg" alt="街口支付 / TWQR 贊助收款碼" class="qr-img">
+        </div>
 
-      <div class="account-info-box">
-        <div class="info-row">
-          <span class="info-label">收款暱稱</span>
-          <span class="info-val" style="font-family: inherit; font-size: 16px;">Wilson</span>
+        <div class="account-info-box">
+          <div class="info-row">
+            <span class="info-label">街口機構代碼</span>
+            <span class="info-val">396</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">街口帳號 (Wilson)</span>
+            <span class="info-val">905805571</span>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="info-label">街口機構代碼</span>
-          <span class="info-val">396</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">街口帳號</span>
-          <span class="info-val">905805571</span>
-        </div>
-      </div>
 
-      <button class="btn-copy" id="copy-btn" onclick="copyAccount()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span>複製街口帳號 (905805571)</span>
-      </button>
+        <button class="btn-copy" onclick="copyAccount()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>複製街口帳號 (905805571)</span>
+        </button>
 
-      <div class="twqr-note">
-        <span>✨ 支援街口支付、各大網銀、台灣 Pay、全支付、一卡通 iPASS 掃碼轉帳，零手續費！</span>
-      </div>
-    </div>
-
-    <!-- 手機打賞操作步驟教學 -->
-    <div class="guide-box">
-      <h3>📱 手機如何快速打賞？</h3>
-      <div class="steps">
-        <div class="step-item">
-          <span class="step-num">1</span>
-          <div class="step-text"><strong>截圖此頁面</strong> 或點擊上方「複製帳號」</div>
-        </div>
-        <div class="step-item">
-          <span class="step-num">2</span>
-          <div class="step-text">打開 <strong>街口支付</strong> 或 <strong>任一網銀 App</strong></div>
-        </div>
-        <div class="step-item">
-          <span class="step-num">3</span>
-          <div class="step-text">選擇「掃描 QR Code（讀取相簿）」或「跨行轉帳」即可完成支持！</div>
+        <div class="twqr-note">
+          <span>✨ 支援街口、各大網銀、台灣 Pay、全支付、一卡通 掃碼轉帳</span>
         </div>
       </div>
     </div>
 
-    <!-- 費用用途 -->
+    <!-- 款項用途 -->
     <div class="cost-box">
       <h3>💡 支持款項會用在哪裡？</h3>
       <ul>
