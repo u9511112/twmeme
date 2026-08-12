@@ -98,6 +98,10 @@
       transform: translateY(-3px);
       box-shadow: var(--shadow-lg);
     }
+    .btn-copy:focus-visible, .btn-kofi:focus-visible {
+      outline: 3px solid var(--primary);
+      outline-offset: 2px;
+    }
     .channel-badge {
       display: inline-flex;
       align-items: center;
@@ -389,8 +393,11 @@
       var ta = document.createElement('textarea');
       ta.value = text;
       ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '0';
       ta.style.opacity = '0';
       document.body.appendChild(ta);
+      ta.focus();
       ta.select();
       try {
         document.execCommand('copy');
