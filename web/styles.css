@@ -1016,7 +1016,33 @@ mark.highlight-term {
   text-align: center;
 }
 .article-cta h3 { margin-bottom: var(--s-md); }
-.article-cta .btn { display: inline-flex; margin: var(--s-xs); }
+.article-cta .btn,
+.article a.btn {
+  display: inline-flex;
+  margin: var(--s-xs);
+  text-decoration: none !important;
+}
+.article a.btn-primary,
+.article-cta .btn-primary {
+  background: var(--primary) !important;
+  color: #FFFFFF !important;
+}
+.article a.btn-primary:hover,
+.article-cta .btn-primary:hover {
+  background: var(--primary-ink) !important;
+  color: #FFFFFF !important;
+}
+.article a.btn-secondary,
+.article-cta .btn-secondary {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--border) !important;
+}
+.article a.btn-secondary:hover,
+.article-cta .btn-secondary:hover {
+  border-color: var(--ink) !important;
+  color: var(--ink) !important;
+}
 .article table {
   font-size: 14px;
   line-height: 1.5;
