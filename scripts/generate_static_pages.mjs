@@ -308,7 +308,7 @@ ${relatedHtml}
     <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a> ·
     <a href="/sponsor" style="color: var(--primary); margin: 0 var(--s-xs); text-decoration: none; font-weight: 600;">贊助支持</a>
   </div>
-  © 2026 TWmeme · 台灣繁中迷因搜尋
+  © 2026 Geek Tech 極客科技. All rights reserved.
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -435,7 +435,7 @@ ${itemsHtml}
     <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a> ·
     <a href="/sponsor" style="color: var(--primary); margin: 0 var(--s-xs); text-decoration: none; font-weight: 600;">贊助支持</a>
   </div>
-  © 2026 TWmeme · 台灣繁中迷因搜尋
+  © 2026 Geek Tech 極客科技. All rights reserved.
 </footer>
 
 </body>
