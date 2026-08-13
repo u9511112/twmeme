@@ -15,10 +15,10 @@ TWmeme 是專為台灣網路使用者設計的迷因梗圖搜尋工具。收錄�
 - 涵蓋動漫、時事、日常、職場等多元主題
 
 ## 網站結構
-- 首頁：https://twmeme.pages.dev/
-- 搜尋結果：https://twmeme.pages.dev/results.html?q={關鍵字}
-- 迷因詳細頁：https://twmeme.pages.dev/meme/{uuid}.html
-- 使用指南：https://twmeme.pages.dev/guide/
+- 首頁：https://tw-meme.com/
+- 搜尋結果：https://tw-meme.com/results.html?q={關鍵字}
+- 迷因詳細頁：https://tw-meme.com/meme/{uuid}.html
+- 使用指南：https://tw-meme.com/guide/
 
 ## 聯絡
 - Email: twmeme.contact@gmail.com

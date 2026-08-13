@@ -32,7 +32,7 @@ if (!NEON_URL) {
   process.exit(1);
 }
 
-const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://twmeme.pages.dev';
+const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://tw-meme.com';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const WEB_DIR = join(__dirname, '..', 'web');
 const MEME_DIR = join(WEB_DIR, 'meme');

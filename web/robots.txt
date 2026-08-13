@@ -4,4 +4,4 @@ Allow: /guide/
 Allow: /meme/
 Disallow: /results.html
 
-Sitemap: https://twmeme.pages.dev/sitemap.xml
+Sitemap: https://tw-meme.com/sitemap.xml
