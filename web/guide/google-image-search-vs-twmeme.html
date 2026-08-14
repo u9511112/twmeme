@@ -141,7 +141,7 @@
     <p>TWmeme 的解法是<strong>反過來建索引</strong>——不依賴圖片本身的 metadata、改用<strong>論壇的中文標題和推文</strong>當作圖片描述。</p>
 
     <ul>
-      <li>每 4 小時爬 熱門網路討論區和 動漫專區 板</li>
+      <li>每 3 天爬 熱門網路討論區和 動漫專區 板</li>
       <li>把文章標題、推文摘要、發文日期跟圖片綁在一起存到資料庫</li>
       <li>搜尋時、用 PostgreSQL trigram 索引比對中文標題、ILIKE 模糊匹配</li>
       <li>結果按發文時間和熱門度排序</li>
