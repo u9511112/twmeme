@@ -238,7 +238,7 @@ ${safeJsonLd(breadcrumbLd)}
 </header>
 
 <div class="topbar">
-  <a href="/" class="back" aria-label="回首頁">
+  <a href="/" class="back" aria-label="返回" onclick="if(history.length>1){history.back();return false;}">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </a>
   <form class="searchbox" action="/results.html" method="get">

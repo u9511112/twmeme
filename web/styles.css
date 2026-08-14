@@ -216,6 +216,36 @@ a { color: inherit; text-decoration: none; }
   gap: var(--s-xs);
 }
 
+/* P1 fix: collapse categories on mobile to reduce cognitive overload */
+.search-categories .category-row:nth-child(n+3) {
+  display: none;
+}
+.search-categories.expanded .category-row:nth-child(n+3) {
+  display: flex;
+}
+.chip-toggle {
+  display: block;
+  margin: var(--s-sm) auto 0;
+  padding: 8px 20px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  transition: color var(--d-short) ease-out, border-color var(--d-short) ease-out;
+}
+.chip-toggle:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+@media (min-width: 901px) {
+  .search-categories .category-row:nth-child(n+3) { display: flex; }
+  .chip-toggle { display: none; }
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -434,10 +464,13 @@ a { color: inherit; text-decoration: none; }
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
-/* Shimmer Skeleton Animation */
+/* Shimmer Skeleton Animation (single definition, used by card thumbs + skeleton cards) */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+@keyframes shimmer-slide {
+  100% { transform: translateX(100%); }
 }
 
 .card .thumb {
@@ -971,13 +1004,13 @@ mark.highlight-term {
   margin: 0 0 var(--s-md);
 }
 .article li { margin-bottom: var(--s-xs); }
-.article a {
+.article :where(a:not(.btn)) {
   color: var(--primary);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
-.article a:hover { color: var(--primary-ink); }
+.article :where(a:not(.btn)):hover { color: var(--primary-ink); }
 .article code {
   font-family: 'DM Sans', monospace;
   background: var(--surface);
@@ -1024,24 +1057,24 @@ mark.highlight-term {
 }
 .article a.btn-primary,
 .article-cta .btn-primary {
-  background: var(--primary) !important;
-  color: #FFFFFF !important;
+  background: var(--primary);
+  color: #FFFFFF;
 }
 .article a.btn-primary:hover,
 .article-cta .btn-primary:hover {
-  background: var(--primary-ink) !important;
-  color: #FFFFFF !important;
+  background: var(--primary-ink);
+  color: #FFFFFF;
 }
 .article a.btn-secondary,
 .article-cta .btn-secondary {
-  background: var(--surface) !important;
-  color: var(--ink) !important;
-  border: 1px solid var(--border) !important;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
 }
 .article a.btn-secondary:hover,
 .article-cta .btn-secondary:hover {
-  border-color: var(--ink) !important;
-  color: var(--ink) !important;
+  border-color: var(--ink);
+  color: var(--ink);
 }
 .article table {
   font-size: 14px;
@@ -1207,13 +1240,7 @@ mark.highlight-term {
     oklch(99.5% 0.005 45 / 0.8) 60%,
     oklch(99.5% 0.005 45 / 0) 100%
   );
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
+  animation: shimmer-slide 1.5s infinite;
 }
 
 /* ===== Sponsor & Support Styles (Playful Paper Craft) ===== */
