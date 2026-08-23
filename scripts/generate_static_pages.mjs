@@ -169,8 +169,33 @@ function renderMemePage(meme, related) {
     ],
   };
 
-  // Visible meme-context paragraph (200+ 字 zh for AI citation sweet spot)
-  const memeContext = `這張迷因「${cleanTitle}」於 ${date} 被 TWmeme 自動收錄。${hasDims ? `圖片原始解析度為 ${meme.width}×${meme.height} pixels、` : ''}適合作為 LINE 群組的反應圖、IG 限時動態的素材、Threads 留言的回覆圖、或 FB 粉專貼文的配圖。點上方「複製連結」會把圖片直接 URL 放到剪貼簿、貼到任何聊天室都會自動展開預覽；點「下載原圖」會把原始解析度的檔案存到電腦。整個流程不需要登入、也不會記錄你點了哪張迷因。如果你是這張圖的原始創作者、希望從索引中下架、用首頁右上角「意見回饋」聯絡即可。`;
+  // Dynamic usage note based on tags/title
+  let usageNote = '這張迷因在台灣社群中被廣泛用於表達生動的情緒反應。一鍵複製圖片連結即可在 LINE、IG 限動、Threads 與 Discord 聊天室中即時展開預覽。';
+  const tagStr = (meme.tags || []).join(' ') + ' ' + cleanTitle;
+  if (/崩潰|哭|難過|眼淚|痛|傷心|救命/.test(tagStr)) {
+    usageNote = '適合在遭遇突發意外、考試/工作進度落後、或是遇到令人難以置信的荒謬事件時，在 LINE、Discord 或 Threads 上作為「無語問蒼天」的情緒宣洩反應圖。';
+  } else if (/貓|狗|柴犬|動物|水豚|鳥/.test(tagStr)) {
+    usageNote = '這張動物反應圖自帶天然的萌感與幽默防護罩，非常適合作為工作群組中的安全牌表情包、或是向好友撒嬌、發呆與表達平和心境時使用。';
+  } else if (/職場|社畜|工作|加班|主管|上班|同事|老闆/.test(tagStr)) {
+    usageNote = '專為職場打工人設計的自嘲神器。適合在週一開工、週五下班前被臨時交辦任務、或是與同事私下吐槽工作日常時使用。';
+  } else if (/二次元|動漫|吉伊卡哇|芙莉蓮|遊戲|VTuber|鳴潮|蔚藍|鐵道/.test(tagStr)) {
+    usageNote = '具備濃厚次文化色彩的經典名場面，適合在動漫討論區、遊戲公會 Discord、或是向同好同溫層精準傳遞作品專屬梗點時使用。';
+  } else if (/生氣|怒|火大|不爽|嗆/.test(tagStr)) {
+    usageNote = '火藥味十足但幽默感滿分的吐槽圖。適合在朋友講冷笑話、遊戲被隊友坑、或是對荒謬現象發表抗議時作為有力回擊。';
+  } else if (/傻眼|問號|疑惑|無奈|尷尬|老頭/.test(tagStr)) {
+    usageNote = '經典的「冷眼看世界」系列表情包。面對令人啼笑皆非的對話或長輩群組的奇葩言論時，一張圖勝過千言萬語。';
+  }
+
+  const loreBoxHtml = `
+    <div class="meme-lore-box">
+      <h3>💡 推薦聊天場合與使用指南</h3>
+      <p>${escapeHtml(usageNote)}</p>
+      ${meme.ocr_text ? `<p><strong>📝 畫面核心文字：</strong>「${escapeHtml(meme.ocr_text)}」</p>` : ''}
+      ${meme.description ? `<p><strong>🎯 視覺語意解析：</strong>${escapeHtml(meme.description)}</p>` : ''}
+      <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">
+        📅 收錄日期：${escapeHtml(date)} · 📐 原始畫質：${hasDims ? `${meme.width}×${meme.height} px` : '標準規格'} · 🔓 著作權屬原作者所有，提供公開網路社群索引搜尋。
+      </p>
+    </div>`;
 
   // Related memes (12 most recent excluding current)
   const relatedHtml = related
@@ -233,6 +258,8 @@ ${safeJsonLd(breadcrumbLd)}
 <header class="site-header">
   <a href="/" class="wordmark">迷因<em>搜</em></a>
   <nav class="nav-links">
+    <a href="/guide/">指南專題</a>
+    <a href="/sponsor">贊助支持</a>
     <a href="mailto:u9511112@gmail.com?subject=TWmeme%20%E6%84%8F%E8%A6%8B%E5%9B%9E%E9%A5%8B">意見回饋</a>
   </nav>
 </header>
@@ -251,17 +278,21 @@ ${safeJsonLd(breadcrumbLd)}
 </div>
 
 <main class="detail">
-  <div class="image-pane t-sand">
-    ${imageUrl
-      ? `<img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(title)}" class="thumb-img">`
-      : '<span class="emoji-fallback">🖼️</span>'}
-    ${hasDims ? `<span class="quality-badge">${meme.width}×${meme.height}</span>` : ''}
+  <div>
+    <div class="image-pane t-sand">
+      ${imageUrl
+        ? `<img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(title)}" class="thumb-img">`
+        : '<span class="emoji-fallback">🖼️</span>'}
+      ${hasDims ? `<span class="quality-badge">${meme.width}×${meme.height}</span>` : ''}
+    </div>
+    ${loreBoxHtml}
   </div>
 
   <aside>
     <h1>${escapeHtml(title)}</h1>
     <div class="meta-row">
-      <span>${escapeHtml(date)}</span>
+      <span>📅 ${escapeHtml(date)}</span>
+      <a href="/guide/" style="color:var(--primary);text-decoration:none;font-weight:600;">📖 迷因指南</a>
     </div>
 
     ${(meme.ocr_text || meme.description || (meme.tags && meme.tags.length > 0)) ? `
@@ -291,12 +322,22 @@ ${safeJsonLd(breadcrumbLd)}
         🍜 贊助小編
       </a>
     </div>
-
-    <div class="meme-context">
-      <p>${escapeHtml(memeContext)}</p>
-    </div>
   </aside>
 </main>
+
+<div class="ad-container">
+  <span class="ad-label">贊助商廣告 · Advertisement</span>
+  <!-- AdSense Responsive Slot -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-2538043639262395"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
 
 <section class="section">
   <div class="section-head">

@@ -1383,4 +1383,131 @@ mark.highlight-term {
   border-radius: var(--r-sm);
 }
 
+/* ===== Homepage Meme Guides / Lore Section ===== */
+.home-guides {
+  border-top: 3px solid var(--ink);
+  padding-top: var(--s-2xl);
+  padding-bottom: var(--s-2xl);
+}
+.home-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-lg);
+}
+@media (max-width: 768px) {
+  .home-guide-grid {
+    grid-template-columns: 1fr;
+    gap: var(--s-md);
+  }
+}
+.home-guide-card {
+  background: var(--surface);
+  border: var(--border-hard);
+  border-radius: var(--r-md);
+  padding: var(--s-lg) var(--s-xl);
+  box-shadow: var(--shadow-sticker);
+  text-decoration: none !important;
+  color: var(--ink) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform var(--d-short) var(--e-enter), box-shadow var(--d-short) ease-out;
+}
+.home-guide-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-pop);
+}
+.home-guide-tag {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: var(--r-full);
+  border: 1.5px solid var(--ink);
+  box-shadow: 1.5px 1.5px 0 var(--ink);
+  margin-bottom: var(--s-sm);
+}
+.home-guide-tag.hot { background: var(--accent); color: var(--ink); }
+.home-guide-tag.animal { background: oklch(93% 0.05 145); color: var(--ink); }
+.home-guide-tag.work { background: oklch(93% 0.06 25); color: var(--ink); }
+.home-guide-tag.tech { background: oklch(93% 0.04 240); color: var(--ink); }
+
+.home-guide-card h3 {
+  font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 var(--s-xs);
+  color: var(--ink);
+}
+.home-guide-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0 0 var(--s-md);
+  flex: 1;
+}
+.home-guide-meta {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ===== Meme Lore & Usage Sticky Note (Detail Page) ===== */
+.meme-lore-box {
+  margin-top: var(--s-lg);
+  padding: var(--s-md) var(--s-lg);
+  background: oklch(98.0% 0.02 85); /* 淡暖黃手作便條紙 */
+  border: 2px dashed var(--ink);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sticker);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.meme-lore-box h3 {
+  font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary-ink);
+  margin: 0 0 var(--s-xs);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.meme-lore-box p {
+  margin: 0 0 var(--s-sm);
+}
+.meme-lore-box p:last-child {
+  margin-bottom: 0;
+}
+.meme-lore-box strong {
+  color: var(--ink);
+}
+
+/* ===== Safe AdSense Ad Container (Zero CLS) ===== */
+.ad-container {
+  min-height: 100px;
+  max-width: 1200px;
+  margin: var(--s-xl) auto;
+  text-align: center;
+  overflow: hidden;
+  background: oklch(97% 0.005 45);
+  border-radius: var(--r-sm);
+  border: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-xs);
+}
+.ad-label {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
 
