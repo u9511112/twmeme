@@ -41,6 +41,12 @@ const MEME_DIR = join(WEB_DIR, 'meme');
 // pages takes ~30s of fs writes locally; safe ceiling for now.
 const MEME_LIMIT = 5000;
 const RELATED_COUNT = 12;
+
+// AdSense content hygiene: keep forum announcements / ban notices and adult or
+// sexually suggestive posts out of every public surface (pages, sitemap, home).
+// Keep EXCLUDE_TITLE_RE in sync with EXCLUDE_RE in web/db.js.
+const EXCLUDE_TITLE_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底|色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳';
+const SAFE_WHERE = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* $1`;
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const PLATFORM_LABEL = {
@@ -88,6 +94,16 @@ function platformLabel(p) {
 
 function pickImageUrl(meme) {
   return meme.cached_url || meme.media_url || '';
+}
+
+// A meme page only counts as "substantive" (indexable) when it carries unique
+// text beyond the templated copy: OCR text, a description, or tags.
+function hasSubstance(meme) {
+  return Boolean(
+    String(meme.ocr_text || '').trim() ||
+    String(meme.description || '').trim() ||
+    (Array.isArray(meme.tags) && meme.tags.length > 0)
+  );
 }
 
 // Trim PTT-style bracket prefix only for description, keep for title.
@@ -224,7 +240,7 @@ function renderMemePage(meme, related) {
 <title>${escapeHtml(title)} — TWmeme 迷因</title>
 <meta name="description" content="${escapeAttr(description)}">
 <link rel="canonical" href="${escapeAttr(url)}">
-<meta property="og:type" content="article">
+${hasSubstance(meme) ? '' : '<meta name="robots" content="noindex,follow">\n'}<meta property="og:type" content="article">
 <meta property="og:title" content="${escapeAttr(title)} — TWmeme">
 <meta property="og:description" content="${escapeAttr(description)}">
 <meta property="og:image" content="${escapeAttr(imageUrl)}">
@@ -259,6 +275,7 @@ ${safeJsonLd(breadcrumbLd)}
   <a href="/" class="wordmark">迷因<em>搜</em></a>
   <nav class="nav-links">
     <a href="/guide/">指南專題</a>
+    <a href="/about">關於我們</a>
     <a href="/sponsor">贊助支持</a>
     <a href="mailto:u9511112@gmail.com?subject=TWmeme%20%E6%84%8F%E8%A6%8B%E5%9B%9E%E9%A5%8B">意見回饋</a>
   </nav>
@@ -352,6 +369,8 @@ ${relatedHtml}
 <footer class="site-footer">
   <div style="margin-bottom: var(--s-xs);">
     <a href="/guide" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用指南</a> ·
+    <a href="/about" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">關於我們</a> ·
+    <a href="/contact" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">聯絡我們</a> ·
     <a href="/legal/privacy" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">隱私權政策</a> ·
     <a href="/legal/terms" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用條款</a> ·
     <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a> ·
@@ -377,7 +396,8 @@ function renderSitemap(memes, guideSlugs) {
     { loc: `${SITE_ORIGIN}/legal/terms`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
     { loc: `${SITE_ORIGIN}/legal/dmca`, lastmod: TODAY, changefreq: 'yearly', priority: '0.3' },
     { loc: `${SITE_ORIGIN}/sponsor`, lastmod: TODAY, changefreq: 'monthly', priority: '0.5' },
-    { loc: `${SITE_ORIGIN}/meme`, lastmod: TODAY, changefreq: 'daily', priority: '0.9' },
+    { loc: `${SITE_ORIGIN}/about`, lastmod: TODAY, changefreq: 'monthly', priority: '0.6' },
+    { loc: `${SITE_ORIGIN}/contact`, lastmod: TODAY, changefreq: 'monthly', priority: '0.5' },
     { loc: `${SITE_ORIGIN}/guide`, lastmod: TODAY, changefreq: 'monthly', priority: '0.8' },
   ];
 
@@ -388,7 +408,8 @@ function renderSitemap(memes, guideSlugs) {
     priority: slug === 'taiwan-meme' ? '0.9' : '0.7',  // pillar gets higher
   }));
 
-  const memeEntries = memes.map(m => ({
+  // Thin pages (no OCR / description / tags) are noindex, so keep them out.
+  const memeEntries = memes.filter(hasSubstance).map(m => ({
     loc: `${SITE_ORIGIN}/meme/${m.id}`,
     lastmod: m.fetched_at ? new Date(m.fetched_at).toISOString().slice(0, 10) : TODAY,
     changefreq: 'monthly',
@@ -443,6 +464,7 @@ function renderMemeIndexPage(memes) {
 <title>所有迷因索引 — TWmeme</title>
 <meta name="description" content="TWmeme 收錄的所有台灣繁中迷因梗圖索引、依發文時間倒序排列。每張可點進詳細頁複製連結或下載原圖。">
 <link rel="canonical" href="${SITE_ORIGIN}/meme">
+<meta name="robots" content="noindex,follow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="所有迷因索引 — TWmeme">
 <meta property="og:description" content="TWmeme 收錄的所有台灣繁中迷因、依發文時間排列。">
@@ -479,6 +501,8 @@ ${itemsHtml}
 <footer class="site-footer">
   <div style="margin-bottom: var(--s-xs);">
     <a href="/guide" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用指南</a> ·
+    <a href="/about" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">關於我們</a> ·
+    <a href="/contact" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">聯絡我們</a> ·
     <a href="/legal/privacy" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">隱私權政策</a> ·
     <a href="/legal/terms" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用條款</a> ·
     <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a> ·
@@ -562,15 +586,16 @@ async function main() {
   const sql = neon(NEON_URL);
 
   console.log('[ssg] fetching memes (limit ' + MEME_LIMIT + ')...');
-  const memes = await sql`
+  const memes = await sql(`
     SELECT id, title, cached_url, media_url, media_type, platform,
            source_url, width, height, like_count, share_count, comment_count,
            fetched_at, ocr_text, description, tags
     FROM public.memes
+    WHERE ${SAFE_WHERE}
     ORDER BY fetched_at DESC
     LIMIT ${MEME_LIMIT}
-  `;
-  console.log('[ssg] loaded ' + memes.length + ' memes');
+  `, [EXCLUDE_TITLE_RE]);
+  console.log('[ssg] loaded ' + memes.length + ' memes (' + memes.filter(hasSubstance).length + ' indexable)');
 
   if (memes.length === 0) {
     console.error('[ssg] FATAL: 0 memes returned from DB — refusing to wipe /meme/');
@@ -625,7 +650,7 @@ async function main() {
     let indexHtml = await readFile(indexHtmlPath, 'utf-8');
 
     // Update hero subtitle with real meme count
-    const countRes = await sql`SELECT count(*) FROM public.memes`;
+    const countRes = await sql(`SELECT count(*) FROM public.memes WHERE ${SAFE_WHERE}`, [EXCLUDE_TITLE_RE]);
     const totalCount = Number(countRes[0]?.count || memes.length);
     const countStr = totalCount.toLocaleString('en');
     const countText = `早期版本、目前收錄 ${countStr} 張迷因梗圖。搜不到的告訴我們、會補上。`;
@@ -659,28 +684,35 @@ async function main() {
       return html.replace(regex, () => `<!-- SSG:${gridId}:START -->\n${cards}\n    <!-- SSG:${gridId}:END -->`);
     };
 
-    // 🔥 本週熱門 (last 7 days, by popularity)
-    const weeklyRows = await sql`
-      SELECT * FROM public.memes
-      WHERE fetched_at > now() - interval '7 days'
-      ORDER BY like_count DESC, comment_count DESC
-      LIMIT 8`;
+    // 🔥 近期熱門 (widen the window when the latest scrape is stale, so the
+    // section is never empty)
+    let weeklyRows = [];
+    for (const days of [7, 30, 90]) {
+      weeklyRows = await sql(`
+        SELECT * FROM public.memes
+        WHERE ${SAFE_WHERE} AND fetched_at > now() - interval '${days} days'
+        ORDER BY like_count DESC, comment_count DESC
+        LIMIT 8`, [EXCLUDE_TITLE_RE]);
+      if (weeklyRows.length >= 8) break;
+    }
     indexHtml = injectGrid(indexHtml, 'weekly-hot-grid', weeklyRows);
     console.log(`[ssg] injected ${weeklyRows.length} weekly hot memes`);
 
     // 👀 最多人氣 (all-time, by likes)
-    const popularRows = await sql`
+    const popularRows = await sql(`
       SELECT * FROM public.memes
+      WHERE ${SAFE_WHERE}
       ORDER BY like_count DESC, comment_count DESC
-      LIMIT 8`;
+      LIMIT 8`, [EXCLUDE_TITLE_RE]);
     indexHtml = injectGrid(indexHtml, 'popular-grid', popularRows);
     console.log(`[ssg] injected ${popularRows.length} popular memes`);
 
     // 🆕 最新上架 (newest first)
-    const latestRows = await sql`
+    const latestRows = await sql(`
       SELECT * FROM public.memes
+      WHERE ${SAFE_WHERE}
       ORDER BY fetched_at DESC
-      LIMIT 8`;
+      LIMIT 8`, [EXCLUDE_TITLE_RE]);
     indexHtml = injectGrid(indexHtml, 'latest-grid', latestRows);
     console.log(`[ssg] injected ${latestRows.length} latest memes`);
 
@@ -693,7 +725,7 @@ async function main() {
   console.log('[ssg] done.');
   console.log('  /meme/<uuid>.html × ' + memes.length);
   console.log('  /meme/index.html');
-  console.log('  /sitemap.xml (' + (memes.length + 4 + guideSlugs.length) + ' urls)');
+  console.log('  /sitemap.xml (' + (memes.filter(hasSubstance).length + 8 + guideSlugs.length) + ' urls)');
   console.log('  /meme.js');
   console.log('  /index.html (updated statically)');
 }

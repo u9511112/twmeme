@@ -74,10 +74,14 @@ class PTTScraper(BaseScraper):
         self, session: aiohttp.ClientSession, url: str, board: str
     ) -> tuple[list[dict], str | None]:
         async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as r:
+            if r.status != 200:
+                raise RuntimeError(f"HTTP {r.status} for {url}")
             html = await r.text()
 
         soup = BeautifulSoup(html, "html.parser")
         items: list[dict] = []
+        if not soup.select(".r-ent"):
+            logger.warning(f"PTT/{board}: no .r-ent rows parsed from {url} (blocked or layout changed?)")
 
         # Find "previous page" link
         prev_url: str | None = None

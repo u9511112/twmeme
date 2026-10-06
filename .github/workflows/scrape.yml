@@ -61,6 +61,7 @@ jobs:
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
           BACKFILL_LIMIT: '250'
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           doppler run -- python scripts/backfill_gemini_metadata.py
 

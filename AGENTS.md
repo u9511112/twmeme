@@ -3,7 +3,7 @@
 ## 專案性質
 台灣繁中迷因搜尋網站。「你記得長什麼樣、但搜不到名字的那張」。
 目標：FB / IG / Threads 內容創作者；想用迷因回聊天的人。
-Live：https://twmeme.vercel.app/
+Live：https://tw-meme.com/
 
 ## 架構
 ```
@@ -17,7 +17,7 @@ Python Scraper (patchright stealth + 代理輪替)
     ↓
 Neon Postgres (metadata) + Cloudflare R2 (images)
     ↓
-靜態 Web (web/、Vercel)
+靜態 Web (web/、Cloudflare Pages)
     └─ @neondatabase/serverless HTTP driver、GRANT-restricted web_anon role
 ```
 
@@ -29,7 +29,7 @@ Neon Postgres (metadata) + Cloudflare R2 (images)
 | Object Storage | Cloudflare R2（APAC、public `r2.dev` URL） |
 | Scheduler | GitHub Actions `cron: '0 */4 * * *'` |
 | Web | 純靜態 HTML / CSS / JS + `@neondatabase/serverless` HTTP driver |
-| Hosting | Vercel |
+| Hosting | Cloudflare Pages（GitHub Actions `wrangler pages deploy`） |
 
 ## 歷史包袱
 - 曾經有 Flutter mobile app + FCM trending push、後來收斂為純網頁
@@ -72,3 +72,4 @@ Neon Postgres (metadata) + Cloudflare R2 (images)
 - patchright 沒裝 chromium → scraper 在 Actions 上跑會炸（`python -m patchright install chromium`）
 - 改 schema 動到 `legacy/` migration → 歷史紀錄被破壞、Neon 不會跑這些
 - R2 public URL 改了沒同步 web 端 → 圖全壞
+- 改內容過濾規則（公告 / 成人）要同步改 `scripts/generate_static_pages.mjs` 與 `web/db.js` 兩處 → 否則首頁與搜尋結果不一致

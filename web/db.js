@@ -13,6 +13,11 @@
 const NEON_URL = (typeof window !== "undefined" && (window.TWmeme_NEON_URL || window.NEON_URL))
   || "postgresql://web_anon:eSoHu1pLOwjbDiQQsO6IWt90Pr5G@ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require";
 
+// Content hygiene (AdSense): never surface forum announcements / ban notices /
+// adult or sexually suggestive posts. Keep in sync with scripts/generate_static_pages.mjs.
+const EXCLUDE_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底|色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳';
+const SAFE_SQL = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* '${EXCLUDE_RE}'`;
+
 // Lazy-loaded Neon driver. Resolved on first call; stays cached.
 let _sqlPromise = null;
 function sql() {
@@ -55,11 +60,11 @@ function throttled(key) {
 async function getWeeklyHotMemes(limit = 8) {
   try {
     const s = await sql();
-    const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform
+    const rows = await s(`SELECT id, title, cached_url, media_url, media_type, platform
                          FROM public.memes
-                         WHERE fetched_at > now() - interval '7 days'
+                         WHERE ${SAFE_SQL} AND fetched_at > now() - interval '7 days'
                          ORDER BY like_count DESC, comment_count DESC
-                         LIMIT ${limit}`;
+                         LIMIT $1`, [limit]);
     return rows.length > 0 ? rows : null;
   } catch (e) {
     logErr('weekly hot fetch', e);
@@ -70,10 +75,11 @@ async function getWeeklyHotMemes(limit = 8) {
 async function getPopularMemes(limit = 8) {
   try {
     const s = await sql();
-    const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform
+    const rows = await s(`SELECT id, title, cached_url, media_url, media_type, platform
                          FROM public.memes
+                         WHERE ${SAFE_SQL}
                          ORDER BY like_count DESC, comment_count DESC
-                         LIMIT ${limit}`;
+                         LIMIT $1`, [limit]);
     return rows.length > 0 ? rows : null;
   } catch (e) {
     logErr('popular fetch', e);
@@ -84,10 +90,11 @@ async function getPopularMemes(limit = 8) {
 async function getLatestMemes(limit = 8) {
   try {
     const s = await sql();
-    const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform
+    const rows = await s(`SELECT id, title, cached_url, media_url, media_type, platform
                          FROM public.memes
+                         WHERE ${SAFE_SQL}
                          ORDER BY fetched_at DESC
-                         LIMIT ${limit}`;
+                         LIMIT $1`, [limit]);
     return rows.length > 0 ? rows : null;
   } catch (e) {
     logErr('latest fetch', e);
@@ -98,7 +105,7 @@ async function getLatestMemes(limit = 8) {
 async function getMemeCount() {
   try {
     const s = await sql();
-    const rows = await s`SELECT count(*)::int AS n FROM public.memes`;
+    const rows = await s(`SELECT count(*)::int AS n FROM public.memes WHERE ${SAFE_SQL}`);
     return rows[0]?.n ?? null;
   } catch (e) {
     logErr('getMemeCount', e);
@@ -159,7 +166,7 @@ async function searchMemes(query, filters = {}, limit = 40) {
         SELECT id, title, cached_url, media_url, media_type, platform, trending_score, fetched_at, like_count,
                0 AS sm
         FROM public.memes
-        WHERE 1=1
+        WHERE ${SAFE_SQL}
       `;
       const params = [];
       let paramIdx = 1;
@@ -214,7 +221,7 @@ async function searchMemes(query, filters = {}, limit = 40) {
         SELECT id, title, cached_url, media_url, media_type, platform, trending_score, fetched_at, like_count,
                ${smExpr} AS sm
         FROM public.memes
-        WHERE 1=1
+        WHERE ${SAFE_SQL}
       `;
       
       const tokenConditions = [];

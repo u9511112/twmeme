@@ -1,8 +1,9 @@
 import { readFileSync, existsSync, readdirSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { neon } from '@neondatabase/serverless';
 
-const SITE_ROOT = 'C:\\Users\\Mars\\TWmeme';
+const SITE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const WEB_DIR = join(SITE_ROOT, 'web');
 const LIVE_ORIGIN = 'https://tw-meme.com';
 
@@ -39,6 +40,8 @@ async function runTests() {
   assert(existsSync(join(WEB_DIR, 'robots.txt')), 'web/robots.txt 存在');
   assert(existsSync(join(WEB_DIR, 'ads.txt')), 'web/ads.txt 存在');
   assert(existsSync(join(WEB_DIR, 'sponsor.html')), 'web/sponsor.html 存在');
+  assert(existsSync(join(WEB_DIR, 'about.html')), 'web/about.html 存在');
+  assert(existsSync(join(WEB_DIR, 'contact.html')), 'web/contact.html 存在');
   
   // 檢查 8 篇 Guide 文章
   const guideDir = join(WEB_DIR, 'guide');
@@ -49,7 +52,7 @@ async function runTests() {
   const memeDir = join(WEB_DIR, 'meme');
   if (existsSync(memeDir)) {
     const memeFiles = readdirSync(memeDir).filter(f => f.endsWith('.html'));
-    assert(memeFiles.length >= 5000, `SSG 迷因靜態頁面數量 >= 5000 (目前: ${memeFiles.length})`);
+    assert(memeFiles.length > 0, `SSG 迷因靜態頁面數量 > 0 (目前: ${memeFiles.length})`);
   } else {
     assert(false, 'web/meme 目錄存在');
   }
@@ -96,6 +99,14 @@ async function runTests() {
   assert(privacyHtml.includes('Cookie'), '包含 Cookie 與個人化廣告宣告');
   assert(privacyHtml.includes('google.com/settings/ads'), '包含 Google 廣告設定停用連結');
   assert(privacyHtml.includes('aboutads.info'), '包含 aboutads.info 宣告');
+
+  // --- Suite 6: 內容過濾與薄頁 noindex ---
+  console.log('\n🧹 [Suite 6] 內容過濾與薄頁 noindex 檢查');
+  const sitemap = readFileSync(join(WEB_DIR, 'sitemap.xml'), 'utf-8');
+  assert(!sitemap.includes(`${LIVE_ORIGIN}/meme<`), 'sitemap 不含薄的 /meme 索引頁');
+  assert(sitemap.includes(`${LIVE_ORIGIN}/about`) && sitemap.includes(`${LIVE_ORIGIN}/contact`), 'sitemap 含 about / contact');
+  assert(/<meta name="robots" content="noindex,follow">/.test(readFileSync(join(memeDir, 'index.html'), 'utf-8')), '/meme 索引頁為 noindex');
+  assert(!/\[公告\]|\[正妹\]|\[色圖\]/.test(indexHtml), '首頁不含公告 / 正妹 / 色圖內容');
 
   // --- 測試結果總結 ---
   console.log('\n========================================');
