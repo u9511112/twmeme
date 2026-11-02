@@ -234,7 +234,7 @@ function renderMemePage(meme, related) {
 
   return `<!DOCTYPE html>
 <html lang="zh-Hant">
-<head>
+<head><script async src="https://www.googletagmanager.com/gtag/js?id=G-SKYSXNP5M1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-SKYSXNP5M1');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${escapeHtml(title)} — TWmeme 迷因</title>
@@ -458,7 +458,7 @@ function renderMemeIndexPage(memes) {
 
   return `<!DOCTYPE html>
 <html lang="zh-Hant">
-<head>
+<head><script async src="https://www.googletagmanager.com/gtag/js?id=G-SKYSXNP5M1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-SKYSXNP5M1');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>所有迷因索引 — TWmeme</title>
