@@ -27,7 +27,9 @@ from pipeline.uploader import _get_pool
 
 # Cap on how many items to process in one run (configurable via BACKFILL_LIMIT env var)
 BACKFILL_LIMIT = int(os.getenv("BACKFILL_LIMIT", "250"))
-FETCH_TIMEOUT = aiohttp.ClientTimeout(total=30)
+SHARDS = int(os.getenv("BACKFILL_SHARDS", "1"))  # run N processes in parallel, each with its own BACKFILL_SHARD=0..N-1
+SHARD = int(os.getenv("BACKFILL_SHARD", "0"))
+FETCH_TIMEOUT =aiohttp.ClientTimeout(total=30)
 REQUEST_DELAY_SEC = float(os.getenv("GEMINI_DELAY_SEC", "2.5"))  # 30 RPM ceiling -> 2.5s = 24 RPM safe
 
 async def apply_migration_002(conn):
@@ -77,11 +79,11 @@ async def main():
             """
             SELECT id, cached_url, media_url, title
             FROM public.memes
-            WHERE ocr_text IS NULL
+            WHERE ocr_text IS NULL AND abs(hashtext(id::text)) % $2 = $3
             ORDER BY (cached_url IS NOT NULL) DESC, fetched_at DESC
             LIMIT $1
             """,
-            BACKFILL_LIMIT
+            BACKFILL_LIMIT, SHARDS, SHARD
         )
         
     total_found = len(rows)
@@ -113,13 +115,13 @@ async def main():
                 
             # Analyze via Gemini with resilience against 429/timeouts
             logger.info("  → Calling Gemini API for image analysis...")
-            try:
-                ai_meta = await analyze_meme_image(img_bytes)
-            except Exception as e:
-                logger.error(f"  → Gemini API exception: {e}. Cooling down 10s...")
-                await asyncio.sleep(10.0)
-                failed += 1
-                continue
+            while True:  # quota errors: wait and retry the same meme (RPM resets in ~1 min, RPD at midnight PT)
+                try:
+                    ai_meta = await analyze_meme_image(img_bytes, raise_on_quota=True)
+                    break
+                except Exception as e:
+                    logger.error(f"  → Gemini quota exhausted: {str(e)[:80]}. Waiting 60s...")
+                    await asyncio.sleep(60.0)
             
             ocr_text = ai_meta.get("ocr_text")
             description = ai_meta.get("description")
@@ -149,11 +151,12 @@ async def main():
                         SET ocr_text = $1, description = $2, tags = $3
                         WHERE id = $4
                         """,
-                        ocr_text, description, tags, meme_id
+                        ocr_text or "", description, tags, meme_id
                     )
                 success += 1
                 logger.info(f"  → Success [{success}/{i}]: OCR='{ocr_text[:30] if ocr_text else None}', Description='{description[:30] if description else None}', Tags={tags}")
             else:
+                # Quota errors raise above and are retried; empty here is a permanent miss (blocked / not an image).
                 logger.warning("  → Gemini returned empty metadata. Marking as processed.")
                 async with pool.acquire() as conn:
                     await conn.execute("UPDATE public.memes SET ocr_text = '', description = '' WHERE id = $1", meme_id)

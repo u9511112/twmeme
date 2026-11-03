@@ -12,12 +12,15 @@ Features:
 """
 
 import asyncio
+import base64
 import io
 import json
 import logging
 import os
 import random
 import re
+import urllib.error
+import urllib.request
 
 import google.genai as genai
 from google.genai.types import Part
@@ -217,16 +220,41 @@ def _setup_gemini():
         return
     _gemini_configured = True
 
-async def analyze_meme_image(image_bytes: bytes) -> dict:
+def _zhipu_text(img_bytes: bytes, prompt: str) -> str:
+    """OpenAI-compatible vision call to Zhipu (VISION_PROVIDER=zhipu). 429 is mapped to the quota error."""
+    body = {
+        "model": os.getenv("ZHIPU_MODEL", "glm-4.6v-flash"),
+        "max_tokens": 600,
+        "messages": [{"role": "user", "content": [
+            {"type": "text", "text": prompt},
+            {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(img_bytes).decode()}},
+        ]}],
+    }
+    req = urllib.request.Request(
+        "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        json.dumps(body).encode(),
+        {"Content-Type": "application/json", "Authorization": "Bearer " + os.environ["ZHIPU_API_KEY"]},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=90) as r:
+            return json.loads(r.read())["choices"][0]["message"]["content"]
+    except urllib.error.HTTPError as e:
+        if e.code == 429:
+            raise RuntimeError("RESOURCE_EXHAUSTED (zhipu 429)") from e
+        raise
+
+
+async def analyze_meme_image(image_bytes: bytes, raise_on_quota: bool = False) -> dict:
+    use_zhipu = os.getenv("VISION_PROVIDER") == "zhipu"
     _setup_gemini()
-    if not _gemini_configured:
+    if not use_zhipu and not _gemini_configured:
         return {"ocr_text": None, "description": None, "tags": []}
 
     try:
         img = Image.open(io.BytesIO(image_bytes))
         
         api_key = os.getenv("GEMINI_API_KEY")
-        client = genai.Client(api_key=api_key)
+        client = None if use_zhipu else genai.Client(api_key=api_key)
         
         prompt = (
             "你是一隻專門分析繁體中文迷因（Meme）梗圖的 AI 專家。\n"
@@ -244,18 +272,20 @@ async def analyze_meme_image(image_bytes: bytes) -> dict:
         img_bytes_for_api = buf.getvalue()
         
         loop = asyncio.get_running_loop()
-        response = await loop.run_in_executor(
-            None,
-            lambda: client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=[
-                    prompt,
-                    Part.from_bytes(data=img_bytes_for_api, mime_type="image/jpeg")
-                ]
+        if use_zhipu:
+            text = (await loop.run_in_executor(None, _zhipu_text, img_bytes_for_api, prompt)).strip()
+        else:
+            response = await loop.run_in_executor(
+                None,
+                lambda: client.models.generate_content(
+                    model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+                    contents=[
+                        prompt,
+                        Part.from_bytes(data=img_bytes_for_api, mime_type="image/jpeg")
+                    ]
+                )
             )
-        )
-        
-        text = response.text.strip()
+            text = response.text.strip()
         
         if text.startswith("```"):
             text = re.sub(r"^```(?:json)?\n", "", text)
@@ -270,5 +300,7 @@ async def analyze_meme_image(image_bytes: bytes) -> dict:
         }
     except Exception as e:
         logger.error(f"[Gemini] Failed to analyze image: {e}")
+        if raise_on_quota and "RESOURCE_EXHAUSTED" in str(e):
+            raise
         return {"ocr_text": None, "description": None, "tags": []}
 
