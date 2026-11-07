@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/generate_static_pages.mjs"
+    "build": "node scripts/generate_static_pages.mjs",
+    "build:adult": "node scripts/generate_adult_site.mjs"
   },
   "repository": {
     "type": "git",

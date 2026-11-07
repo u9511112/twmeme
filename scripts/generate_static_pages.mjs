@@ -46,7 +46,7 @@ const RELATED_COUNT = 12;
 // sexually suggestive posts out of every public surface (pages, sitemap, home).
 // Keep EXCLUDE_TITLE_RE in sync with EXCLUDE_RE in web/db.js.
 const EXCLUDE_TITLE_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底|色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳';
-const SAFE_WHERE = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* $1`;
+const SAFE_WHERE = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* $1 AND NOT ('18+' = ANY(COALESCE(tags, '{}')))`;
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const PLATFORM_LABEL = {
