@@ -29,6 +29,7 @@ from pipeline.uploader import _get_pool
 BACKFILL_LIMIT = int(os.getenv("BACKFILL_LIMIT", "250"))
 SHARDS = int(os.getenv("BACKFILL_SHARDS", "1"))  # run N processes in parallel, each with its own BACKFILL_SHARD=0..N-1
 SHARD = int(os.getenv("BACKFILL_SHARD", "0"))
+MAX_QUOTA_WAITS = int(os.getenv("BACKFILL_MAX_QUOTA_WAITS", "3"))
 FETCH_TIMEOUT =aiohttp.ClientTimeout(total=30)
 REQUEST_DELAY_SEC = float(os.getenv("GEMINI_DELAY_SEC", "2.5"))  # 30 RPM ceiling -> 2.5s = 24 RPM safe
 
@@ -115,14 +116,21 @@ async def main():
                 
             # Analyze via Gemini with resilience against 429/timeouts
             logger.info("  → Calling Gemini API for image analysis...")
+            quota_waits = 0
             while True:  # quota errors: wait and retry the same meme (RPM resets in ~1 min, RPD at midnight PT)
                 try:
                     ai_meta = await analyze_meme_image(img_bytes, raise_on_quota=True)
                     break
                 except Exception as e:
+                    quota_waits += 1
+                    if quota_waits > MAX_QUOTA_WAITS:  # daily cap: give up so CI proceeds to build/deploy
+                        break
                     logger.error(f"  → Gemini quota exhausted: {str(e)[:80]}. Waiting 60s...")
                     await asyncio.sleep(60.0)
-            
+            if quota_waits > MAX_QUOTA_WAITS:
+                logger.warning("  → Quota still exhausted; stopping backfill, remaining memes retry next run.")
+                break
+
             ocr_text = ai_meta.get("ocr_text")
             description = ai_meta.get("description")
             tags = ai_meta.get("tags")
