@@ -77,10 +77,10 @@ const FOOT = `<footer class="adult-foot age-content">
 </body></html>
 `;
 
-const card = (m) => `<a href="/meme/${m.id}.html"><img src="${esc(img(m))}" alt="${esc(m.title)}" loading="lazy"></a>`;
+const card = (m) => `<a href="/meme/${m.id}"><img src="${esc(img(m))}" alt="${esc(m.title)}" loading="lazy"></a>`;
 
 function memePage(m, related) {
-  const url = `${ORIGIN}/meme/${m.id}.html`;
+  const url = `${ORIGIN}/meme/${m.id}`;
   const title = String(m.title || '迷因').trim();
   const desc = (m.description || title).slice(0, 160);
   const tags = tagsOf(m);
@@ -103,7 +103,7 @@ const indexPage = (memes) => HEAD('TWmeme 成人區', 'TWmeme 成人向迷因圖
 const sitemap = (memes) => `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>${ORIGIN}/</loc></url>
-${memes.map(m => `<url><loc>${ORIGIN}/meme/${m.id}.html</loc></url>`).join('\n')}
+${memes.map(m => `<url><loc>${ORIGIN}/meme/${m.id}</loc></url>`).join('\n')}
 </urlset>
 `;
 
