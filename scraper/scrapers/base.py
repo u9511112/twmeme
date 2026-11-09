@@ -27,7 +27,6 @@ from google.genai.types import Part
 from PIL import Image
 from fake_useragent import UserAgent
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from apify_client import ApifyClient
 
 try:
     from patchright.async_api import async_playwright
@@ -172,6 +171,7 @@ class ApifyBaseScraper(BaseScraper):
         self.api_key = os.getenv("APIFY_API_KEY")
         if not self.api_key:
             raise ValueError("APIFY_API_KEY environment variable is not set")
+        from apify_client import ApifyClient  # lazy: only IG/Threads need it; its impit DLL is blocked by Windows App Control here
         self.client = ApifyClient(self.api_key)
 
     def check_apify_budget_safe(self) -> bool:
@@ -244,17 +244,37 @@ def _zhipu_text(img_bytes: bytes, prompt: str) -> str:
         raise
 
 
+def _ollama_text(img_bytes: bytes, prompt: str) -> str:
+    body = {
+        "model": os.getenv("OLLAMA_MODEL", "qwen3-vl:8b-instruct"),
+        "stream": False,
+        "format": "json",
+        "messages": [{"role": "user", "content": prompt, "images": [base64.b64encode(img_bytes).decode()]}],
+    }
+    req = urllib.request.Request(
+        os.getenv("OLLAMA_URL", "http://localhost:11434") + "/api/chat",
+        json.dumps(body).encode(),
+        {"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=300) as r:
+            return json.loads(r.read())["message"]["content"]
+    except OSError as e:  # ponytail: reuse the quota path so an offline Ollama stops the run instead of marking rows as skipped
+        raise RuntimeError(f"RESOURCE_EXHAUSTED (ollama unavailable: {e})") from e
+
+
 async def analyze_meme_image(image_bytes: bytes, raise_on_quota: bool = False) -> dict:
     use_zhipu = os.getenv("VISION_PROVIDER") == "zhipu"
+    use_ollama = os.getenv("VISION_PROVIDER") == "ollama"
     _setup_gemini()
-    if not use_zhipu and not _gemini_configured:
+    if not (use_zhipu or use_ollama) and not _gemini_configured:
         return {"ocr_text": None, "description": None, "tags": []}
 
     try:
         img = Image.open(io.BytesIO(image_bytes))
         
         api_key = os.getenv("GEMINI_API_KEY")
-        client = None if use_zhipu else genai.Client(api_key=api_key)
+        client = None if (use_zhipu or use_ollama) else genai.Client(api_key=api_key)
         
         prompt = (
             "你是一隻專門分析繁體中文迷因（Meme）梗圖的 AI 專家。\n"
@@ -262,7 +282,8 @@ async def analyze_meme_image(image_bytes: bytes, raise_on_quota: bool = False) -
             "{\n"
             "  \"ocr_text\": \"圖片中出現的所有繁體中文對白、台詞或文字。如果沒有文字，請填 null。\",\n"
             "  \"description\": \"簡短描述這張圖片的視覺畫面（例如：一隻戴著墨鏡露出驚訝表情的柴犬）。\",\n"
-            "  \"tags\": [\"5個繁體中文的關聯標籤，包含情緒、物件、或迷因名稱，例如：傻眼、貓咪、反應圖\"]\n"
+            "  \"tags\": [\"5個繁體中文的關聯標籤，包含情緒、物件、或迷因名稱，例如：傻眼、貓咪、反應圖\"],\n"
+            "  \"minor_risk\": \"若圖中任何真人或角色看起來未滿 18 歲（含動漫幼齡外觀）填 true，否則填 false。\"\n"
             "}"
         )
         
@@ -272,7 +293,9 @@ async def analyze_meme_image(image_bytes: bytes, raise_on_quota: bool = False) -
         img_bytes_for_api = buf.getvalue()
         
         loop = asyncio.get_running_loop()
-        if use_zhipu:
+        if use_ollama:
+            text = (await loop.run_in_executor(None, _ollama_text, img_bytes_for_api, prompt)).strip()
+        elif use_zhipu:
             text = (await loop.run_in_executor(None, _zhipu_text, img_bytes_for_api, prompt)).strip()
         else:
             response = await loop.run_in_executor(
@@ -296,7 +319,8 @@ async def analyze_meme_image(image_bytes: bytes, raise_on_quota: bool = False) -
         return {
             "ocr_text": data.get("ocr_text"),
             "description": data.get("description"),
-            "tags": data.get("tags") if isinstance(data.get("tags"), list) else []
+            "tags": data.get("tags") if isinstance(data.get("tags"), list) else [],
+            "minor_risk": data.get("minor_risk") in (True, "true", "True"),
         }
     except Exception as e:
         logger.error(f"[Gemini] Failed to analyze image: {e}")

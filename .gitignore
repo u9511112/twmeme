@@ -51,3 +51,4 @@ web/meme.js
 web/sitemap.xml
 web-adult/
 scraper/scrape_local.log
+scraper/pipeline.log

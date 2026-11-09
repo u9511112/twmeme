@@ -68,7 +68,7 @@ async def main():
     if not db_url:
         logger.error("NEON_DATABASE_URL not set in environment.")
         return
-    if not gemini_key:
+    if not gemini_key and os.getenv("VISION_PROVIDER") != "ollama":
         logger.error("GEMINI_API_KEY not set in environment.")
         return
 
@@ -150,6 +150,10 @@ async def main():
             elif not isinstance(tags, list):
                 tags = []
             
+            if ai_meta.get("minor_risk"):  # looks under 18: store empty text so the page never gets published
+                ocr_text = description = None
+                tags = []
+
             if ocr_text or description:
                 # Update database
                 async with pool.acquire() as conn:
