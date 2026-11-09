@@ -42,6 +42,7 @@ const HEAD = (title, desc, canonical) => `<!DOCTYPE html>
 <link rel="canonical" href="${esc(canonical)}">
 <meta name="rating" content="adult">
 <meta name="RATING" content="RTA-5042-1996-1400-1577-RTA">
+<meta name="juicyads-site-verification" content="acf7cba738c3a75a496c84949863b731">
 <link rel="stylesheet" href="/styles.css">
 <style>
 html:not(.age-ok) .age-content{display:none}
