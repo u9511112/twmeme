@@ -65,7 +65,7 @@ html.age-ok #age-gate{display:none}
   <div class="box">
     <h1>🔞 成人內容</h1>
     <p>本區含成人向圖片，僅限年滿 18 歲者瀏覽。<br>若你未滿 18 歲，或所在地區禁止瀏覽此類內容，請離開。</p>
-    <button class="yes" onclick="try{localStorage.setItem('tw_adult_ok','1')}catch(e){};document.documentElement.classList.add('age-ok')">我已年滿 18 歲，進入</button>
+    <button class="yes" onclick="try{localStorage.setItem('tw_adult_ok','1')}catch(e){};document.documentElement.classList.add('age-ok');window.jaLoad&&jaLoad()">我已年滿 18 歲，進入</button>
     <a class="no" href="${MAIN}/">離開</a>
   </div>
 </div>
@@ -76,6 +76,19 @@ const FOOT = `<footer class="adult-foot age-content">
   <br><a href="/about">關於</a> · <a href="/terms">使用條款</a> · <a href="/privacy">隱私權政策</a> · <a href="/dmca">著作權與移除申請</a> · <a href="/contact">聯絡我們</a>
   · <a href="${MAIN}/">TWmeme 主站</a>
 </footer>
+<script>
+// JuicyAds: one banner per page, only after the age gate is passed. Wide screens get 300x250, narrow 300x100.
+function jaLoad(){
+  var s=document.querySelector('.ja-slot');
+  if(!s||window.__ja||!document.documentElement.classList.contains('age-ok'))return;
+  window.__ja=1;
+  var z=matchMedia('(min-width:768px)').matches?[1131483,300,250]:[1131482,300,100];
+  s.innerHTML='<ins id="'+z[0]+'" data-width="'+z[1]+'" data-height="'+z[2]+'"></ins>';
+  var j=document.createElement('script');j.async=true;j.src='https://poweredby.jads.co/js/jads.js';j.setAttribute('data-cfasync','false');document.head.appendChild(j);
+  (window.adsbyjuicy=window.adsbyjuicy||[]).push({adzone:z[0]});
+}
+jaLoad();
+</script>
 </body></html>
 `;
 
@@ -94,7 +107,7 @@ const PAGES = {
   privacy: ['隱私權政策', `<p>最後更新：2026 年 11 月</p>
 <h2>我們蒐集什麼</h2><p>本站不要求註冊，不蒐集姓名、電子郵件等個人資料。您按下「我已年滿 18 歲」後，瀏覽器會在本機儲存一個年齡確認標記（localStorage），僅用於避免重複詢問，不會傳送給我們。</p>
 <h2>伺服器紀錄</h2><p>本站由 Cloudflare 提供服務，Cloudflare 可能記錄 IP 位址與請求資訊以提供安全與效能功能，詳見其隱私權政策。</p>
-<h2>廣告</h2><p>本站日後可能放置第三方成人廣告，廣告商可能使用 Cookie 投放與衡量廣告，其處理方式依各廣告商政策。您可透過瀏覽器設定管理 Cookie。</p>
+<h2>廣告</h2><p>本站放置第三方成人廣告（JuicyAds），廣告商可能使用 Cookie 投放與衡量廣告，其處理方式依各廣告商政策。您可透過瀏覽器設定管理 Cookie。</p>
 <h2>您的權利</h2><p>如需詢問或要求刪除與您有關的內容，請見 <a href="/dmca">移除申請</a> 或寄信至 <a href="mailto:${MAIL}">${MAIL}</a>。</p>`],
   dmca: ['著作權與移除申請', `<p>我們尊重智慧財產權與個人隱私。以下情況可申請移除：</p>
 <ul><li>您是著作權人或其授權代理人，認為本站內容侵害您的著作權。</li><li>您是圖片中的人物，且未同意被公開。</li><li>內容涉及或疑似涉及未成年人，或為未經同意散布的私密影像。</li></ul>
@@ -124,6 +137,7 @@ function memePage(m, related) {
   ${m.ocr_text ? `<blockquote>${esc(m.ocr_text)}</blockquote>` : ''}
   ${m.description ? `<p>${esc(m.description)}</p>` : ''}
   ${tags.length ? `<p>${tags.map(t => `#${esc(t)}`).join(' ')}</p>` : ''}
+  <div class="ja-slot" style="text-align:center;margin:16px 0"></div>
   <h2>更多</h2>
   <div class="adult-grid" style="padding:0">${related.filter(r => r.id !== m.id).slice(0, 12).map(card).join('')}</div>
   <p><a href="/">← 成人區首頁</a></p>
@@ -132,7 +146,7 @@ function memePage(m, related) {
 }
 
 const indexPage = (memes) => HEAD('TWmeme 成人區', 'TWmeme 成人向迷因圖區，限 18 歲以上瀏覽。', ORIGIN + '/') +
-  `<main class="age-content"><h1 style="padding:16px 16px 0">TWmeme 成人區</h1><div class="adult-grid">${memes.slice(0, INDEX_COUNT).map(card).join('')}</div></main>\n` + FOOT;
+  `<main class="age-content"><h1 style="padding:16px 16px 0">TWmeme 成人區</h1><div class="ja-slot" style="text-align:center;margin:12px 0"></div><div class="adult-grid">${memes.slice(0, INDEX_COUNT).map(card).join('')}</div></main>\n` + FOOT;
 
 const sitemap = (memes) => `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
