@@ -24,6 +24,8 @@ const INDEX_COUNT = 200;
 
 const ADULT_RE = '色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳';
 const NOT_ADULT_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底';
+// Only anime-board drawings are listed (no real-person photos), and anything hinting at minors is dropped.
+const MINOR_RE = '少女|學生|國中|高中|小學|未成年|蘿莉|loli|幼|童|JK|制服|校服|萌妹|正太|兒童|小孩';
 const SUBSTANCE = process.env.ADULT_TEST ? 'TRUE'
   : `(COALESCE(ocr_text,'') <> '' OR COALESCE(description,'') <> '' OR COALESCE(array_length(tags,1),0) > 0)`;
 
@@ -165,11 +167,14 @@ const sql = neon(NEON_URL);
 const memes = await sql(`
   SELECT id, title, cached_url, media_url, ocr_text, description, tags, fetched_at
   FROM public.memes
-  WHERE (COALESCE(source_url,'') LIKE '%/bbs/Beauty/%' OR COALESCE(title,'') ~* $1 OR '18+' = ANY(COALESCE(tags,'{}')))
+  WHERE COALESCE(source_url,'') LIKE '%/bbs/C_Chat/%'
+    AND (COALESCE(title,'') ~* $1 OR '18+' = ANY(COALESCE(tags,'{}')))
     AND COALESCE(title,'') !~* $2
+    AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* $3
+    AND NOT ('hide-adult' = ANY(COALESCE(tags,'{}')))
     AND ${SUBSTANCE}
   ORDER BY fetched_at DESC
-  LIMIT ${LIMIT}`, [ADULT_RE, NOT_ADULT_RE]);
+  LIMIT ${LIMIT}`, [ADULT_RE, NOT_ADULT_RE, MINOR_RE]);
 console.log('[adult] ' + memes.length + ' pages');
 if (memes.length === 0) { console.error('[adult] nothing to build — import AI results first'); process.exit(1); }
 

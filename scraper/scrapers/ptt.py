@@ -19,7 +19,8 @@ from .base import BaseScraper
 logger = logging.getLogger(__name__)
 
 PTT_BASE    = "https://www.ptt.cc"
-PTT_BOARDS  = ["Beauty", "Memes", "funny", "joke", "StupidClown", "C_Chat"]
+# Beauty (real-person photos, no consent) is intentionally not scraped.
+PTT_BOARDS  = ["Memes", "funny", "joke", "StupidClown", "C_Chat"]
 
 # Image/video URL patterns found in PTT posts
 IMG_PATTERN  = re.compile(r"\.(jpg|jpeg|png|gif|webp)$", re.I)
