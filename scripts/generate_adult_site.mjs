@@ -43,6 +43,7 @@ const HEAD = (title, desc, canonical) => `<!DOCTYPE html>
 <meta name="rating" content="adult">
 <meta name="RATING" content="RTA-5042-1996-1400-1577-RTA">
 <meta name="juicyads-site-verification" content="acf7cba738c3a75a496c84949863b731">
+<meta name="6a97888e-site-verification" content="419bd8f87cf17a28420be1cffdca2c38">
 <link rel="stylesheet" href="/styles.css">
 <style>
 html:not(.age-ok) .age-content{display:none}
@@ -86,6 +87,10 @@ function jaLoad(){
   s.innerHTML='<ins id="'+z[0]+'" data-width="'+z[1]+'" data-height="'+z[2]+'"></ins>';
   var j=document.createElement('script');j.async=true;j.src='https://poweredby.jads.co/js/jads.js';j.setAttribute('data-cfasync','false');document.head.appendChild(j);
   (window.adsbyjuicy=window.adsbyjuicy||[]).push({adzone:z[0]});
+  // ExoClick 300x250 zone, stacked under the JuicyAds banner.
+  var e=document.createElement('div');e.style.marginTop='12px';e.innerHTML='<ins class="eas6a97888e2" data-zoneid="6084128"></ins>';s.appendChild(e);
+  var x=document.createElement('script');x.async=true;x.src='https://a.magsrv.com/ad-provider.js';document.head.appendChild(x);
+  (window.AdProvider=window.AdProvider||[]).push({serve:{}});
 }
 jaLoad();
 </script>
