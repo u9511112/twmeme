@@ -1,7 +1,7 @@
 # TWmeme/scraper — Subdirectory Instructions for Codex
 
 ## 角色
-Python scraper、跑 PTT / Dcard、抓圖去重後寫進 Neon + R2。GitHub Actions cron 每 4 小時跑。
+Python scraper、跑 PTT / Dcard、抓圖去重後寫進 Neon + R2。GitHub Actions cron 每 3 天跑；PTT 另由本機排程每日 04:00 跑（GitHub IP 被 403）。
 
 ## Stack
 - Python 3.12

@@ -7,7 +7,7 @@ Live：https://tw-meme.com/
 
 ## 架構
 ```
-GitHub Actions (cron 每 4 小時)
+GitHub Actions (cron 每 3 天；PTT 改由本機排程每日 04:00 跑)
     ↓
 Python Scraper (patchright stealth + 代理輪替)
     ├─ PTT / Dcard
@@ -27,7 +27,7 @@ Neon Postgres (metadata) + Cloudflare R2 (images)
 | Scraper | Python 3.12 / patchright / aiohttp / imagehash / asyncpg / boto3 |
 | Database | Neon Postgres 17（Singapore） |
 | Object Storage | Cloudflare R2（APAC、public `r2.dev` URL） |
-| Scheduler | GitHub Actions `cron: '0 */4 * * *'` |
+| Scheduler | GitHub Actions `cron: '0 0 */3 * *'` + 本機 Windows 排程 `TWmeme-Scrape-PTT` |
 | Web | 純靜態 HTML / CSS / JS + `@neondatabase/serverless` HTTP driver |
 | Hosting | Cloudflare Pages（GitHub Actions `wrangler pages deploy`） |
 
@@ -63,7 +63,7 @@ Neon Postgres (metadata) + Cloudflare R2 (images)
 - Public Development URL：`https://pub-xxxx.r2.dev`（**不要關**，web 直接讀）
 
 ## Cron Schedule
-- GitHub Actions：每 4 小時跑 scraper
+- GitHub Actions：每 3 天跑 scraper（PTT/Dcard 在 GitHub IP 會 403，PTT 改由本機每日 04:00 排程跑）
 - 跑前確認代理還活著（爬蟲被 ban 的常見原因）
 
 ## 常見陷阱
