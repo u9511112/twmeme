@@ -259,6 +259,10 @@ def _ollama_text(img_bytes: bytes, prompt: str) -> str:
     try:
         with urllib.request.urlopen(req, timeout=300) as r:
             return json.loads(r.read())["message"]["content"]
+    except urllib.error.HTTPError as e:
+        if 400 <= e.code < 500:  # Ollama rejected this one image (bad format/size): a permanent miss, don't retry or stop the run
+            raise ValueError(f"ollama rejected image: HTTP {e.code}") from e
+        raise RuntimeError(f"RESOURCE_EXHAUSTED (ollama error: {e})") from e
     except OSError as e:  # ponytail: reuse the quota path so an offline Ollama stops the run instead of marking rows as skipped
         raise RuntimeError(f"RESOURCE_EXHAUSTED (ollama unavailable: {e})") from e
 
