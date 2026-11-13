@@ -571,6 +571,7 @@ function renderMemeJs() {
     var btn = e.target.closest('[data-action]');
     if (!btn) return;
     var action = btn.dataset.action;
+    if (window.gtag) gtag('event', 'meme_' + action, { meme_title: btn.dataset.title || '' }); // GA4 關鍵事件
     if (action === 'copy') onCopy(btn);
     else if (action === 'download') onDownload(btn);
     else if (action === 'share') onShare(btn);
