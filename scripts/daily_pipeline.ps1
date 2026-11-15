@@ -21,6 +21,6 @@ Soft 'ai text (ollama)' { Push-Location scraper; & $py scripts\backfill_gemini_m
 
 Step 'build main' { npm run build }
 Step 'build adult' { npm run build:adult }
-Step 'deploy main' { doppler run --project hermes --config prd -- npx wrangler pages deploy web --project-name twmeme --branch master --commit-dirty=true }
-Step 'deploy adult' { doppler run --project hermes --config prd -- npx wrangler pages deploy web-adult --project-name twmeme-adult --branch master --commit-dirty=true }
+Step 'deploy main' { doppler run --project hermes --config prd -- npx --yes wrangler pages deploy web --project-name twmeme --branch master --commit-dirty=true }
+Step 'deploy adult' { doppler run --project hermes --config prd -- npx --yes wrangler pages deploy web-adult --project-name twmeme-adult --branch master --commit-dirty=true }
 Write-Host "[$(Get-Date -Format s)] done"
