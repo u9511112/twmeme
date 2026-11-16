@@ -61,14 +61,40 @@ html.age-ok #age-gate{display:none}
 .adult-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;padding:16px}
 .adult-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
 .adult-foot{padding:24px 16px;text-align:center;font-size:13px;color:#888}
+body{background:#0f0f12;color:#ececf1}
+a{color:#ff8a4c}
+.a-top{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;padding:14px 16px}
+.a-top .mark{font-weight:700;font-size:18px;color:#fff;text-decoration:none}
+.a-top .mark b{background:#e8590c;color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;font-size:13px}
+.a-top nav a{color:#b9b9c4;text-decoration:none;font-size:14px;margin-left:16px}
+.a-hero{max-width:1200px;margin:0 auto;padding:40px 16px 24px}
+.a-hero h1{font-size:clamp(34px,7vw,72px);line-height:1.08;margin:0 0 16px;color:#fff;letter-spacing:-.01em}
+.a-hero h1 em{font-style:normal;color:#ff8a4c;white-space:nowrap}
+.a-hero .lead{font-size:clamp(16px,2.2vw,20px);line-height:1.7;color:#c9c9d3;max-width:44ch;margin:0 0 20px}
+.a-facts{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 24px;padding:0;list-style:none;color:#fff;font-weight:700}
+.a-facts span{display:block;font-weight:400;font-size:13px;color:#8d8d99}
+.a-btn{display:inline-block;background:#e8590c;color:#fff;font-weight:700;font-size:17px;padding:14px 26px;border-radius:8px;text-decoration:none;transition:transform .12s,background .12s}
+.a-btn:hover{background:#ff6f1f;transform:translateY(-2px)}
+.a-btn:active{transform:translateY(0)}
+.a-chips{display:flex;flex-wrap:wrap;gap:8px;max-width:1200px;margin:0 auto;padding:8px 16px 0}
+.a-chips button{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;font-size:15px;cursor:pointer}
+.a-chips button[aria-pressed=true]{background:#e8590c;border-color:#e8590c;color:#fff}
+.a-sec{max-width:1200px;margin:0 auto;padding:28px 16px 0;font-size:22px;color:#fff}
+.adult-grid{max-width:1200px;margin:0 auto}
+.adult-grid a{display:block;overflow:hidden;border-radius:8px}
+.adult-grid img{display:block;transition:transform .2s}
+.adult-grid a:hover img{transform:scale(1.03)}
+.ja-slot{min-height:100px;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:12px}
+#age-gate .what{font-size:15px;color:#ff8a4c;font-weight:700;margin:0 0 8px}
 </style>
 <script>try{if(localStorage.getItem('tw_adult_ok')==='1')document.documentElement.classList.add('age-ok')}catch(e){}</script>
 </head>
 <body>
 <div id="age-gate" role="dialog" aria-modal="true">
   <div class="box">
-    <h1>🔞 成人內容</h1>
-    <p>本區含成人向圖片，僅限年滿 18 歲者瀏覽。<br>若你未滿 18 歲，或所在地區禁止瀏覽此類內容，請離開。</p>
+    <p class="what">TWmeme 成人區</p>
+    <h1>動漫成人向梗圖圖庫</h1>
+    <p>收錄網友分享的 ACG 成人向插畫與迷因。本區含成人向圖片，僅限年滿 18 歲者瀏覽。<br>若你未滿 18 歲，或所在地區禁止瀏覽此類內容，請離開。</p>
     <button class="yes" onclick="try{localStorage.setItem('tw_adult_ok','1')}catch(e){};document.documentElement.classList.add('age-ok');window.jaLoad&&jaLoad()">我已年滿 18 歲，進入</button>
     <a class="no" href="${MAIN}/">離開</a>
   </div>
@@ -91,7 +117,7 @@ function jaLoad(){
   var j=document.createElement('script');j.async=true;j.src='https://poweredby.jads.co/js/jads.js';j.setAttribute('data-cfasync','false');document.head.appendChild(j);
   (window.adsbyjuicy=window.adsbyjuicy||[]).push({adzone:z[0]});
   // ExoClick 300x250 zone, stacked under the JuicyAds banner.
-  var e=document.createElement('div');e.style.marginTop='12px';e.innerHTML='<ins class="eas6a97888e2" data-zoneid="6084128"></ins>';s.appendChild(e);
+  var e=document.createElement('div');e.innerHTML='<ins class="eas6a97888e2" data-zoneid="6084128"></ins>';s.appendChild(e);
   var x=document.createElement('script');x.async=true;x.src='https://a.magsrv.com/ad-provider.js';document.head.appendChild(x);
   (window.AdProvider=window.AdProvider||[]).push({serve:{}});
 }
@@ -128,18 +154,18 @@ const PAGES = {
 const staticPage = (slug) => {
   const [title, body] = PAGES[slug];
   return HEAD(`${title} — TWmeme 成人區`, title, `${ORIGIN}/${slug}`) +
-    `<main class="age-content" style="max-width:68ch;margin:0 auto;padding:24px 16px;line-height:1.8"><h1>${title}</h1>${body}<p><a href="/">← 成人區首頁</a></p></main>
+    TOP + `<main class="age-content" style="max-width:68ch;margin:0 auto;padding:24px 16px;line-height:1.8"><h1>${title}</h1>${body}<p><a href="/">← 成人區首頁</a></p></main>
 ` + FOOT;
 };
 
-const card = (m) => `<a href="/meme/${m.id}"><img src="${esc(img(m))}" alt="${esc(m.title)}" loading="lazy"></a>`;
+const card = (m) => `<a href="/meme/${m.id}" data-tags="${esc(tagsOf(m).join('|'))}"><img src="${esc(img(m))}" alt="${esc(m.title)}" loading="lazy"></a>`;
 
 function memePage(m, related) {
   const url = `${ORIGIN}/meme/${m.id}`;
   const title = String(m.title || '迷因').trim();
   const desc = (m.description || title).slice(0, 160);
   const tags = tagsOf(m);
-  return HEAD(`${title} — TWmeme 成人區`, desc, url) + `<main class="detail age-content" style="padding:16px;max-width:900px;margin:0 auto">
+  return HEAD(`${title} — TWmeme 成人區`, desc, url) + TOP + `<main class="detail age-content" style="padding:16px;max-width:900px;margin:0 auto">
   <h1>${esc(title)}</h1>
   <img src="${esc(img(m))}" alt="${esc(m.description || title)}" style="max-width:100%;border-radius:8px">
   ${m.ocr_text ? `<blockquote>${esc(m.ocr_text)}</blockquote>` : ''}
@@ -153,8 +179,36 @@ function memePage(m, related) {
 ` + FOOT;
 }
 
-const indexPage = (memes) => HEAD('TWmeme 成人區', 'TWmeme 成人向迷因圖區，限 18 歲以上瀏覽。', ORIGIN + '/') +
-  `<main class="age-content"><h1 style="padding:16px 16px 0">TWmeme 成人區</h1><div class="ja-slot" style="text-align:center;margin:12px 0"></div><div class="adult-grid">${memes.slice(0, INDEX_COUNT).map(card).join('')}</div></main>\n` + FOOT;
+const TOP = `<header class="a-top age-content"><a class="mark" href="/">TWmeme 成人區<b>18+</b></a><nav><a href="/about">關於</a><a href="/dmca">移除申請</a></nav></header>
+`;
+
+function indexPage(memes) {
+  const shown = memes.slice(0, INDEX_COUNT);
+  const count = new Map();
+  for (const m of shown) for (const t of tagsOf(m)) if (!/^(adult-|hide-)/.test(t)) count.set(t, (count.get(t) || 0) + 1);
+  const chips = [...count].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([t]) => t);
+  return HEAD('TWmeme 成人區 — 動漫成人向梗圖圖庫', `收錄 ${memes.length} 張 ACG 成人向插畫與迷因，每張附中文說明與標籤，每天更新。限 18 歲以上瀏覽。`, ORIGIN + '/') + TOP +
+`<main class="age-content">
+<section class="a-hero">
+  <h1>動漫成人向梗圖，<em>一頁看完</em></h1>
+  <p class="lead">這裡收錄 PTT 西洽板友分享的 ACG 成人向插畫與迷因。每張都有中文說明與標籤，點圖就能看大圖。</p>
+  <ul class="a-facts"><li>${memes.length} 張<span>目前收錄</span></li><li>每天<span>自動更新</span></li><li>18+<span>限成年人瀏覽</span></li></ul>
+  <a class="a-btn" href="#latest">看最新圖片</a>
+</section>
+<div class="ja-slot" style="text-align:center;margin:12px 0"></div>
+<h2 class="a-sec" id="latest">最新收錄</h2>
+<div class="a-chips" id="chips"><button aria-pressed="true" data-t="">全部</button>${chips.map(t => `<button aria-pressed="false" data-t="${esc(t)}">#${esc(t)}</button>`).join('')}</div>
+<div class="adult-grid" id="grid">${shown.map(card).join('')}</div>
+</main>
+<script>
+document.getElementById('chips').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;var t=b.dataset.t;
+  this.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  document.querySelectorAll('#grid a').forEach(function(a){a.hidden=!!t&&a.dataset.tags.split('|').indexOf(t)<0});
+});
+</script>
+` + FOOT;
+}
 
 const sitemap = (memes) => `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
