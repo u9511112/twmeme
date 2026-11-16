@@ -282,6 +282,7 @@ ${safeJsonLd(breadcrumbLd)}
     <a href="/guide/">指南專題</a>
     <a href="/about">關於我們</a>
     <a href="/sponsor">贊助支持</a>
+    <a href="https://adult.tw-meme.com/" class="nav-adult">成人專區 18+</a>
     <a href="mailto:u9511112@gmail.com?subject=TWmeme%20%E6%84%8F%E8%A6%8B%E5%9B%9E%E9%A5%8B">意見回饋</a>
   </nav>
 </header>
@@ -379,7 +380,8 @@ ${relatedHtml}
     <a href="/legal/privacy" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">隱私權政策</a> ·
     <a href="/legal/terms" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用條款</a> ·
     <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a> ·
-    <a href="/sponsor" style="color: var(--primary); margin: 0 var(--s-xs); text-decoration: none; font-weight: 600;">贊助支持</a>
+    <a href="/sponsor" style="color: var(--primary); margin: 0 var(--s-xs); text-decoration: none; font-weight: 600;">贊助支持</a> ·
+    <a href="https://adult.tw-meme.com/" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">成人專區 18+</a>
   </div>
   © 2026 Geek Tech 極客科技. All rights reserved.
 </footer>
@@ -518,7 +520,8 @@ ${itemsHtml}
     <a href="/legal/privacy" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">隱私權政策</a> ·
     <a href="/legal/terms" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">使用條款</a> ·
     <a href="/legal/dmca" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">著作權申訴</a> ·
-    <a href="/sponsor" style="color: var(--primary); margin: 0 var(--s-xs); text-decoration: none; font-weight: 600;">贊助支持</a>
+    <a href="/sponsor" style="color: var(--primary); margin: 0 var(--s-xs); text-decoration: none; font-weight: 600;">贊助支持</a> ·
+    <a href="https://adult.tw-meme.com/" style="color: var(--muted); margin: 0 var(--s-xs); text-decoration: none;">成人專區 18+</a>
   </div>
   © 2026 Geek Tech 極客科技. All rights reserved.
 </footer>

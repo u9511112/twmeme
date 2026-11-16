@@ -36,7 +36,7 @@
   var EN = {
     // header / nav / footer
     '跳至主要內容': 'Skip to main content', '指南': 'Guide', '指南專題': 'Guides', '關於我們': 'About', '意見回饋': 'Feedback',
-    '贊助支持': 'Support us', '使用指南': 'Guide', '聯絡我們': 'Contact', '服務條款': 'Terms', '使用條款': 'Terms',
+    '贊助支持': 'Support us', '成人專區 18+': 'Adult (18+)', '使用指南': 'Guide', '聯絡我們': 'Contact', '服務條款': 'Terms', '使用條款': 'Terms',
     '隱私權政策': 'Privacy', 'DMCA 侵權通報': 'DMCA', '著作權申訴': 'Copyright claims', '贊助商廣告 · Advertisement': 'Sponsored · Advertisement',
     '© 2026 TWmeme 迷因搜 ·': '© 2026 TWmeme ·', '台灣繁體中文迷因搜尋引擎 ·': 'Taiwanese meme search ·',
     '© 2026 TWmeme 迷因搜 · 台灣繁體中文迷因搜尋引擎 ·': '© 2026 TWmeme · Taiwanese meme search ·',
