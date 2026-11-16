@@ -85,6 +85,12 @@ a{color:#ff8a4c}
 .adult-grid img{display:block;transition:transform .2s}
 .adult-grid a:hover img{transform:scale(1.03)}
 .ja-slot{min-height:100px;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:12px}
+main.detail h1{font-size:clamp(20px,3.4vw,30px);line-height:1.3;color:#fff;margin:8px 0 16px}
+main.detail>img{display:block;margin:0 auto;max-height:78vh;width:auto;max-width:100%;object-fit:contain}
+main.detail blockquote{margin:16px 0;padding:10px 14px;border-left:3px solid #e8590c;background:#17171c;color:#ececf1}
+.d-tags{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.d-tags span{padding:4px 12px;border-radius:999px;background:#1a1a20;border:1px solid #33333d;color:#c9c9d3;font-size:14px}
+.d-back{display:inline-block;color:#b9b9c4;text-decoration:none;font-size:14px}
 #age-gate .what{font-size:15px;color:#ff8a4c;font-weight:700;margin:0 0 8px}
 </style>
 <script>try{if(localStorage.getItem('tw_adult_ok')==='1')document.documentElement.classList.add('age-ok')}catch(e){}</script>
@@ -166,15 +172,16 @@ function memePage(m, related) {
   const desc = (m.description || title).slice(0, 160);
   const tags = tagsOf(m);
   return HEAD(`${title} — TWmeme 成人區`, desc, url) + TOP + `<main class="detail age-content" style="padding:16px;max-width:900px;margin:0 auto">
+  <a class="d-back" href="/">← 全部成人梗圖</a>
   <h1>${esc(title)}</h1>
   <img src="${esc(img(m))}" alt="${esc(m.description || title)}" style="max-width:100%;border-radius:8px">
   ${m.ocr_text ? `<blockquote>${esc(m.ocr_text)}</blockquote>` : ''}
   ${m.description ? `<p>${esc(m.description)}</p>` : ''}
-  ${tags.length ? `<p>${tags.map(t => `#${esc(t)}`).join(' ')}</p>` : ''}
+  ${tags.length ? `<div class="d-tags">${tags.map(t => `<span>#${esc(t)}</span>`).join('')}</div>` : ''}
   <div class="ja-slot" style="text-align:center;margin:16px 0"></div>
-  <h2>更多</h2>
+  <h2 class="a-sec" style="padding:20px 0 12px">看更多成人梗圖</h2>
   <div class="adult-grid" style="padding:0">${related.filter(r => r.id !== m.id).slice(0, 12).map(card).join('')}</div>
-  <p><a href="/">← 成人區首頁</a></p>
+  <p style="text-align:center"><a class="a-btn" href="/">回成人區首頁</a></p>
 </main>
 ` + FOOT;
 }
