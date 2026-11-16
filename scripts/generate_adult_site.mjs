@@ -22,10 +22,11 @@ const OUT = join(ROOT, 'web-adult');
 const LIMIT = 5000;
 const INDEX_COUNT = 200;
 
-const ADULT_RE = '色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳';
+const ADULT_RE = '色圖|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|自慰|兔女郎|性感|內褲|胖次|乳';
 const NOT_ADULT_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底';
 // Only anime-board drawings are listed (no real-person photos), and anything hinting at minors is dropped.
-const MINOR_RE = '少女|學生|國中|高中|小學|未成年|蘿莉|loli|幼|童|JK|制服|校服|萌妹|正太|兒童|小孩';
+const MINOR_RE = '少女|學生|國中|高中|小學|未成年|蘿莉|loli|幼|童|JK|制服|校服|萌妹|正太|兒童|小孩|蔚藍|碧藍檔案|正妹|寫真|貓|喵|狗|犬|動物|寵物|鼠|鳥';
+// ExoClick rejects young-looking characters (Blue Archive = all students) and animals; real-person photo words (寫真|正妹|女優) are not selected at all.
 const SUBSTANCE = process.env.ADULT_TEST ? 'TRUE'
   : `(COALESCE(ocr_text,'') <> '' OR COALESCE(description,'') <> '' OR COALESCE(array_length(tags,1),0) > 0)`;
 
