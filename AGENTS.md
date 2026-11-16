@@ -7,7 +7,7 @@ Live：https://tw-meme.com/
 
 ## 架構
 ```
-GitHub Actions (cron 每 3 天；實際由本機排程 TWmeme-Daily 每日 12:00 越南時間跑 scripts/daily_pipeline.ps1：爬 PTT → Ollama 補 AI 文字 → 建置 → 部署)
+Oracle VPS cron 每日 04:00 越南時間爬 PTT（~/twmeme，金鑰走 Doppler 專案 twmeme）；本機排程 TWmeme-Daily 每日 12:00 越南時間跑 scripts/daily_pipeline.ps1：爬 PTT → Ollama 補 AI 文字 → 建置 → 部署（GitHub Actions 僅保留手動觸發）
     ↓
 Python Scraper (patchright stealth + 代理輪替)
     ├─ PTT / Dcard
@@ -27,7 +27,7 @@ Neon Postgres (metadata) + Cloudflare R2 (images)
 | Scraper | Python 3.12 / patchright / aiohttp / imagehash / asyncpg / boto3 |
 | Database | Neon Postgres 17（Singapore） |
 | Object Storage | Cloudflare R2（APAC、public `r2.dev` URL） |
-| Scheduler | GitHub Actions `cron: '0 0 */3 * *'` + 本機 Windows 排程 `TWmeme-Daily`（每日 12:00） |
+| Scheduler | Oracle VPS cron（每日 21:00 UTC 爬取）+ 本機 Windows 排程 `TWmeme-Daily`（每日 12:00 補 AI 文字/建置/部署）；GitHub Actions 僅手動 |
 | Web | 純靜態 HTML / CSS / JS + `@neondatabase/serverless` HTTP driver |
 | Hosting | Cloudflare Pages（GitHub Actions `wrangler pages deploy`） |
 
@@ -63,7 +63,7 @@ Neon Postgres (metadata) + Cloudflare R2 (images)
 - Public Development URL：`https://pub-xxxx.r2.dev`（**不要關**，web 直接讀）
 
 ## Cron Schedule
-- GitHub Actions：每 3 天跑 scraper（PTT/Dcard 在 GitHub IP 會 403，PTT 改由本機每日 12:00 排程跑，log 在 scraper/pipeline.log）
+- GitHub Actions：已移除排程，只能手動觸發（PTT/Dcard 對 GitHub IP 回 403）。爬取改由 Oracle VPS 每日 cron（log：VPS 上 ~/twmeme/scrape.log）與本機每日 12:00 排程（log：scraper/pipeline.log）負責
 - 跑前確認代理還活著（爬蟲被 ban 的常見原因）
 
 ## 常見陷阱

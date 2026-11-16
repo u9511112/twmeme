@@ -1,8 +1,8 @@
 name: Scrape Memes
 
+# Scheduled runs removed: PTT/Dcard return 403 to GitHub IPs. Scraping runs on the Oracle VPS (daily cron)
+# and the local TWmeme-Daily task instead. Manual dispatch is kept.
 on:
-  schedule:
-    - cron: '0 0 */3 * *'
   workflow_dispatch:
     inputs:
       platforms:
