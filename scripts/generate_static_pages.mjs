@@ -41,6 +41,10 @@ const MEME_DIR = join(WEB_DIR, 'meme');
 // pages takes ~30s of fs writes locally; safe ceiling for now.
 const MEME_LIMIT = 5000;
 const RELATED_COUNT = 12;
+const SITEMAP_MEME_LIMIT = 1000; // sitemap lists only the most-liked substantive pages; the rest stay crawlable via links
+const TAG_MIN = 8;              // a tag gets its own hub page once this many substantive memes carry it
+let TAG_PAGES = new Set();       // tags with a hub page (filled in main)
+const tagOk = (t) => !/[\/\\?#%&"'<>:*|]|^(adult-|hide-)|^18\+$/.test(t);
 
 // AdSense content hygiene: keep forum announcements / ban notices and adult or
 // sexually suggestive posts out of every public surface (pages, sitemap, home).
@@ -319,7 +323,7 @@ ${safeJsonLd(breadcrumbLd)}
       ${meme.description ? `<p class="ai-desc" id="ai-desc">${escapeHtml(meme.description)}</p>` : ''}
       ${(meme.tags && meme.tags.length > 0) ? `
       <div class="ai-tags" id="ai-tags">
-        ${meme.tags.map(tag => `<a class="chip-sm" href="/results.html?q=${encodeURIComponent(tag)}">#${escapeHtml(tag)}</a>`).join('')}
+        ${meme.tags.map(tag => `<a class="chip-sm" href="${TAG_PAGES.has(tag) ? '/tag/' : '/results.html?q='}${encodeURIComponent(tag)}">#${escapeHtml(tag)}</a>`).join('')}
       </div>` : ''}
     </div>` : ''}
 
@@ -388,7 +392,7 @@ ${relatedHtml}
 `;
 }
 
-function renderSitemap(memes, guideSlugs) {
+function renderSitemap(memes, guideSlugs, tagNames = []) {
   const staticEntries = [
     { loc: `${SITE_ORIGIN}/`, lastmod: TODAY, changefreq: 'daily', priority: '1.0' },
     // results.html is intentionally excluded — it's marked noindex,follow
@@ -410,14 +414,17 @@ function renderSitemap(memes, guideSlugs) {
   }));
 
   // Thin pages (no OCR / description / tags) are noindex, so keep them out.
-  const memeEntries = memes.filter(hasSubstance).map(m => ({
+  const memeEntries = memes.filter(hasSubstance)
+    .sort((a, b) => (b.like_count || 0) - (a.like_count || 0) || (b.comment_count || 0) - (a.comment_count || 0))
+    .slice(0, SITEMAP_MEME_LIMIT).map(m => ({
     loc: `${SITE_ORIGIN}/meme/${m.id}`,
     lastmod: m.fetched_at ? new Date(m.fetched_at).toISOString().slice(0, 10) : TODAY,
     changefreq: 'monthly',
     priority: '0.7',
   }));
 
-  const entries = [...staticEntries, ...guideEntries, ...memeEntries]
+  const tagEntries = tagNames.map(t => ({ loc: `${SITE_ORIGIN}/tag/${encodeURIComponent(t)}`, lastmod: TODAY, changefreq: 'daily', priority: '0.6' }));
+  const entries = [...staticEntries, ...guideEntries, ...tagEntries, ...memeEntries]
     .map(e =>
       `  <url>
     <loc>${e.loc}</loc>
@@ -435,7 +442,11 @@ ${entries}
 `;
 }
 
-function renderMemeIndexPage(memes) {
+function renderMemeIndexPage(memes, o = {}) {
+  const pTitle = o.title || '所有迷因索引 — TWmeme';
+  const pDesc = o.desc || 'TWmeme 收錄的所有台灣繁中迷因梗圖索引、依發文時間倒序排列。每張可點進詳細頁複製連結或下載原圖。';
+  const pUrl = o.url || `${SITE_ORIGIN}/meme`;
+  const pRobots = o.indexable ? '' : '<meta name="robots" content="noindex,follow">\n';
   // HTML sitemap — a real page users can browse, also great for AI crawlers
   // to discover every meme. Sorted newest first.
   const itemsHtml = memes.map(m => {
@@ -462,14 +473,13 @@ function renderMemeIndexPage(memes) {
 <head><script async src="https://www.googletagmanager.com/gtag/js?id=G-SKYSXNP5M1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-SKYSXNP5M1');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>所有迷因索引 — TWmeme</title>
-<meta name="description" content="TWmeme 收錄的所有台灣繁中迷因梗圖索引、依發文時間倒序排列。每張可點進詳細頁複製連結或下載原圖。">
-<link rel="canonical" href="${SITE_ORIGIN}/meme">
-<meta name="robots" content="noindex,follow">
-<meta property="og:type" content="website">
-<meta property="og:title" content="所有迷因索引 — TWmeme">
-<meta property="og:description" content="TWmeme 收錄的所有台灣繁中迷因、依發文時間排列。">
-<meta property="og:url" content="${SITE_ORIGIN}/meme">
+<title>${escapeHtml(pTitle)}</title>
+<meta name="description" content="${escapeAttr(pDesc)}">
+<link rel="canonical" href="${escapeAttr(pUrl)}">
+${pRobots}<meta property="og:type" content="website">
+<meta property="og:title" content="${escapeAttr(pTitle)}">
+<meta property="og:description" content="${escapeAttr(pDesc)}">
+<meta property="og:url" content="${escapeAttr(pUrl)}">
 <meta property="og:locale" content="zh_TW">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -489,8 +499,8 @@ function renderMemeIndexPage(memes) {
 
 <main>
 <section class="hero" style="padding-bottom: var(--s-md)">
-  <h1>所有迷因索引</h1>
-  <p class="sub">目前收錄 ${memes.length.toLocaleString('en')} 張迷因、依發文時間倒序排列。</p>
+  <h1>${escapeHtml(o.h1 || '所有迷因索引')}</h1>
+  <p class="sub">${escapeHtml(o.sub || `目前收錄 ${memes.length.toLocaleString('en')} 張迷因、依發文時間倒序排列。`)}</p>
 </section>
 
 <section class="section">
@@ -610,13 +620,27 @@ async function main() {
   await rm(MEME_DIR, { recursive: true, force: true });
   await mkdir(MEME_DIR, { recursive: true });
 
-  // For "related" links on each page, reuse the recent slice
+  // Tag hubs: tags carried by >= TAG_MIN substantive memes get /tag/<tag>.html.
+  const byTag = new Map();
+  for (const m of memes.filter(hasSubstance)) for (const t of new Set(m.tags || [])) if (tagOk(t)) (byTag.get(t) || byTag.set(t, []).get(t)).push(m);
+  for (const [t, list] of byTag) if (list.length < TAG_MIN) byTag.delete(t);
+  TAG_PAGES = new Set(byTag.keys());
+
+  // "Related" = memes sharing a tag first, padded with the newest ones.
   const recent = memes.slice(0, RELATED_COUNT + 1);
+  const relatedFor = (m) => {
+    const seen = new Set([m.id]), out = [];
+    for (const r of [...(m.tags || []).filter(t => TAG_PAGES.has(t)).flatMap(t => byTag.get(t)), ...recent]) {
+      if (!seen.has(r.id)) { seen.add(r.id); out.push(r); }
+      if (out.length > RELATED_COUNT) break;
+    }
+    return out;
+  };
 
   console.log('[ssg] writing ' + memes.length + ' meme pages...');
   let written = 0;
   for (const meme of memes) {
-    const html = renderMemePage(meme, recent);
+    const html = renderMemePage(meme, relatedFor(meme));
     await writeFile(join(MEME_DIR, `${meme.id}.html`), html, 'utf-8');
     written++;
     if (written % 50 === 0) console.log('  ' + written + '/' + memes.length);
@@ -626,6 +650,21 @@ async function main() {
   // Index page (HTML sitemap for users + AI crawlers)
   console.log('[ssg] writing meme index page...');
   await writeFile(join(MEME_DIR, 'index.html'), renderMemeIndexPage(memes), 'utf-8');
+
+  const TAG_DIR = join(WEB_DIR, 'tag');
+  await rm(TAG_DIR, { recursive: true, force: true });
+  await mkdir(TAG_DIR, { recursive: true });
+  for (const [t, list] of byTag) {
+    await writeFile(join(TAG_DIR, `${t}.html`), renderMemeIndexPage(list.slice(0, 60), {
+      title: `#${t} 迷因圖 — TWmeme`,
+      desc: `TWmeme 收錄的「${t}」台灣繁中迷因梗圖，共 ${list.length} 張，可複製連結或下載。`,
+      url: `${SITE_ORIGIN}/tag/${encodeURIComponent(t)}`,
+      h1: `#${t} 迷因圖`,
+      sub: `共 ${list.length} 張標記為「${t}」的迷因，顯示最新 ${Math.min(list.length, 60)} 張。`,
+      indexable: true,
+    }), 'utf-8');
+  }
+  console.log('[ssg] wrote ' + byTag.size + ' tag pages');
 
   // Glob /guide/*.html (excluding index.html) for sitemap inclusion
   const guideDir = join(WEB_DIR, 'guide');
@@ -640,7 +679,7 @@ async function main() {
 
   // Sitemap with all meme URLs + guides
   console.log('[ssg] writing sitemap.xml...');
-  await writeFile(join(WEB_DIR, 'sitemap.xml'), renderSitemap(memes, guideSlugs), 'utf-8');
+  await writeFile(join(WEB_DIR, 'sitemap.xml'), renderSitemap(memes, guideSlugs, [...byTag.keys()]), 'utf-8');
 
   // Shared meme.js
   console.log('[ssg] writing /meme.js...');
