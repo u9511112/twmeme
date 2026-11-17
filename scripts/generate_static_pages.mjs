@@ -44,7 +44,7 @@ const RELATED_COUNT = 12;
 const SITEMAP_MEME_LIMIT = 1000; // sitemap lists only the most-liked substantive pages; the rest stay crawlable via links
 const TAG_MIN = 8;              // a tag gets its own hub page once this many substantive memes carry it
 let TAG_PAGES = new Set();       // tags with a hub page (filled in main)
-const tagOk = (t) => !/[\/\\?#%&"'<>:*|]|^(adult-|hide-)|^18\+$/.test(t);
+const tagOk = (t) => !/[\/\\?#%&"'<>:*|]|^(adult-|hide-)|^18\+$/.test(t) && !new RegExp(EXCLUDE_TITLE_RE, 'i').test(t); // same minor/adult words as titles
 
 // AdSense content hygiene: keep forum announcements / ban notices and adult or
 // sexually suggestive posts out of every public surface (pages, sitemap, home).
