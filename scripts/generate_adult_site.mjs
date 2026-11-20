@@ -60,19 +60,21 @@ html.age-ok #age-gate{display:none}
 #age-gate .no{background:#444;color:#fff}
 .adult-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;padding:16px}
 .adult-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
-.adult-foot{padding:24px 16px;text-align:center;font-size:13px;color:#888}
+.adult-foot{padding:24px 16px;text-align:center;font-size:14px;line-height:1.6;color:#9a9aa6}
+.adult-foot a{display:inline-block;padding:11px 6px}
 body{background:#0f0f12;color:#ececf1}
 a{color:#ff8a4c}
 .a-top{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;padding:14px 16px}
-.a-top .mark{font-weight:700;font-size:18px;color:#fff;text-decoration:none}
+.a-top .mark{font-weight:700;font-size:18px;color:#fff;text-decoration:none;white-space:nowrap;padding:8px 0}
 .a-top .mark b{background:#e8590c;color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;font-size:13px}
-.a-top nav a{color:#b9b9c4;text-decoration:none;font-size:14px;margin-left:16px}
+.a-top nav{display:flex;align-items:center}
+.a-top nav a{color:#b9b9c4;text-decoration:none;font-size:14px;padding:13px 10px}
 .a-hero{max-width:1200px;margin:0 auto;padding:40px 16px 24px}
 .a-hero h1{font-size:clamp(34px,7vw,72px);line-height:1.08;margin:0 0 16px;color:#fff;letter-spacing:-.01em}
 .a-hero h1 em{font-style:normal;color:#ff8a4c;white-space:nowrap}
 .a-hero .lead{font-size:clamp(16px,2.2vw,20px);line-height:1.7;color:#c9c9d3;max-width:44ch;margin:0 0 20px}
 .a-facts{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 24px;padding:0;list-style:none;color:#fff;font-weight:700}
-.a-facts span{display:block;font-weight:400;font-size:13px;color:#8d8d99}
+.a-facts span{display:block;font-weight:400;font-size:14px;color:#9a9aa6}
 .a-btn{display:inline-block;background:#e8590c;color:#fff;font-weight:700;font-size:17px;padding:14px 26px;border-radius:8px;text-decoration:none;transition:transform .12s,background .12s}
 .a-btn:hover{background:#ff6f1f;transform:translateY(-2px)}
 .a-btn:active{transform:translateY(0)}
@@ -90,10 +92,17 @@ main.detail>img{display:block;margin:0 auto;max-height:78vh;width:auto;max-width
 main.detail blockquote{margin:16px 0;padding:10px 14px;border-left:3px solid #e8590c;background:#17171c;color:#ececf1}
 .d-tags{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .d-tags span{padding:4px 12px;border-radius:999px;background:#1a1a20;border:1px solid #33333d;color:#c9c9d3;font-size:14px}
-.d-back{display:inline-block;color:#b9b9c4;text-decoration:none;font-size:14px}
+.d-back{display:inline-block;color:#b9b9c4;text-decoration:none;font-size:14px;padding:12px 0}
+main.detail{display:block}
 #age-gate .what{font-size:15px;color:#ff8a4c;font-weight:700;margin:0 0 8px}
-.lang-toggle{min-height:36px;padding:0 14px;margin-left:16px;border-radius:999px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;font-size:14px;cursor:pointer}
+.lang-toggle{min-height:44px;padding:0 14px;margin-left:8px;border-radius:999px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;font-size:14px;cursor:pointer}
 #age-gate .lang-toggle{display:block;margin:20px auto 0}
+@media(max-width:560px){
+.a-top nav a:nth-child(2){display:none}
+.adult-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+.a-chips{flex-wrap:nowrap;overflow-x:auto}
+.a-chips button{flex:none}
+}
 </style>
 <script>try{if(localStorage.getItem('tw_adult_ok')==='1')document.documentElement.classList.add('age-ok')}catch(e){}</script>
 <script src="/i18n.js"></script>
