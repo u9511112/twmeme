@@ -92,8 +92,11 @@ main.detail blockquote{margin:16px 0;padding:10px 14px;border-left:3px solid #e8
 .d-tags span{padding:4px 12px;border-radius:999px;background:#1a1a20;border:1px solid #33333d;color:#c9c9d3;font-size:14px}
 .d-back{display:inline-block;color:#b9b9c4;text-decoration:none;font-size:14px}
 #age-gate .what{font-size:15px;color:#ff8a4c;font-weight:700;margin:0 0 8px}
+.lang-toggle{min-height:36px;padding:0 14px;margin-left:16px;border-radius:999px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;font-size:14px;cursor:pointer}
+#age-gate .lang-toggle{display:block;margin:20px auto 0}
 </style>
 <script>try{if(localStorage.getItem('tw_adult_ok')==='1')document.documentElement.classList.add('age-ok')}catch(e){}</script>
+<script src="/i18n.js"></script>
 </head>
 <body>
 <div id="age-gate" role="dialog" aria-modal="true">
@@ -249,4 +252,5 @@ for (const slug of Object.keys(PAGES)) await writeFile(join(OUT, `${slug}.html`)
 await writeFile(join(OUT, 'sitemap.xml'), sitemap(memes));
 await writeFile(join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`);
 await copyFile(join(ROOT, 'web', 'styles.css'), join(OUT, 'styles.css'));
+await copyFile(join(ROOT, 'web', 'i18n.js'), join(OUT, 'i18n.js'));
 console.log('[adult] done → web-adult/');

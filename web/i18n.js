@@ -13,14 +13,17 @@
   if (lang === 'en') { root.style.visibility = 'hidden'; setTimeout(reveal, 1000); }
 
   function addToggle() {
-    var host = document.querySelector('.nav-links') || document.querySelector('.site-header');
-    if (!host) return;
-    var b = document.createElement('button');
-    b.type = 'button'; b.className = 'lang-toggle'; b.textContent = lang === 'en' ? '中文' : 'EN';
-    b.lang = lang === 'en' ? 'zh-Hant' : 'en';
-    b.setAttribute('aria-label', lang === 'en' ? '切換成中文' : 'Switch to English');
-    b.addEventListener('click', function () { set(lang === 'en' ? 'zh' : 'en'); location.reload(); });
-    host.appendChild(b);
+    // Main site: .nav-links / .site-header. Adult site: header nav, plus the age gate (first screen a visitor sees).
+    var hosts = document.querySelectorAll('.nav-links, .a-top nav, #age-gate .box');
+    if (!hosts.length) { var h = document.querySelector('.site-header'); hosts = h ? [h] : []; }
+    Array.prototype.forEach.call(hosts, function (host) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'lang-toggle'; b.textContent = lang === 'en' ? '中文' : 'EN';
+      b.lang = lang === 'en' ? 'zh-Hant' : 'en';
+      b.setAttribute('aria-label', lang === 'en' ? '切換成中文' : 'Switch to English');
+      b.addEventListener('click', function () { set(lang === 'en' ? 'zh' : 'en'); location.reload(); });
+      host.appendChild(b);
+    });
   }
 
   // English users can't search by English keywords (index is Chinese): say so under the home search box.
@@ -81,12 +84,24 @@
     '此卡片暫無連結可複製': 'No link to copy on this card', '巴哈姆特': 'Bahamut', '網路討論區': 'Forum', '熱門論壇': 'Forum', '社群平台': 'Social media',
     '💡 推薦聊天場合與使用指南': '💡 Where to use it', '標準規格': 'Standard size',
     '📝 畫面核心文字：': '📝 Text in the image:', '🎯 視覺語意解析：': '🎯 Visual description:',
-    '© 2026 Geek Tech 極客科技. All rights reserved.': '© 2026 Geek Tech. All rights reserved.'
+    '© 2026 Geek Tech 極客科技. All rights reserved.': '© 2026 Geek Tech. All rights reserved.',
+    // adult site (adult.tw-meme.com serves a copy of this file); legal pages and meme text stay Chinese
+    'TWmeme 成人區': 'TWmeme Adult', '動漫成人向梗圖圖庫': 'Adult anime meme gallery', 'TWmeme 成人區 — 動漫成人向梗圖圖庫': 'TWmeme Adult — Adult anime meme gallery',
+    '收錄網友分享的 ACG 成人向插畫與迷因。本區含成人向圖片，僅限年滿 18 歲者瀏覽。': 'Adult-oriented ACG illustrations and memes shared by users. This section contains adult images and is for people aged 18 or older only.',
+    '若你未滿 18 歲，或所在地區禁止瀏覽此類內容，請離開。': 'If you are under 18, or viewing this kind of content is prohibited where you live, please leave.',
+    '我已年滿 18 歲，進入': 'I am 18 or older — enter', '離開': 'Leave', '關於': 'About', '移除申請': 'Removal request', '關於本站': 'About this site',
+    '動漫成人向梗圖，': 'Adult anime memes, ', '一頁看完': 'all on one page',
+    '這裡收錄 PTT 西洽板友分享的 ACG 成人向插畫與迷因。每張都有中文說明與標籤，點圖就能看大圖。': 'Adult-oriented ACG illustrations and memes shared on PTT’s C_Chat board. Every image has a Chinese description and tags; tap one to see it full size.',
+    '目前收錄': 'indexed', '每天': 'Daily', '自動更新': 'auto-updated', '限成年人瀏覽': 'adults only', '看最新圖片': 'See the latest', '最新收錄': 'Latest', '全部': 'All',
+    '本區圖片收集自公開網路社群，著作權歸原作者所有。權利人或圖中人物請至': 'Images are collected from public social platforms; copyright belongs to the original authors. Rights holders or people shown in an image:',
+    '著作權與移除申請': 'Copyright & removal', 'TWmeme 主站': 'TWmeme main site',
+    '← 全部成人梗圖': '← All adult memes', '看更多成人梗圖': 'More adult memes', '回成人區首頁': 'Back to adult home', '← 成人區首頁': '← Adult home', '。': '.'
   };
   // Dynamic strings with numbers / names
   var RULES = [
     [/^早期版本、目前收錄 ([\d,]+) 張迷因梗圖。搜不到的告訴我們、會補上。$/, 'Early version — $1 memes indexed. Can’t find one? Tell us and we’ll add it.'],
     [/^看全部 (\d+) 篇專題 →$/, 'See all $1 guides →'],
+    [/^([\d,]+) 張$/, '$1 images'],
     [/^沒找到「(.*)」？$/, 'No results for “$1”?'],
     [/^來源：(.*)$/, 'Source: $1'],
     [/^已複製「(.*)」連結$/, 'Copied link for “$1”'],
@@ -97,14 +112,14 @@
 
   function tr(s) {
     var t = s.trim();
-    if (!t || !/[㐀-鿿]/.test(t)) return null;
+    if (!t || !/[㐀-鿿。]/.test(t)) return null;
     var lead = s.slice(0, s.indexOf(t)), tail = s.slice(s.indexOf(t) + t.length);
     if (EN[t] !== undefined) return lead + EN[t] + tail;
     for (var i = 0; i < RULES.length; i++) {
       if (RULES[i][0].test(t)) return lead + t.replace(RULES[i][0], RULES[i][1]) + tail;
     }
-    var ti = t.match(/^(.*) — TWmeme( 迷因)?$/); // page titles (before the chip rule, which would grab the first word)
-    if (ti) { var h = tr(ti[1]); return lead + (h === null ? ti[1] : h) + ' — TWmeme' + tail; }
+    var ti = t.match(/^(.*) — TWmeme( 迷因| 成人區)?$/); // page titles (before the chip rule, which would grab the first word)
+    if (ti) { var h = tr(ti[1]); return lead + (h === null ? ti[1] : h) + ' — TWmeme' + (ti[2] === ' 成人區' ? ' Adult' : '') + tail; }
     var sp = t.indexOf(' '); // chip label + emoticon
     if (sp > 0 && EN[t.slice(0, sp)] !== undefined) return lead + EN[t.slice(0, sp)] + t.slice(sp) + tail;
     return null;
