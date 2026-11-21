@@ -26,6 +26,7 @@ const ADULT_RE = '色圖|黑絲|全裸|裸體|裸照|色色|情色|成人|保險
 const NOT_ADULT_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底';
 // Only anime-board drawings are listed (no real-person photos), and anything hinting at minors is dropped.
 const MINOR_RE = '少女|學生|國中|高中|小學|未成年|蘿莉|loli|幼|童|JK|制服|校服|萌妹|正太|兒童|小孩|蔚藍|碧藍檔案|正妹|寫真|貓|喵|狗|犬|動物|寵物|鼠|鳥';
+const EXPLICIT_RE = '做愛|裸體|性愛|自慰|全裸|裸照';
 // ExoClick rejects young-looking characters (Blue Archive = all students) and animals; real-person photo words (寫真|正妹|女優) are not selected at all.
 const SUBSTANCE = process.env.ADULT_TEST ? 'TRUE'
   : `(COALESCE(ocr_text,'') <> '' OR COALESCE(description,'') <> '' OR COALESCE(array_length(tags,1),0) > 0)`;
@@ -64,6 +65,7 @@ html.age-ok #age-gate{display:none}
 .adult-foot a{display:inline-block;padding:11px 6px}
 body{background:#0f0f12;color:#ececf1}
 a{color:#ff8a4c}
+main.age-content ul:not(.a-facts),main.age-content ol{padding-left:1.5em}
 .a-top{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;padding:14px 16px}
 .a-top .mark{font-weight:700;font-size:18px;color:#fff;text-decoration:none;white-space:nowrap;padding:8px 0}
 .a-top .mark b{background:#e8590c;color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;font-size:13px}
@@ -88,15 +90,26 @@ a{color:#ff8a4c}
 .adult-grid a:hover img{transform:scale(1.03)}
 .ja-slot{min-height:100px;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:12px}
 main.detail h1{font-size:clamp(20px,3.4vw,30px);line-height:1.3;color:#fff;margin:8px 0 16px}
-main.detail>img{display:block;margin:0 auto;max-height:78vh;width:auto;max-width:100%;object-fit:contain}
+main.detail>img{display:block;margin:0 auto;max-height:78vh;width:auto;height:auto;max-width:100%;object-fit:contain}
 main.detail blockquote{margin:16px 0;padding:10px 14px;border-left:3px solid #e8590c;background:#17171c;color:#ececf1}
 .d-tags{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .d-tags span{padding:4px 12px;border-radius:999px;background:#1a1a20;border:1px solid #33333d;color:#c9c9d3;font-size:14px}
 .d-back{display:inline-block;color:#b9b9c4;text-decoration:none;font-size:14px;padding:12px 0}
+.d-report-wrap{margin:16px 0}
+.d-report{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;text-decoration:none;font-size:14px}
+.d-report:hover{border-color:#ff8a4c;color:#ff8a4c}
 main.detail{display:block}
 #age-gate .what{font-size:15px;color:#ff8a4c;font-weight:700;margin:0 0 8px}
 .lang-toggle{min-height:44px;padding:0 14px;margin-left:8px;border-radius:999px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;font-size:14px;cursor:pointer}
 #age-gate .lang-toggle{display:block;margin:20px auto 0}
+@media(min-width:768px){
+.a-hero{display:grid;grid-template-columns:1.35fr 1fr;gap:16px 48px;align-items:center}
+.a-hero h1,.a-hero .lead{grid-column:1}
+.a-hero .lead{margin-bottom:0}
+.a-hero .a-facts,.a-hero .a-btn{grid-column:2;justify-self:start}
+.a-hero .a-facts{grid-row:1;align-self:end;margin:0}
+.a-hero .a-btn{grid-row:2;align-self:start}
+}
 @media(max-width:560px){
 .a-top nav a:nth-child(2){display:none}
 .adult-grid{grid-template-columns:repeat(2,1fr);gap:8px}
@@ -190,6 +203,7 @@ function memePage(m, related) {
   ${m.ocr_text ? `<blockquote>${esc(m.ocr_text)}</blockquote>` : ''}
   ${m.description ? `<p>${esc(m.description)}</p>` : ''}
   ${tags.length ? `<div class="d-tags">${tags.map(t => `<span>#${esc(t)}</span>`).join('')}</div>` : ''}
+  <p class="d-report-wrap"><a class="d-report" href="mailto:${MAIL}?subject=${encodeURIComponent('移除申請：' + title)}&body=${encodeURIComponent('頁面網址：' + url + '\n\n移除原因（著作權／肖像／其他）：\n')}">檢舉／要求移除這張圖</a></p>
   <div class="ja-slot" style="text-align:center;margin:16px 0"></div>
   <h2 class="a-sec" style="padding:20px 0 12px">看更多成人梗圖</h2>
   <div class="adult-grid" style="padding:0">${related.filter(r => r.id !== m.id).slice(0, 12).map(card).join('')}</div>
@@ -245,10 +259,11 @@ const memes = await sql(`
     AND (COALESCE(title,'') ~* $1 OR '18+' = ANY(COALESCE(tags,'{}')))
     AND COALESCE(title,'') !~* $2
     AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* $3
+    AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* $4
     AND NOT ('hide-adult' = ANY(COALESCE(tags,'{}')))
     AND ${SUBSTANCE}
   ORDER BY fetched_at DESC
-  LIMIT ${LIMIT}`, [ADULT_RE, NOT_ADULT_RE, MINOR_RE]);
+  LIMIT ${LIMIT}`, [ADULT_RE, NOT_ADULT_RE, MINOR_RE, EXPLICIT_RE]);
 console.log('[adult] ' + memes.length + ' pages');
 if (memes.length === 0) { console.error('[adult] nothing to build — import AI results first'); process.exit(1); }
 
