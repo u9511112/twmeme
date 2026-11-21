@@ -65,7 +65,9 @@ html.age-ok #age-gate{display:none}
 .adult-foot a{display:inline-block;padding:11px 6px}
 body{background:#0f0f12;color:#ececf1}
 a{color:#ff8a4c}
-main.age-content ul:not(.a-facts),main.age-content ol{padding-left:1.5em}
+main.age-content ul:not(.a-facts),main.age-content ol{padding-left:1.5em;margin:8px 0 16px}
+main.age-content h2{margin:24px 0 8px;color:#fff}
+main.age-content p{margin:0 0 12px}
 .a-top{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;padding:14px 16px}
 .a-top .mark{font-weight:700;font-size:18px;color:#fff;text-decoration:none;white-space:nowrap;padding:8px 0}
 .a-top .mark b{background:#e8590c;color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;font-size:13px}
@@ -97,18 +99,18 @@ main.detail blockquote{margin:16px 0;padding:10px 14px;border-left:3px solid #e8
 .d-back{display:inline-block;color:#b9b9c4;text-decoration:none;font-size:14px;padding:12px 0}
 .d-report-wrap{margin:16px 0}
 .d-report{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;text-decoration:none;font-size:14px}
-.d-report:hover{border-color:#ff8a4c;color:#ff8a4c}
+.d-report:hover,.d-report:focus-visible{border-color:#ff8a4c;color:#ff8a4c}
 main.detail{display:block}
 #age-gate .what{font-size:15px;color:#ff8a4c;font-weight:700;margin:0 0 8px}
 .lang-toggle{min-height:44px;padding:0 14px;margin-left:8px;border-radius:999px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;font-size:14px;cursor:pointer}
 #age-gate .lang-toggle{display:block;margin:20px auto 0}
 @media(min-width:768px){
 .a-hero{display:grid;grid-template-columns:1.35fr 1fr;gap:16px 48px;align-items:center}
-.a-hero h1,.a-hero .lead{grid-column:1}
-.a-hero .lead{margin-bottom:0}
+.a-hero h1{grid-column:1;margin-bottom:0;font-size:clamp(32px,4.2vw,56px)}
+.a-hero .lead{grid-column:1;margin-bottom:0}
 .a-hero .a-facts,.a-hero .a-btn{grid-column:2;justify-self:start}
 .a-hero .a-facts{grid-row:1;align-self:end;margin:0}
-.a-hero .a-btn{grid-row:2;align-self:start}
+.a-hero .a-btn{grid-row:2;align-self:center}
 }
 @media(max-width:560px){
 .a-top nav a:nth-child(2){display:none}
@@ -203,7 +205,7 @@ function memePage(m, related) {
   ${m.ocr_text ? `<blockquote>${esc(m.ocr_text)}</blockquote>` : ''}
   ${m.description ? `<p>${esc(m.description)}</p>` : ''}
   ${tags.length ? `<div class="d-tags">${tags.map(t => `<span>#${esc(t)}</span>`).join('')}</div>` : ''}
-  <p class="d-report-wrap"><a class="d-report" href="mailto:${MAIL}?subject=${encodeURIComponent('移除申請：' + title)}&body=${encodeURIComponent('頁面網址：' + url + '\n\n移除原因（著作權／肖像／其他）：\n')}">檢舉／要求移除這張圖</a></p>
+  <p class="d-report-wrap"><a class="d-report" href="${esc(`mailto:${MAIL}?subject=${encodeURIComponent('移除申請：' + title)}&body=${encodeURIComponent('頁面網址：' + url + '\r\n\r\n移除原因（著作權／肖像／其他）：\r\n')}`)}">檢舉／要求移除這張圖</a></p>
   <div class="ja-slot" style="text-align:center;margin:16px 0"></div>
   <h2 class="a-sec" style="padding:20px 0 12px">看更多成人梗圖</h2>
   <div class="adult-grid" style="padding:0">${related.filter(r => r.id !== m.id).slice(0, 12).map(card).join('')}</div>
@@ -273,6 +275,7 @@ const recent = memes.slice(0, 13);
 for (const m of memes) await writeFile(join(OUT, 'meme', `${m.id}.html`), memePage(m, recent));
 await writeFile(join(OUT, 'index.html'), indexPage(memes));
 for (const slug of Object.keys(PAGES)) await writeFile(join(OUT, `${slug}.html`), staticPage(slug));
+await writeFile(join(OUT, '404.html'), HEAD('找不到這張迷因 — TWmeme 成人區', '找不到這張迷因', ORIGIN + '/404') + TOP + '<main class="age-content" style="max-width:68ch;margin:0 auto;padding:48px 16px;text-align:center"><h1>找不到這張迷因</h1><p>可能已被移除、或連結錯誤。</p><p><a class="a-btn" href="/">← 成人區首頁</a></p></main>\n' + FOOT);
 await writeFile(join(OUT, 'sitemap.xml'), sitemap(memes));
 await writeFile(join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`);
 await copyFile(join(ROOT, 'web', 'styles.css'), join(OUT, 'styles.css'));

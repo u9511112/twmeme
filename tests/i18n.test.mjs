@@ -15,6 +15,7 @@ function load(lang) {
     readyState: 'loading', title: '', body: { nodeType: 1, nodeName: 'BODY', firstChild: null, hasAttribute: () => false },
     documentElement: { style, lang: '' },
     querySelector: () => null,
+    querySelectorAll: () => [],
     createElement: () => ({ setAttribute() {}, addEventListener() {} }),
     addEventListener(_, fn) { document.ready = fn; },
   };
@@ -33,6 +34,9 @@ const cases = [
   ['沒找到「柴犬」？', 'No results for “柴犬”?'],
   ['統神 — TWmeme 迷因', 'Tong God — TWmeme'],
   ['📅 收錄日期：2026-01-02 · 📐 原始畫質：標準規格 · 🔓 版權歸原作者', 'Added: 2026-01-02 · Size: standard · Copyright belongs to the original author'],
+  ['檢舉／要求移除這張圖', 'Report / request removal'],
+  ['關於本站 — TWmeme 成人區', 'About this site — TWmeme Adult'],
+  ['一、使用資格', '1. Eligibility'],
 ];
 for (const [zh, en] of cases) assert.equal(tr(zh), en, zh);
 assert.equal(tr('Search'), null, 'English text is left alone');

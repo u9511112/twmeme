@@ -85,7 +85,7 @@
     '💡 推薦聊天場合與使用指南': '💡 Where to use it', '標準規格': 'Standard size',
     '📝 畫面核心文字：': '📝 Text in the image:', '🎯 視覺語意解析：': '🎯 Visual description:',
     '© 2026 Geek Tech 極客科技. All rights reserved.': '© 2026 Geek Tech. All rights reserved.',
-    // adult site (adult.tw-meme.com serves a copy of this file); legal pages and meme text stay Chinese
+    // adult site (adult.tw-meme.com serves a copy of this file); meme text stays Chinese, adult legal pages are translated below
     'TWmeme 成人區': 'TWmeme Adult', '動漫成人向梗圖圖庫': 'Adult anime meme gallery', 'TWmeme 成人區 — 動漫成人向梗圖圖庫': 'TWmeme Adult — Adult anime meme gallery',
     '收錄網友分享的 ACG 成人向插畫與迷因。本區含成人向圖片，僅限年滿 18 歲者瀏覽。': 'Adult-oriented ACG illustrations and memes shared by users. This section contains adult images and is for people aged 18 or older only.',
     '若你未滿 18 歲，或所在地區禁止瀏覽此類內容，請離開。': 'If you are under 18, or viewing this kind of content is prohibited where you live, please leave.',
@@ -132,7 +132,18 @@
     '四、免責聲明': '4. Disclaimer',
     '本站內容依現狀提供，不保證完整或正確。本站有權隨時移除內容或調整服務。': 'Content is provided “as is” without warranty of accuracy or completeness. We reserve the right to remove content or modify the service at any time.',
     '五、聯絡': '5. Contact',
-    '任何問題請寄': 'For any questions, email'
+    '任何問題請寄': 'For any questions, email',
+    '我們蒐集什麼': 'What we collect',
+    '本站不要求註冊，不蒐集姓名、電子郵件等個人資料。您按下「我已年滿 18 歲」後，瀏覽器會在本機儲存一個年齡確認標記（localStorage），僅用於避免重複詢問，不會傳送給我們。': 'This site requires no registration and collects no personal data such as names or emails. When you confirm you are 18 or older, your browser stores a local flag (localStorage) only to avoid asking again; it is never sent to us.',
+    '伺服器紀錄': 'Server logs',
+    '本站由 Cloudflare 提供服務，Cloudflare 可能記錄 IP 位址與請求資訊以提供安全與效能功能，詳見其隱私權政策。': 'This site is served via Cloudflare, which may log IP addresses and request metadata for security and performance purposes under its privacy policy.',
+    '廣告': 'Advertising',
+    '本站放置第三方成人廣告（JuicyAds），廣告商可能使用 Cookie 投放與衡量廣告，其處理方式依各廣告商政策。您可透過瀏覽器設定管理 Cookie。': 'This site displays third-party adult advertisements (JuicyAds). Advertisers may use cookies to serve and measure ads under their own policies. You can manage cookies in your browser settings.',
+    '您的權利': 'Your rights',
+    '如需詢問或要求刪除與您有關的內容，請見': 'To inquire or request removal of content related to you, see',
+    '或寄信至': 'or email',
+    '電子郵件：': 'Email: ',
+    '一般詢問、合作洽談、內容移除申請皆可寄至此信箱，我們會在 72 小時內回覆。內容移除請參考': 'For general inquiries, partnerships, or removal requests, email us and we will reply within 72 hours. For content removal, please see'
   };
   // Dynamic strings with numbers / names
   var RULES = [

@@ -16,7 +16,8 @@ const NEON_URL = (typeof window !== "undefined" && (window.TWmeme_NEON_URL || wi
 // Content hygiene (AdSense): never surface forum announcements / ban notices /
 // adult or sexually suggestive posts. Keep in sync with scripts/generate_static_pages.mjs.
 const EXCLUDE_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底|色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳|少女|學生|國中|高中|小學|未成年|蘿莉|(^|[^a-z])loli|幼|童|JK|制服|校服|萌妹|正太|兒童|小孩';
-const SAFE_SQL = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* '${EXCLUDE_RE}' AND NOT ('18+' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-adult' = ANY(COALESCE(tags, '{}')))`;
+const EXPLICIT_RE = '做愛|裸體|性愛|自慰|全裸|裸照';
+const SAFE_SQL = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* '${EXCLUDE_RE}' AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* '${EXPLICIT_RE}' AND NOT ('18+' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-adult' = ANY(COALESCE(tags, '{}')))`;
 
 // Lazy-loaded Neon driver. Resolved on first call; stays cached.
 let _sqlPromise = null;
