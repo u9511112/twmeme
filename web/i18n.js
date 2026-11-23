@@ -91,7 +91,7 @@
     '若你未滿 18 歲，或所在地區禁止瀏覽此類內容，請離開。': 'If you are under 18, or viewing this kind of content is prohibited where you live, please leave.',
     '我已年滿 18 歲，進入': 'I am 18 or older — enter', '離開': 'Leave', '關於': 'About', '移除申請': 'Removal request', '關於本站': 'About this site',
     '動漫成人向梗圖，': 'Adult anime memes, ', '一頁看完': 'all on one page',
-    '這裡收錄 PTT 西洽板友分享的 ACG 成人向插畫與迷因。每張都有中文說明與標籤，點圖就能看大圖。': 'Adult-oriented ACG illustrations and memes shared on PTT’s C_Chat board. Every image has a Chinese description and tags; tap one to see it full size.',
+    '這裡收錄 ACG 成人向插畫與迷因。每張都有中文說明與標籤，點圖就能看大圖。': 'Adult-oriented ACG illustrations and memes. Every image has a Chinese description and tags; tap one to see it full size.',
     '目前收錄': 'indexed', '每天': 'Daily', '自動更新': 'auto-updated', '限成年人瀏覽': 'adults only', '看最新圖片': 'See the latest', '最新收錄': 'Latest', '全部': 'All',
     '本區圖片收集自公開網路社群，著作權歸原作者所有。權利人或圖中人物請至': 'Images are collected from public social platforms; copyright belongs to the original authors. Rights holders or people shown in an image:',
     '著作權與移除申請': 'Copyright & removal', 'TWmeme 主站': 'TWmeme main site',

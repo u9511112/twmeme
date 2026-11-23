@@ -35,6 +35,7 @@ const cases = [
   ['統神 — TWmeme 迷因', 'Tong God — TWmeme'],
   ['📅 收錄日期：2026-01-02 · 📐 原始畫質：標準規格 · 🔓 版權歸原作者', 'Added: 2026-01-02 · Size: standard · Copyright belongs to the original author'],
   ['檢舉／要求移除這張圖', 'Report / request removal'],
+  ['這裡收錄 ACG 成人向插畫與迷因。每張都有中文說明與標籤，點圖就能看大圖。', 'Adult-oriented ACG illustrations and memes. Every image has a Chinese description and tags; tap one to see it full size.'],
   ['關於本站 — TWmeme 成人區', 'About this site — TWmeme Adult'],
   ['一、使用資格', '1. Eligibility'],
 ];

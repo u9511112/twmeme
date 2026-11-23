@@ -226,7 +226,7 @@ function indexPage(memes) {
 `<main class="age-content">
 <section class="a-hero">
   <h1>動漫成人向梗圖，<em>一頁看完</em></h1>
-  <p class="lead">這裡收錄 PTT 西洽板友分享的 ACG 成人向插畫與迷因。每張都有中文說明與標籤，點圖就能看大圖。</p>
+  <p class="lead">這裡收錄 ACG 成人向插畫與迷因。每張都有中文說明與標籤，點圖就能看大圖。</p>
   <ul class="a-facts"><li>${memes.length} 張<span>目前收錄</span></li><li>每天<span>自動更新</span></li><li>18+<span>限成年人瀏覽</span></li></ul>
   <a class="a-btn" href="#latest">看最新圖片</a>
 </section>
