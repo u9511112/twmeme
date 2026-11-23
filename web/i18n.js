@@ -96,7 +96,7 @@
     '本區圖片收集自公開網路社群，著作權歸原作者所有。權利人或圖中人物請至': 'Images are collected from public social platforms; copyright belongs to the original authors. Rights holders or people shown in an image:',
     '著作權與移除申請': 'Copyright & removal', 'TWmeme 主站': 'TWmeme main site',
     '← 全部成人梗圖': '← All adult memes', '看更多成人梗圖': 'More adult memes', '回成人區首頁': 'Back to adult home', '← 成人區首頁': '← Adult home', '。': '.',
-    '檢舉／要求移除這張圖': 'Report / request removal', '檢舉／要求移除': 'Report / request removal',
+    '檢舉／要求移除這張圖': 'Report / request removal',
     // adult legal pages (about / dmca / terms)
     'TWmeme 成人區是': 'TWmeme Adult is a separate section of',
     '的獨立分站，收錄台灣網路社群公開張貼的成人向迷因與插畫，並以繁體中文加上文字說明與標籤，方便搜尋。': 'that indexes adult-oriented anime memes and illustrations posted on public Taiwanese forums with Traditional Chinese descriptions and tags.',
@@ -169,7 +169,7 @@
     var ti = t.match(/^(.*) — TWmeme( 迷因| 成人區)?$/); // page titles (before the chip rule, which would grab the first word)
     if (ti) { var h = tr(ti[1]); return lead + (h === null ? ti[1] : h) + ' — TWmeme' + (ti[2] === ' 成人區' ? ' Adult' : '') + tail; }
     var sp = t.indexOf(' '); // chip label + emoticon
-    if (sp > 0 && EN[t.slice(0, sp)] !== undefined) return lead + EN[t.slice(0, sp)] + t.slice(sp) + tail;
+    if (sp > 0 && EN[t.slice(0, sp)] !== undefined && !/[㐀-鿿]/.test(t.slice(sp + 1))) return lead + EN[t.slice(0, sp)] + t.slice(sp) + tail;
     return null;
   }
 

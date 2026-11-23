@@ -10,12 +10,13 @@ const src = readFileSync(new URL('../web/i18n.js', import.meta.url), 'utf8')
 
 function load(lang) {
   const style = {};
-  const els = [];
+  const toggles = [];
+  const host = { appendChild(el) { toggles.push(el); } };
   const document = {
     readyState: 'loading', title: '', body: { nodeType: 1, nodeName: 'BODY', firstChild: null, hasAttribute: () => false },
     documentElement: { style, lang: '' },
     querySelector: () => null,
-    querySelectorAll: () => [],
+    querySelectorAll: () => [host],
     createElement: () => ({ setAttribute() {}, addEventListener() {} }),
     addEventListener(_, fn) { document.ready = fn; },
   };
@@ -23,10 +24,10 @@ function load(lang) {
   const ctx = { document, window, localStorage: { getItem: () => lang, setItem() {} }, setTimeout: () => 0,
     MutationObserver: class { observe() {} }, location: {}, console };
   vm.runInNewContext(src, ctx);
-  return { tr: window.__tr, style, document };
+  return { tr: window.__tr, style, document, toggles };
 }
 
-const { tr, style, document } = load('en');
+const { tr, style, document, toggles } = load('en');
 const cases = [
   ['搜尋', 'Search'],
   ['傻眼 😑', 'Speechless 😑'],
@@ -37,7 +38,10 @@ const cases = [
   ['檢舉／要求移除這張圖', 'Report / request removal'],
   ['這裡收錄 ACG 成人向插畫與迷因。每張都有中文說明與標籤，點圖就能看大圖。', 'Adult-oriented ACG illustrations and memes. Every image has a Chinese description and tags; tap one to see it full size.'],
   ['關於本站 — TWmeme 成人區', 'About this site — TWmeme Adult'],
+  ['找不到這張迷因 — TWmeme 成人區', 'Meme not found — TWmeme Adult'],
+  ['TWmeme 主站', 'TWmeme main site'],
   ['一、使用資格', '1. Eligibility'],
+  ['傻眼 貓咪 — TWmeme 迷因', '傻眼 貓咪 — TWmeme'],
 ];
 for (const [zh, en] of cases) assert.equal(tr(zh), en, zh);
 assert.equal(tr('Search'), null, 'English text is left alone');
@@ -47,6 +51,8 @@ assert.equal(style.visibility, 'hidden', 'English mode hides the page until tran
 document.ready();
 assert.equal(document.documentElement.lang, 'en', 'run() sets <html lang=en>');
 assert.equal(style.visibility, '', 'run() reveals the page when done');
+assert.equal(toggles.length, 1, 'addToggle() appends a toggle button');
+assert.equal(toggles[0].textContent, '中文', 'English mode toggle button offers Chinese');
 
 const zh = load('zh');
 assert.equal(zh.style.visibility, undefined, 'Chinese mode never hides the page');

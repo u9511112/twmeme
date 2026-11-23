@@ -51,7 +51,7 @@ const tagOk = (t) => !/[\/\\?#%&"'<>:*|]|^(adult-|hide-)|^18\+$/.test(t) && !new
 // Keep EXCLUDE_TITLE_RE in sync with EXCLUDE_RE in web/db.js.
 const EXCLUDE_TITLE_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底|色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳|少女|學生|國中|高中|小學|未成年|蘿莉|(^|[^a-z])loli|幼|童|JK|制服|校服|萌妹|正太|兒童|小孩';
 const EXPLICIT_RE = '做愛|裸體|性愛|自慰|全裸|裸照';
-const SAFE_WHERE = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* $1 AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* '${EXPLICIT_RE}' AND NOT ('18+' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-adult' = ANY(COALESCE(tags, '{}')))`;
+const SAFE_WHERE = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* $1 AND concat_ws(' ', ocr_text, description, array_to_string(tags, ' ')) !~* '${EXPLICIT_RE}' AND NOT ('18+' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-adult' = ANY(COALESCE(tags, '{}')))`;
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const PLATFORM_LABEL = {
@@ -319,15 +319,18 @@ ${safeJsonLd(breadcrumbLd)}
       <a href="/guide/" style="color:var(--primary);text-decoration:none;font-weight:600;">📖 迷因指南</a>
     </div>
 
-    ${(meme.ocr_text || meme.description || (meme.tags && meme.tags.length > 0)) ? `
+    ${(() => {
+      const visibleTags = (meme.tags || []).filter(tagOk);
+      return (meme.ocr_text || meme.description || visibleTags.length > 0) ? `
     <div class="ai-interpretation" id="ai-section">
       ${meme.ocr_text ? `<blockquote id="ai-ocr">${escapeHtml(meme.ocr_text)}</blockquote>` : ''}
       ${meme.description ? `<p class="ai-desc" id="ai-desc">${escapeHtml(meme.description)}</p>` : ''}
-      ${(meme.tags && meme.tags.length > 0) ? `
+      ${visibleTags.length > 0 ? `
       <div class="ai-tags" id="ai-tags">
-        ${meme.tags.map(tag => `<a class="chip-sm" href="${TAG_PAGES.has(tag) ? '/tag/' : '/results.html?q='}${encodeURIComponent(tag)}">#${escapeHtml(tag)}</a>`).join('')}
+        ${visibleTags.map(tag => `<a class="chip-sm" href="${TAG_PAGES.has(tag) ? '/tag/' : '/results.html?q='}${encodeURIComponent(tag)}">#${escapeHtml(tag)}</a>`).join('')}
       </div>` : ''}
-    </div>` : ''}
+    </div>` : '';
+    })()}
 
     <div class="actions">
       <button class="btn btn-primary" data-action="copy" data-url="${escapeAttr(imageUrl)}" data-title="${escapeAttr(title)}">

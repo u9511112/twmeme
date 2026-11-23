@@ -33,7 +33,7 @@ const SUBSTANCE = process.env.ADULT_TEST ? 'TRUE'
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const img = (m) => m.cached_url || m.media_url || '';
-const tagsOf = (m) => (m.tags || []).filter(t => t !== '18+');
+const tagsOf = (m) => (m.tags || []).filter(t => t !== '18+' && !/^(adult-|hide-)/.test(t));
 
 // Gate: hide <main> until confirmed. Content stays in the HTML (labelled via RTA meta).
 const HEAD = (title, desc, canonical) => `<!DOCTYPE html>
@@ -43,7 +43,7 @@ const HEAD = (title, desc, canonical) => `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${esc(canonical)}">
+${canonical ? `<link rel="canonical" href="${esc(canonical)}">` : '<meta name="robots" content="noindex">'}
 <meta name="rating" content="adult">
 <meta name="RATING" content="RTA-5042-1996-1400-1577-RTA">
 <meta name="juicyads-site-verification" content="acf7cba738c3a75a496c84949863b731">
@@ -54,9 +54,9 @@ html:not(.age-ok) .age-content{display:none}
 html.age-ok #age-gate{display:none}
 #age-gate{position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;background:#111;color:#fff;padding:24px;text-align:center}
 #age-gate .box{max-width:420px}
-#age-gate h1{font-size:28px;margin:0 0 12px}
+#age-gate .title{font-size:28px;font-weight:700;margin:0 0 12px;color:#fff}
 #age-gate p{line-height:1.7;margin:0 0 20px;color:#ddd}
-#age-gate button,#age-gate a{display:inline-block;margin:6px;padding:12px 22px;border-radius:8px;border:0;font-size:16px;cursor:pointer;text-decoration:none}
+#age-gate .yes,#age-gate .no{display:inline-block;margin:6px;padding:12px 22px;border-radius:8px;border:0;font-size:16px;cursor:pointer;text-decoration:none}
 #age-gate .yes{background:#e8590c;color:#fff}
 #age-gate .no{background:#444;color:#fff}
 .adult-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;padding:16px}
@@ -69,7 +69,7 @@ main.age-content ul:not(.a-facts),main.age-content ol{padding-left:1.5em;margin:
 main.age-content h2{margin:24px 0 8px;color:#fff}
 main.age-content p{margin:0 0 12px}
 .a-top{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;padding:14px 16px}
-.a-top .mark{font-weight:700;font-size:18px;color:#fff;text-decoration:none;white-space:nowrap;padding:8px 0}
+.a-top .mark{display:inline-flex;align-items:center;min-height:44px;font-weight:700;font-size:18px;color:#fff;text-decoration:none;white-space:nowrap;padding:8px 0}
 .a-top .mark b{background:#e8590c;color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;font-size:13px}
 .a-top nav{display:flex;align-items:center}
 .a-top nav a{color:#b9b9c4;text-decoration:none;font-size:14px;padding:13px 10px;white-space:nowrap}
@@ -103,6 +103,7 @@ main.detail blockquote{margin:16px 0;padding:10px 14px;border-left:3px solid #e8
 main.detail{display:block}
 #age-gate .what{font-size:15px;color:#ff8a4c;font-weight:700;margin:0 0 8px}
 .lang-toggle{min-height:44px;padding:0 14px;margin-left:8px;border-radius:999px;border:1px solid #33333d;background:#1a1a20;color:#ececf1;font-size:14px;cursor:pointer}
+.lang-toggle:hover,.lang-toggle:focus-visible{border-color:#ff8a4c;color:#ff8a4c}
 #age-gate .lang-toggle{display:block;margin:20px auto 0}
 @media(min-width:768px){
 .a-hero{display:grid;grid-template-columns:1.35fr 1fr;gap:16px 48px;align-items:center}
@@ -112,7 +113,7 @@ main.detail{display:block}
 .a-hero .a-facts{grid-row:1;align-self:end;margin:0}
 .a-hero .a-btn{grid-row:2;align-self:center}
 }
-@media(max-width:560px){
+@media(max-width:640px){
 .a-top{padding:12px}
 .a-top .mark{font-size:16px}
 .a-top nav a{font-size:13px;padding:13px 6px}
@@ -130,7 +131,7 @@ main.detail{display:block}
 <div id="age-gate" role="dialog" aria-modal="true">
   <div class="box">
     <p class="what">TWmeme 成人區</p>
-    <h1>動漫成人向梗圖圖庫</h1>
+    <p class="title">動漫成人向梗圖圖庫</p>
     <p>收錄網友分享的 ACG 成人向插畫與迷因。本區含成人向圖片，僅限年滿 18 歲者瀏覽。<br>若你未滿 18 歲，或所在地區禁止瀏覽此類內容，請離開。</p>
     <button class="yes" onclick="try{localStorage.setItem('tw_adult_ok','1')}catch(e){};document.documentElement.classList.add('age-ok');window.jaLoad&&jaLoad()">我已年滿 18 歲，進入</button>
     <a class="no" href="${MAIN}/">離開</a>
@@ -191,7 +192,7 @@ const PAGES = {
 const staticPage = (slug) => {
   const [title, body] = PAGES[slug];
   return HEAD(`${title} — TWmeme 成人區`, title, `${ORIGIN}/${slug}`) +
-    TOP + `<main class="age-content" style="max-width:68ch;margin:0 auto;padding:24px 16px;line-height:1.8"><h1>${title}</h1>${body}<p><a href="/">← 成人區首頁</a></p></main>
+    TOP + `<main class="age-content" style="max-width:68ch;margin:0 auto;padding:24px 16px;line-height:1.8"><h1>${title}</h1>${body}<p><a class="d-back" href="/">← 成人區首頁</a></p></main>
 ` + FOOT;
 };
 
@@ -224,7 +225,7 @@ const TOP = `<header class="a-top age-content"><a class="mark" href="/">TWmeme �
 function indexPage(memes) {
   const shown = memes.slice(0, INDEX_COUNT);
   const count = new Map();
-  for (const m of shown) for (const t of tagsOf(m)) if (!/^(adult-|hide-)/.test(t)) count.set(t, (count.get(t) || 0) + 1);
+  for (const m of shown) for (const t of tagsOf(m)) count.set(t, (count.get(t) || 0) + 1);
   const chips = [...count].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([t]) => t);
   return HEAD('TWmeme 成人區 — 動漫成人向梗圖圖庫', `收錄 ${memes.length} 張 ACG 成人向插畫與迷因，每張附中文說明與標籤，每天更新。限 18 歲以上瀏覽。`, ORIGIN + '/') + TOP +
 `<main class="age-content">
@@ -279,7 +280,7 @@ const recent = memes.slice(0, 13);
 for (const m of memes) await writeFile(join(OUT, 'meme', `${m.id}.html`), memePage(m, recent));
 await writeFile(join(OUT, 'index.html'), indexPage(memes));
 for (const slug of Object.keys(PAGES)) await writeFile(join(OUT, `${slug}.html`), staticPage(slug));
-await writeFile(join(OUT, '404.html'), HEAD('找不到這張迷因 — TWmeme 成人區', '找不到這張迷因', ORIGIN + '/404') + TOP + '<main class="age-content" style="max-width:68ch;margin:0 auto;padding:48px 16px;text-align:center"><h1>找不到這張迷因</h1><p>可能已被移除、或連結錯誤。</p><p><a class="a-btn" href="/">← 成人區首頁</a></p></main>\n' + FOOT);
+await writeFile(join(OUT, '404.html'), HEAD('找不到這張迷因 — TWmeme 成人區', '找不到這張迷因', '') + TOP + '<main class="age-content" style="max-width:68ch;margin:0 auto;padding:48px 16px;text-align:center"><h1>找不到這張迷因</h1><p>可能已被移除、或連結錯誤。</p><p><a class="a-btn" href="/">← 成人區首頁</a></p></main>\n' + FOOT);
 await writeFile(join(OUT, 'sitemap.xml'), sitemap(memes));
 await writeFile(join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`);
 await copyFile(join(ROOT, 'web', 'styles.css'), join(OUT, 'styles.css'));

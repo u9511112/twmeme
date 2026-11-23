@@ -17,7 +17,7 @@ const NEON_URL = (typeof window !== "undefined" && (window.TWmeme_NEON_URL || wi
 // adult or sexually suggestive posts. Keep in sync with scripts/generate_static_pages.mjs.
 const EXCLUDE_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底|色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳|少女|學生|國中|高中|小學|未成年|蘿莉|(^|[^a-z])loli|幼|童|JK|制服|校服|萌妹|正太|兒童|小孩';
 const EXPLICIT_RE = '做愛|裸體|性愛|自慰|全裸|裸照';
-const SAFE_SQL = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* '${EXCLUDE_RE}' AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* '${EXPLICIT_RE}' AND NOT ('18+' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-adult' = ANY(COALESCE(tags, '{}')))`;
+const SAFE_SQL = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* '${EXCLUDE_RE}' AND concat_ws(' ', ocr_text, description, array_to_string(tags, ' ')) !~* '${EXPLICIT_RE}' AND NOT ('18+' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-adult' = ANY(COALESCE(tags, '{}')))`;
 
 // Lazy-loaded Neon driver. Resolved on first call; stays cached.
 let _sqlPromise = null;
@@ -119,12 +119,12 @@ async function getMemeById(id) {
     const safe = String(id || '').trim();
     if (!safe) return null;
     const s = await sql();
-    const rows = await s`SELECT id, title, cached_url, media_url, media_type, platform,
+    const rows = await s(`SELECT id, title, cached_url, media_url, media_type, platform,
                                 source_url, width, height, like_count, share_count,
                                 comment_count, fetched_at, ocr_text, description, tags
                          FROM public.memes
-                         WHERE id = ${safe}::uuid
-                         LIMIT 1`;
+                         WHERE id = $1::uuid AND ${SAFE_SQL}
+                         LIMIT 1`, [safe]);
     return rows[0] || null;
   } catch (e) {
     logErr('getMemeById', e);
