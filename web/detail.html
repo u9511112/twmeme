@@ -25,6 +25,7 @@
 <meta name="robots" content="noindex,follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev">
 <link rel="preconnect" href="https://esm.sh">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <meta name="description" content="台灣繁中迷因 — 一鍵複製連結到聊天室、下載原圖。">
@@ -162,7 +163,7 @@
     document.getElementById('og-title').setAttribute('content', title + ' — TWmeme');
     document.getElementById('meme-title').textContent = title;
 
-    const url = meme.media_url;
+    const url = meme.cached_url || meme.media_url;
     const img = document.getElementById('meme-img');
     const emoji = document.getElementById('emoji-fallback');
     if (url) {
@@ -273,7 +274,7 @@
       a.href = url;
       a.download = (title || 'meme') + '.jpg';
       a.target = '_blank';
-      a.rel = 'noopener noreferrer';
+      a.rel = 'noopener';
       document.body.appendChild(a);
       a.click();
       a.remove();

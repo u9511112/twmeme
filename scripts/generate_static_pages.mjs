@@ -51,7 +51,7 @@ const tagOk = (t) => !/[\/\\?#%&"'<>:*|]|^(adult-|hide-)|^18\+$/.test(t) && !new
 // Keep EXCLUDE_TITLE_RE in sync with EXCLUDE_RE in web/db.js.
 const EXCLUDE_TITLE_RE = '公告|水桶|板規|版規|板務|菸害|處置|刪文|置底|色圖|正妹|寫真|黑絲|全裸|裸體|裸照|色色|情色|成人|保險套|過夜|18禁|限制級|內衣|比基尼|泳裝|巨乳|爆乳|性愛|做愛|約砲|援交|開房|女優|自慰|兔女郎|性感|內褲|胖次|乳|少女|學生|國中|高中|小學|未成年|蘿莉|(^|[^a-z])loli|幼|童|JK|制服|校服|萌妹|正太|兒童|小孩';
 const EXPLICIT_RE = '做愛|裸體|性愛|自慰|全裸|裸照';
-const SAFE_WHERE = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* $1 AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* '${EXPLICIT_RE}' AND NOT ('18+' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-adult' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-dead' = ANY(COALESCE(tags, '{}')))`;
+const SAFE_WHERE = `COALESCE(source_url, '') NOT LIKE '%/bbs/Beauty/%' AND COALESCE(title, '') !~* $1 AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* '${EXPLICIT_RE}' AND NOT ('18+' = ANY(COALESCE(tags, '{}'))) AND NOT ('hide-adult' = ANY(COALESCE(tags, '{}')))`;
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const PLATFORM_LABEL = {
@@ -98,7 +98,7 @@ function platformLabel(p) {
 }
 
 function pickImageUrl(meme) {
-  return meme.media_url || '';
+  return meme.cached_url || meme.media_url || '';
 }
 
 // A meme page only counts as "substantive" (indexable) when it carries unique
@@ -226,9 +226,11 @@ function renderMemePage(meme, related) {
       const rUrl = `/meme/${r.id}`;
       const rTitle = String(r.title || '迷因').trim();
       const rImg = pickImageUrl(r);
+      const rFallback = (r.cached_url && r.media_url && r.cached_url !== r.media_url) ? r.media_url : '';
+      const fbAttr = rFallback ? ` data-fallback="${escapeAttr(rFallback)}"` : '';
       return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
-          <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img" onload="this.parentElement.classList.add('loaded')" onerror="var p=this.parentElement;this.remove();if(p){p.classList.add('loaded');p.textContent='🖼️';}">` : '🖼️'}</div>
+          <div class="thumb t-sand">${rImg ? `<img src="${escapeAttr(rImg)}" alt="${escapeAttr(rTitle)}" loading="lazy" class="thumb-img"${fbAttr} onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}">` : '🖼️'}</div>
           <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
         </a>
       </article>`;
@@ -456,9 +458,11 @@ function renderMemeIndexPage(memes, o = {}) {
     const img = pickImageUrl(m);
     const platform = platformLabel(m.platform);
     const date = fmtDate(m.fetched_at);
+    const mFallback = (m.cached_url && m.media_url && m.cached_url !== m.media_url) ? m.media_url : '';
+    const fbAttr = mFallback ? ` data-fallback="${escapeAttr(mFallback)}"` : '';
     return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(url)}" aria-label="${escapeAttr(title)}">
-          <div class="thumb t-sand">${img ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" loading="lazy" class="thumb-img" onload="this.parentElement.classList.add('loaded')" onerror="var p=this.parentElement;this.remove();if(p){p.classList.add('loaded');p.textContent='🖼️';}">` : '🖼️'}</div>
+          <div class="thumb t-sand">${img ? `<img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" loading="lazy" class="thumb-img"${fbAttr} onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}">` : '🖼️'}</div>
           <div class="caption">
             <span class="name">${escapeHtml(title)}</span>
             <span class="meta-sm">${escapeHtml(date)}</span>
@@ -557,7 +561,7 @@ function renderMemeJs() {
     a.href = url;
     a.download = (btn.dataset.title || 'meme') + '.jpg';
     a.target = '_blank';
-    a.rel = 'noopener noreferrer';
+    a.rel = 'noopener';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -600,7 +604,7 @@ async function main() {
 
   console.log('[ssg] fetching memes (limit ' + MEME_LIMIT + ')...');
   const memes = await sql(`
-    SELECT id, title, media_url, media_type, platform,
+    SELECT id, title, cached_url, media_url, media_type, platform,
            source_url, width, height, like_count, share_count, comment_count,
            fetched_at, ocr_text, description, tags
     FROM public.memes
@@ -706,10 +710,12 @@ async function main() {
       const rUrl = `/meme/${r.id}`;
       const rTitle = String(r.title || '迷因').trim();
       const primaryUrl = pickImageUrl(r);
+      const fallbackUrl = (r.cached_url && r.media_url && r.cached_url !== r.media_url) ? r.media_url : '';
       const loadingAttr = (typeof idx === 'number' && idx < 8) ? '' : 'loading="lazy"';
+      const fallbackAttr = fallbackUrl ? ` data-fallback="${escapeAttr(fallbackUrl)}"` : '';
       return `      <article class="card-wrap">
         <a class="card" href="${escapeAttr(rUrl)}" aria-label="${escapeAttr(rTitle)} 迷因詳細">
-          <div class="thumb t-sand">${primaryUrl ? `<img src="${escapeAttr(primaryUrl)}" alt="${escapeAttr(rTitle)}" ${loadingAttr} class="thumb-img" onload="this.parentElement.classList.add('loaded')" onerror="var p=this.parentElement;this.remove();if(p){p.classList.add('loaded');p.textContent='🖼️';}">` : '🖼️'}</div>
+          <div class="thumb t-sand">${primaryUrl ? `<img src="${escapeAttr(primaryUrl)}" alt="${escapeAttr(rTitle)}" ${loadingAttr} class="thumb-img"${fallbackAttr} onload="this.parentElement.classList.add('loaded')" onerror="var f=this.dataset.fallback;if(f&&this.src!==f){this.src=f;}else{this.remove();this.parentElement.classList.add('loaded');}">` : '🖼️'}</div>
           <div class="caption"><span class="name">${escapeHtml(rTitle)}</span></div>
         </a>
       </article>`;

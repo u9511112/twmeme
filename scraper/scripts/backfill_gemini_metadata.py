@@ -75,12 +75,13 @@ async def main():
     pool = await _get_pool()
     logger.info(f"Fetching memes missing AI metadata (limit {BACKFILL_LIMIT})...")
     async with pool.acquire() as conn:
+        # Prioritize memes that already have cached_url on Cloudflare R2 for lightning-fast downloads
         rows = await conn.fetch(
             """
-            SELECT id, media_url, title
+            SELECT id, cached_url, media_url, title
             FROM public.memes
             WHERE ocr_text IS NULL AND abs(hashtext(id::text)) % $2 = $3
-            ORDER BY fetched_at DESC
+            ORDER BY (cached_url IS NOT NULL) DESC, fetched_at DESC
             LIMIT $1
             """,
             BACKFILL_LIMIT, SHARDS, SHARD
@@ -101,7 +102,7 @@ async def main():
     try:
         for i, row in enumerate(rows, 1):
             meme_id = row["id"]
-            img_url = row["media_url"]
+            img_url = row["cached_url"] or row["media_url"]
             title = row["title"] or "Meme"
             
             logger.info(f"[{i}/{total_found}] Processing meme {meme_id} ({title[:30]})")

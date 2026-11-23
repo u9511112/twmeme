@@ -36,20 +36,10 @@ RECENT_HASH_LIMIT = 5000
 _state: dict = {"pool": None, "r2": None, "bucket": None, "public_url": None}
 
 
-def _r2_enabled() -> bool:
-    """R2 storage is disabled by default during origin-link migration; set DISABLE_R2_UPLOAD=0 to re-enable."""
-    return os.environ.get("DISABLE_R2_UPLOAD", "1").strip().lower() in ("0", "false", "no")
-
-
 def get_client() -> dict:
-    """Initialize R2 (when enabled) + return state bag. asyncpg pool is created on first DB call."""
-    if not os.environ.get("NEON_DATABASE_URL", "").strip():
-        raise RuntimeError(
-            "Missing required env var(s): NEON_DATABASE_URL. "
-            "Set them in scraper/.env locally, or as GitHub Actions repo secrets."
-        )
-    if _r2_enabled() and _state["r2"] is None:
-        required = ("R2_ENDPOINT", "R2_ACCESS_KEY_ID",
+    """Initialize R2 + return state bag. asyncpg pool is created on first DB call."""
+    if _state["r2"] is None:
+        required = ("NEON_DATABASE_URL", "R2_ENDPOINT", "R2_ACCESS_KEY_ID",
                     "R2_SECRET_ACCESS_KEY", "R2_BUCKET", "R2_PUBLIC_URL")
         missing = [k for k in required if not os.environ.get(k, "").strip()]
         if missing:
@@ -120,9 +110,6 @@ async def upload_media_to_storage(
                     content_type = r.content_type or "image/jpeg"
                     data = await r.read()
 
-            if not _r2_enabled() or client.get("r2") is None:
-                return None, data
-
             ext = content_type.split("/")[-1].split(";")[0].strip()
             if ext not in ("jpeg", "jpg", "png", "gif", "webp", "mp4", "webm", "mov"):
                 ext = "jpg"
@@ -148,9 +135,6 @@ async def upload_media_to_storage(
 
 async def backfill_missing_cache(client: dict) -> int:
     """Re-download and upload media for all memes with NULL cached_url."""
-    if not _r2_enabled() or client.get("r2") is None:
-        logger.info("R2 upload disabled; skipping backfill_missing_cache")
-        return 0
     pool = await _get_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch(

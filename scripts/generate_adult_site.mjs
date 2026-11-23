@@ -32,7 +32,7 @@ const SUBSTANCE = process.env.ADULT_TEST ? 'TRUE'
   : `(COALESCE(ocr_text,'') <> '' OR COALESCE(description,'') <> '' OR COALESCE(array_length(tags,1),0) > 0)`;
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-const img = (m) => m.media_url || '';
+const img = (m) => m.cached_url || m.media_url || '';
 const tagsOf = (m) => (m.tags || []).filter(t => t !== '18+');
 
 // Gate: hide <main> until confirmed. Content stays in the HTML (labelled via RTA meta).
@@ -255,7 +255,7 @@ ${memes.map(m => `<url><loc>${ORIGIN}/meme/${m.id}</loc></url>`).join('\n')}
 
 const sql = neon(NEON_URL);
 const memes = await sql(`
-  SELECT id, title, media_url, ocr_text, description, tags, fetched_at
+  SELECT id, title, cached_url, media_url, ocr_text, description, tags, fetched_at
   FROM public.memes
   WHERE COALESCE(source_url,'') LIKE '%/bbs/C_Chat/%'
     AND (COALESCE(title,'') ~* $1 OR '18+' = ANY(COALESCE(tags,'{}')))
@@ -263,7 +263,6 @@ const memes = await sql(`
     AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* $3
     AND concat_ws(' ', title, ocr_text, description, array_to_string(tags, ' ')) !~* $4
     AND NOT ('hide-adult' = ANY(COALESCE(tags,'{}')))
-    AND NOT ('hide-dead' = ANY(COALESCE(tags,'{}')))
     AND ${SUBSTANCE}
   ORDER BY fetched_at DESC
   LIMIT ${LIMIT}`, [ADULT_RE, NOT_ADULT_RE, MINOR_RE, EXPLICIT_RE]);

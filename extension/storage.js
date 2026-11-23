@@ -27,7 +27,7 @@ async function pushRecent(meme) {
   const trimmed = {
     id: meme.id,
     title: meme.title || "",
-    media_url: meme.media_url || "",
+    cached_url: meme.cached_url || "",
     media_type: meme.media_type || "image",
     platform: meme.platform || "",
   };
