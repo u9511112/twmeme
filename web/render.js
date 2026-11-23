@@ -1,7 +1,7 @@
 // TWmeme — shared DOM render helpers.
 //
 // renderCard(meme) accepts both shapes:
-//   - DB row:        { id, title, cached_url, media_type, platform }
+//   - DB row:        { id, title, media_url, media_type, platform }
 //   - Mock fallback: { name, emoji, bg, quality, tall }
 // Real images get an <img>; mock entries fall back to emoji + color block.
 
@@ -37,8 +37,7 @@ function renderCard(meme, opts) {
   const bgClass = ALLOWED_BGS.has(meme.bg) ? meme.bg : 't-sand';
   thumb.className = 'thumb ' + bgClass;
 
-  const primaryUrl = meme.cached_url || meme.media_url;
-  const fallbackUrl = (meme.cached_url && meme.media_url && meme.cached_url !== meme.media_url) ? meme.media_url : null;
+  const primaryUrl = meme.media_url;
 
   if (primaryUrl) {
     const img = document.createElement('img');
@@ -53,16 +52,10 @@ function renderCard(meme, opts) {
       thumb.classList.add('loaded');
     });
 
-    let attemptedFallback = false;
     img.addEventListener('error', () => {
-      if (fallbackUrl && !attemptedFallback) {
-        attemptedFallback = true;
-        img.src = fallbackUrl;
-      } else {
-        img.remove();
-        thumb.classList.add('loaded');
-        thumb.textContent = meme.emoji || '🖼️';
-      }
+      img.remove();
+      thumb.classList.add('loaded');
+      thumb.textContent = meme.emoji || '🖼️';
     });
 
     img.src = primaryUrl;
@@ -121,7 +114,7 @@ function renderCard(meme, opts) {
   copyBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const url = meme.cached_url || meme.media_url;
+    const url = meme.media_url;
     if (url) {
       try {
         await navigator.clipboard.writeText(url);

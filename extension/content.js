@@ -120,7 +120,7 @@ function closeOverlay() {
 // while spiking (you're testing with an empty input anyway), but the
 // real `insertImageInto()` must preserve the rest of the composer state.
 async function insertImageInto(el, meme) {
-  console.log("[TWmeme] would insert", meme.cached_url, "into", el);
+  console.log("[TWmeme] would insert", meme.media_url, "into", el);
 
   // Remove the trailing `:meme <query>` so the input is back to clean state.
   const text = getText(el);

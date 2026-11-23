@@ -276,11 +276,11 @@ class Overlay {
       cell.className = "cell" + (i === 0 ? " selected" : "");
       cell.dataset.index = String(i);
 
-      // DOM API instead of innerHTML so cached_url / title / platform values
+      // DOM API instead of innerHTML so media_url / title / platform values
       // are treated as data, not parsed as HTML. No XSS surface even if a
       // future scraper bug lets a malicious string into the row.
       const img = document.createElement("img");
-      img.src = row.cached_url || "";
+      img.src = row.media_url || "";
       img.alt = row.title || "";
       img.loading = "lazy";
       cell.appendChild(img);

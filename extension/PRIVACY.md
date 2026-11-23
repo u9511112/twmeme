@@ -17,7 +17,7 @@ This Chrome extension lets you type `:meme <關鍵字>` inside chat boxes (LINE,
 The only outbound requests are to:
 
 - `https://ep-dawn-voice-ao8hd53u-pooler.c-2.ap-southeast-1.aws.neon.tech/sql` — to query the public TWmeme meme catalog (PostgreSQL over HTTPS).
-- `https://pub-26dcc45acd9349968b1ee689f0113ee1.r2.dev/memes/*` — to load meme images (Cloudflare R2 public bucket).
+- Origin meme image hosts referenced in the catalog — to load meme images directly from their source image host.
 
 These are the same endpoints `https://twmeme.vercel.app/` uses. The connection is read-only by Postgres-level GRANT permissions (the `web_anon` role can SELECT public memes and INSERT anonymous search logs only; it cannot read logs back, cannot modify the catalog).
 

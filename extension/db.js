@@ -48,9 +48,10 @@ async function searchMemes(query, limit = 5, opts = {}) {
   if (!safe) return [];
   const pattern = "%" + safe + "%";
   return await neonQuery(
-    `SELECT id, title, cached_url, media_type, platform
+    `SELECT id, title, media_url, media_type, platform
      FROM public.memes
      WHERE title ILIKE $1
+       AND NOT ('hide-dead' = ANY(COALESCE(tags, '{}')))
      ORDER BY trending_score DESC
      LIMIT $2`,
     [pattern, limit],
