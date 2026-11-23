@@ -72,7 +72,7 @@ main.age-content p{margin:0 0 12px}
 .a-top .mark{font-weight:700;font-size:18px;color:#fff;text-decoration:none;white-space:nowrap;padding:8px 0}
 .a-top .mark b{background:#e8590c;color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;font-size:13px}
 .a-top nav{display:flex;align-items:center}
-.a-top nav a{color:#b9b9c4;text-decoration:none;font-size:14px;padding:13px 10px}
+.a-top nav a{color:#b9b9c4;text-decoration:none;font-size:14px;padding:13px 10px;white-space:nowrap}
 .a-hero{max-width:1200px;margin:0 auto;padding:40px 16px 24px}
 .a-hero h1{font-size:clamp(34px,7vw,72px);line-height:1.08;margin:0 0 16px;color:#fff;letter-spacing:-.01em}
 .a-hero h1 em{font-style:normal;color:#ff8a4c;white-space:nowrap}
@@ -113,7 +113,11 @@ main.detail{display:block}
 .a-hero .a-btn{grid-row:2;align-self:center}
 }
 @media(max-width:560px){
-.a-top nav a:nth-child(2){display:none}
+.a-top{padding:12px}
+.a-top .mark{font-size:16px}
+.a-top nav a{font-size:13px;padding:13px 6px}
+.a-top nav a:nth-child(n+2){display:none}
+.lang-toggle{margin-left:4px;padding:0 10px;font-size:13px}
 .adult-grid{grid-template-columns:repeat(2,1fr);gap:8px}
 .a-chips{flex-wrap:nowrap;overflow-x:auto}
 .a-chips button{flex:none}
@@ -214,7 +218,7 @@ function memePage(m, related) {
 ` + FOOT;
 }
 
-const TOP = `<header class="a-top age-content"><a class="mark" href="/">TWmeme 成人區<b>18+</b></a><nav><a href="/about">關於</a><a href="/dmca">移除申請</a></nav></header>
+const TOP = `<header class="a-top age-content"><a class="mark" href="/">TWmeme 成人區<b>18+</b></a><nav><a href="${MAIN}/">TWmeme 主站</a><a href="/about">關於</a><a href="/dmca">移除申請</a></nav></header>
 `;
 
 function indexPage(memes) {
