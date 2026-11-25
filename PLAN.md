@@ -1,6 +1,12 @@
 # PLAN.md — 成人區風險收斂與版面收尾（交接給 Antigravity）
 
-最後更新：2026-11-21。語言：繁體中文。最小 git diff，不做多餘重構。
+最後更新：2026-11-25。語言：繁體中文。最小 git diff，不做多餘重構。
+
+## 目前狀態（2026-11-25）
+- 任務 1–5 **已全部完成並上線**（成人區 264 頁、主站 `404.html` 已補，未知網址回 404）。程式碼面沒有未完成的必做項目，**不要自行開新工作**。
+- 沒有使用者明確指示前，**不要 commit、推送、部署、清快取**（見鐵則 4）。使用者說「部署並提交」才做。
+- 待使用者決定、不屬於實作範圍：ExoClick／JuicyAds 類別排除、Search Console 讀取日期（2026-12-01 由排程檢查）、法律諮詢、`twmeme-cache-purge` token 輪替、手機版廣告把圖庫擠出第一屏（廣告位置不得移動，需使用者拍板才能動）。
+- 若要新增任務，先回報使用者並寫進本檔，不要只在對話裡約定。
 
 ## 背景（只列必要）
 - 主站 tw-meme.com（`web/`，`npm run build`）；成人區 adult.tw-meme.com（`web-adult/`，gitignored，`npm run build:adult`，產生器 `scripts/generate_adult_site.mjs`）。
