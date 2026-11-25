@@ -689,6 +689,9 @@ async function main() {
   console.log('[ssg] writing sitemap.xml...');
   await writeFile(join(WEB_DIR, 'sitemap.xml'), renderSitemap(memes, guideSlugs, [...byTag.keys()]), 'utf-8');
 
+  // 404.html: without it Pages serves index.html with 200 for any unknown URL (soft 404)
+  await writeFile(join(WEB_DIR, '404.html'), '<!DOCTYPE html>\n<html lang="zh-Hant">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<meta name="robots" content="noindex">\n<title>找不到這個頁面 — TWmeme</title>\n<link rel="stylesheet" href="/styles.css">\n</head>\n<body>\n<main style="max-width:68ch;margin:0 auto;padding:64px 16px;text-align:center">\n<h1>找不到這個頁面</h1>\n<p>可能已被移除、或連結錯誤。</p>\n<p><a href="/">← 回到 TWmeme 首頁</a></p>\n</main>\n</body>\n</html>\n', 'utf-8');
+
   // Shared meme.js
   console.log('[ssg] writing /meme.js...');
   await writeFile(join(WEB_DIR, 'meme.js'), renderMemeJs(), 'utf-8');
