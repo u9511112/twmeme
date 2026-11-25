@@ -261,7 +261,6 @@ ${hasSubstance(meme) ? '' : '<meta name="robots" content="noindex,follow">\n'}<m
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538043639262395" crossorigin="anonymous"></script>
 
 <script type="application/ld+json">
 ${safeJsonLd(imageObjectLd)}
@@ -353,19 +352,6 @@ ${safeJsonLd(breadcrumbLd)}
   </aside>
 </main>
 
-<div class="ad-container">
-  <span class="ad-label">贊助商廣告 · Advertisement</span>
-  <!-- AdSense Responsive Slot -->
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-2538043639262395"
-       data-ad-slot="auto"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-</div>
 
 <section class="section">
   <div class="section-head">
@@ -492,7 +478,6 @@ ${pRobots}<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538043639262395" crossorigin="anonymous"></script>
 <script src="/i18n.js"></script>
 </head>
 <body>

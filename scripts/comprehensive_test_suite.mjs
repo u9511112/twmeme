@@ -70,7 +70,6 @@ async function runTests() {
   // --- Suite 3: 首頁結構與 SEO 規範 ---
   console.log('\n🔍 [Suite 3] 首頁 SEO 與結構檢查');
   const indexHtml = readFileSync(join(WEB_DIR, 'index.html'), 'utf-8');
-  assert(indexHtml.includes('ca-pub-2538043639262395'), '包含 Google AdSense 宣告代碼');
   assert(indexHtml.includes('home-guides'), '首頁包含「📰 迷因文化專題」區塊');
   assert(indexHtml.includes('taiwan-meme-origin-top10'), '首頁連結至十大經典迷因起源考');
   assert(indexHtml.includes('cat-dog-meme-collection'), '首頁連結至貓狗迷因梗圖大全');
@@ -85,7 +84,6 @@ async function runTests() {
       const memeHtml = readFileSync(join(memeDir, f), 'utf-8');
       assert(memeHtml.includes('meme-lore-box'), `${f} 包含 meme-lore-box 解析區塊`);
       assert(memeHtml.includes('💡 推薦聊天場合與使用指南'), `${f} 包含推薦聊天場合標題`);
-      assert(memeHtml.includes('ad-container'), `${f} 包含 ad-container 安全廣告版位`);
       assert(memeHtml.includes('@type": "ImageObject"'), `${f} 包含 ImageObject Schema`);
       assert(memeHtml.includes('"license": "https://tw-meme.com/legal/terms"'), `${f} 包含 license 授權網址`);
       assert(memeHtml.includes('history.back()'), `${f} 返回鍵包含 history.back() 修復`);
